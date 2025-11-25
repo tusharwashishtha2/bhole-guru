@@ -129,6 +129,11 @@ const Login = () => {
                     <p className="mt-2 text-sm text-gray-500">
                         Sign in to access your account
                     </p>
+                    <div className="mt-4 p-3 bg-luminous-gold/10 rounded-lg text-xs text-luminous-maroon border border-luminous-gold/20">
+                        <p className="font-bold">Demo Admin Access:</p>
+                        <p>Email: admin@bholeguru.com</p>
+                        <p>Password: admin123</p>
+                    </div>
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

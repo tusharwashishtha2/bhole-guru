@@ -247,27 +247,27 @@ const Header = () => {
                         )}
                     </div>
 
-                    <Link to="/" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Home</Link>
-                    <Link to="/shop" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Shop</Link>
-                    <Link to="/about" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">About</Link>
+                    <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Home</Link>
+                    <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Shop</Link>
+                    <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">About</Link>
                     {user && !user.isAdmin && (
-                        <Link to="/track-order" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Track Order</Link>
+                        <Link to="/track-order" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Track Order</Link>
                     )}
-                    <Link to="/wishlist" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Wishlist ({wishlist.length})</Link>
+                    <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Wishlist ({wishlist.length})</Link>
                     <hr className="border-luminous-gold/20" />
                     {!user && (
                         <>
-                            <Link to="/login" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Login</Link>
-                            <Link to="/signup" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Signup</Link>
+                            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Login</Link>
+                            <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Signup</Link>
                         </>
                     )}
                     {user && (
                         <>
-                            <Link to="/profile" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">My Profile</Link>
+                            <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">My Profile</Link>
                             {user.isAdmin && (
-                                <Link to="/admin" className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Admin Dashboard</Link>
+                                <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Admin Dashboard</Link>
                             )}
-                            <button onClick={handleLogout} className="text-left text-lg font-bold text-red-600">Logout</button>
+                            <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="text-left text-lg font-bold text-red-600">Logout</button>
                         </>
                     )}
                 </div>

@@ -26,6 +26,11 @@ const About = () => {
                 </div>
 
                 <div className="container mx-auto px-6 relative z-10 text-center">
+                    {/* Rotating Mandala Animation */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-20 pointer-events-none -z-10">
+                        <Sun className="w-full h-full text-luminous-gold animate-spin-slow" strokeWidth={0.5} />
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
