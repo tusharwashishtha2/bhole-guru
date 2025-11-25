@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Cinzel:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-luminous-bg text-luminous-text dark:bg-stone-950 dark:text-stone-100 font-sans antialiased selection:bg-luminous-saffron selection:text-white overflow-x-hidden transition-colors duration-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-luminous-maroon dark:text-luminous-gold transition-colors duration-300;
+  }
+}
+
+@layer components {
+  .btn-luminous {
+    @apply relative overflow-hidden bg-gradient-to-r from-luminous-saffron to-red-600 text-white font-bold uppercase tracking-widest px-10 py-4 rounded-full shadow-lg shadow-orange-500/30 transition-all duration-300 hover:scale-105 hover:shadow-orange-500/50;
+  }
+
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500 dark:bg-stone-900/80 dark:border-stone-800;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-luminous-maroon via-luminous-saffron to-luminous-gold dark:from-luminous-gold dark:via-luminous-saffron dark:to-luminous-maroon;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFBF2;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0c0a09;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF6B35;
+}

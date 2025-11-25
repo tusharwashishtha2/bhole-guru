@@ -1,0 +1,686 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles, Star, ShoppingBag, Flame, Flower, Bell, Sun, Wind } from 'lucide-react';
+import Button from '../components/ui/Button';
+import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useProduct } from '../context/ProductContext';
+import { useContent } from '../context/ContentContext';
+
+const Home = () => {
+    const { addToCart } = useCart();
+    const { products } = useProduct();
+    const { sacredOfferings, heroSection, divineFavorites, divineEssentials } = useContent();
+
+    // Get top rated products for Royal Treasury
+    const royalTreasuryProducts = products.filter(p => p.rating >= 4.8).slice(0, 5);
+
+    return (
+        <div className="min-h-screen bg-luminous-bg overflow-x-hidden">
+
+            {/* --- HERO SECTION --- */}
+            <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-20 md:pt-0">
+
+                {/* Left Content */}
+                <div className="relative z-10 w-full md:w-1/2 flex flex-col items-start text-left space-y-6 md:space-y-8">
+                    <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        {/* Badge */}
+                        <div className="inline-flex items-center gap-2 bg-luminous-gold/10 border border-luminous-gold/20 rounded-full px-4 py-1.5 mb-6">
+                            <Sparkles className="text-luminous-maroon w-4 h-4" />
+                            <span className="text-xs md:text-sm font-bold tracking-widest text-luminous-maroon uppercase">Premium Spiritual Collection</span>
+                        </div>
+
+                        {/* Hindi Heading */}
+                        <h1 className="flex flex-col font-bold leading-tight">
+                            <span className="text-6xl md:text-8xl text-luminous-maroon font-serif mb-2">भोले गुरु</span>
+                            <span className="text-5xl md:text-7xl text-luminous-saffron font-serif">पूजन सामग्री</span>
+                        </h1>
+
+                        {/* Description */}
+                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg mt-6 leading-relaxed">
+                            Experience the divine connection with our authentically crafted spiritual essentials, designed to bring peace, purity, and prosperity to your home.
+                        </p>
+
+                        {/* Buttons */}
+                        <div className="flex flex-wrap gap-4 mt-8">
+                            <Button to="/shop" variant="primary" className="bg-luminous-saffron hover:bg-luminous-maroon text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                                Shop Collection
+                            </Button>
+                            <Button to="/about" variant="outline" className="border-2 border-luminous-maroon text-luminous-maroon hover:bg-luminous-maroon hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300">
+                                Our Story
+                            </Button>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Right Content - Blended Image (No Container) */}
+                <div className="absolute top-0 right-0 w-full md:w-3/5 h-full z-0 overflow-hidden pointer-events-none">
+                    <div className="relative w-full h-full">
+                        <img
+                            src="/images/hero-shyam-v2.jpg"
+                            alt="Khatu Shyam Ji"
+                            className="w-full h-full object-cover object-center"
+                        />
+                        {/* Gradient Blend - Middle to Right (Left side of image fades into bg) */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-luminous-bg via-luminous-bg/60 to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-b from-luminous-bg/20 via-transparent to-luminous-bg/20"></div>
+                    </div>
+                </div>
+
+                {/* Scroll Indicator */}
+                <motion.div
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 text-luminous-maroon/50 flex flex-col items-center gap-2"
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                >
+                    <span className="text-xs tracking-widest uppercase font-semibold">Scroll</span>
+                    <ArrowRight className="rotate-90 w-5 h-5" />
+                </motion.div>
+            </section>
+
+            {/* --- SHUBH AARAMBH (Welcome Banner) --- */}
+            <div className="bg-luminous-maroon text-white py-3 overflow-hidden relative z-20 shadow-lg">
+                <div className="animate-marquee whitespace-nowrap flex gap-12 items-center">
+                    {[...Array(10)].map((_, i) => (
+                        <div key={i} className="flex items-center gap-4 text-lg font-display tracking-widest">
+                            <Star size={16} className="text-luminous-gold fill-current" />
+                            <span>SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* --- GRAND ROYAL TORAN & DIVINE ATMOSPHERE --- */}
+            <div className="relative w-full h-48 mt-0 mb-8 z-20 pointer-events-none overflow-hidden">
+                {/* Background Glow for the Gap */}
+                <div className="absolute inset-0 bg-gradient-to-b from-luminous-gold/5 via-transparent to-transparent opacity-40"></div>
+
+                {/* Full Width Hanging Arrangement */}
+                <div className="absolute top-0 left-0 w-full h-full flex justify-between items-start px-0 md:px-4">
+
+                    {/* Left Decorative Pillar/Anchor */}
+                    <div className="hidden md:flex flex-col items-center w-16 pt-2">
+                        <div className="w-1 h-24 bg-gradient-to-b from-luminous-maroon to-transparent"></div>
+                        <Star className="text-luminous-gold animate-spin-slow" size={24} fill="#D4AF37" />
+                    </div>
+
+                    {/* Main Toran Garland - Spanning Full Width */}
+                    <div className="flex-1 flex justify-between items-start px-2 md:px-8">
+                        {
+                            Array.from({ length: 12 }).map((_, i) => (
+                                <div key={i} className="flex flex-col items-center relative group" style={{
+                                    marginTop: i % 2 === 0 ? '-5px' : '15px', // Zig-zag pattern
+                                }}>
+                                    {/* String */}
+                                    <div className="w-[1px] h-12 md:h-20 bg-luminous-gold/60"></div>
+
+                                    {/* Hanging Element */}
+                                    <div className="relative -mt-1 z-10 transform transition-transform duration-1000 hover:scale-110">
+                                        {i % 3 === 0 ? (
+                                            // Golden Bell
+                                            <div className="relative animate-swing" style={{ animationDelay: `${i * 0.2}s` }}>
+                                                <div className="absolute inset-0 bg-luminous-gold blur-md opacity-40 rounded-full"></div>
+                                                <Bell className="text-luminous-gold drop-shadow-lg" size={24} fill="#D4AF37" />
+                                            </div>
+                                        ) : i % 3 === 1 ? (
+                                            // Marigold Flower
+                                            <div className="relative animate-bounce-slow" style={{ animationDelay: `${i * 0.3}s` }}>
+                                                <Flower className="text-luminous-saffron drop-shadow-md" size={28} fill="#FF9933" />
+                                            </div>
+                                        ) : (
+                                            // Glowing Diya
+                                            <div className="relative animate-pulse" style={{ animationDelay: `${i * 0.4}s` }}>
+                                                <div className="absolute inset-0 bg-luminous-saffron blur-lg opacity-50 rounded-full"></div>
+                                                <div className="w-8 h-8 bg-white/90 rounded-full border border-luminous-gold flex items-center justify-center shadow-[0_0_15px_rgba(255,107,53,0.6)]">
+                                                    <Flame className="text-luminous-saffron" size={14} fill="currentColor" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Extra Sparkle for some items */}
+                                    {i % 4 === 0 && (
+                                        <Sparkles className="absolute -bottom-6 text-luminous-gold animate-ping opacity-60" size={12} />
+                                    )}
+                                </div>
+                            ))
+                        }
+                    </div>
+
+                    {/* Right Decorative Pillar/Anchor */}
+                    <div className="hidden md:flex flex-col items-center w-16 pt-2">
+                        <div className="w-1 h-24 bg-gradient-to-b from-luminous-maroon to-transparent"></div>
+                        <Star className="text-luminous-gold animate-spin-slow" size={24} fill="#D4AF37" />
+                    </div>
+                </div>
+
+                {/* Floating Particles Filling the Void */}
+                <div className="absolute inset-0 w-full h-full overflow-hidden">
+                    {
+                        Array.from({ length: 15 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className="absolute w-1 h-1 bg-luminous-gold rounded-full animate-pulse"
+                                style={{
+                                    top: `${Math.random() * 100}%`,
+                                    left: `${Math.random() * 100}%`,
+                                    animationDelay: `${Math.random() * 3}s`,
+                                    opacity: 0.4 + Math.random() * 0.4
+                                }}
+                            ></div>
+                        ))
+                    }
+
+                </div>
+
+                {/* Carousel Container */}
+                <div className="relative w-full flex overflow-hidden group">
+                    {/* Gradient Masks for Smooth Edges */}
+                    <div className="absolute top-0 left-0 h-full w-16 md:w-32 bg-gradient-to-r from-luminous-bg to-transparent z-20 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 h-full w-16 md:w-32 bg-gradient-to-l from-luminous-bg to-transparent z-20 pointer-events-none"></div>
+
+                    {/* Track 1 */}
+                    <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0">
+                        {sacredOfferings.map((cat, idx) => (
+                            <Link to={`/shop?category=${cat.category}`} key={`t1-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4">
+                                <div className="flex flex-col items-center">
+                                    {/* The Divine Arch Card */}
+                                    <div className="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-luminous-gold/30 group-hover/card:border-luminous-gold transition-all duration-500 shadow-md group-hover/card:shadow-[0_0_25px_rgba(212,175,55,0.4)] bg-white transform group-hover/card:-translate-y-2">
+
+                                        {/* Image Container */}
+                                        <div className="absolute inset-0 overflow-hidden">
+                                            <img
+                                                src={cat.img}
+                                                alt={cat.title}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=' + cat.title }}
+                                            />
+                                            {/* Gradient Overlay */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-luminous-maroon/90 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
+                                        </div>
+
+                                        {/* Hover Reveal Content */}
+                                        <div className="absolute inset-0 flex flex-col justify-end items-center p-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-20">
+                                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500 delay-100">
+                                                <ArrowRight className="text-white" size={24} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Title Outside the Card */}
+                                    <div className="mt-6 text-center relative">
+                                        <h3 className="text-xl font-display font-bold text-luminous-maroon tracking-wide group-hover/card:text-luminous-saffron transition-colors duration-300">
+                                            {cat.title}
+                                        </h3>
+                                        <div className="w-0 h-[2px] bg-luminous-gold mx-auto mt-2 transition-all duration-500 group-hover/card:w-full"></div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Track 2 (Duplicate) */}
+                    <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0" aria-hidden="true">
+                        {sacredOfferings.map((cat, idx) => (
+                            <Link to={`/shop?category=${cat.category}`} key={`t2-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4">
+                                <div className="flex flex-col items-center">
+                                    {/* The Divine Arch Card */}
+                                    <div className="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-luminous-gold/30 group-hover/card:border-luminous-gold transition-all duration-500 shadow-md group-hover/card:shadow-[0_0_25px_rgba(212,175,55,0.4)] bg-white transform group-hover/card:-translate-y-2">
+
+                                        {/* Image Container */}
+                                        <div className="absolute inset-0 overflow-hidden">
+                                            <img
+                                                src={cat.img}
+                                                alt={cat.title}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=' + cat.title }}
+                                            />
+                                            {/* Gradient Overlay */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-luminous-maroon/90 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
+                                        </div>
+
+                                        {/* Hover Reveal Content */}
+                                        <div className="absolute inset-0 flex flex-col justify-end items-center p-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-20">
+                                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500 delay-100">
+                                                <ArrowRight className="text-white" size={24} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Title Outside the Card */}
+                                    <div className="mt-6 text-center relative">
+                                        <h3 className="text-xl font-display font-bold text-luminous-maroon tracking-wide group-hover/card:text-luminous-saffron transition-colors duration-300">
+                                            {cat.title}
+                                        </h3>
+                                        <div className="w-0 h-[2px] bg-luminous-gold mx-auto mt-2 transition-all duration-500 group-hover/card:w-full"></div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* --- DIVINE FAVORITES (BESTSELLERS) --- */}
+            <section className="py-20 relative overflow-hidden bg-gradient-to-b from-white to-luminous-bg">
+                {/* Decorative Background Elements */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-luminous-gold/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="text-center mb-16 relative z-10 px-6">
+                    <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-maroon mb-4 tracking-tight">
+                        Divine Favorites
+                    </h2>
+                    <div className="flex items-center justify-center gap-4">
+                        <div className="h-[1px] w-12 bg-luminous-gold"></div>
+                        <Star size={16} className="text-luminous-gold fill-current" />
+                        <div className="h-[1px] w-12 bg-luminous-gold"></div>
+                    </div>
+                    <p className="text-luminous-text/70 text-lg mt-4 font-medium">
+                        Exquisite artifacts loved by devotees worldwide.
+                    </p>
+                </div>
+
+                {/* Full Width Carousel Container */}
+                <div className="relative w-full flex overflow-hidden group py-8">
+                    {/* Gradient Masks */}
+                    <div className="absolute top-0 left-0 h-full w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 h-full w-16 md:w-32 bg-gradient-to-l from-luminous-bg to-transparent z-20 pointer-events-none"></div>
+
+                    {/* Track 1 (Reverse Scrolling) */}
+                    <div className="flex gap-8 animate-marquee-reverse whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0">
+                        {[...royalTreasuryProducts, ...royalTreasuryProducts, ...royalTreasuryProducts].map((product, idx) => (
+                            <div key={`rt1-${idx}`} className="inline-block w-72 md:w-80 flex-shrink-0 group/card mx-4 relative">
+                                {/* Floating Glass Card */}
+                                <Link to={`/product/${product.id}`} className="block relative aspect-[4/5] rounded-xl overflow-hidden bg-white border border-luminous-gold/20 shadow-lg group-hover/card:shadow-2xl transition-all duration-500 transform group-hover/card:-translate-y-3 group-hover/card:rotate-1">
+
+                                    {/* Image */}
+                                    <div className="absolute inset-0 p-3">
+                                        <div className="w-full h-full rounded-lg overflow-hidden relative">
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/300x400?text=' + product.name }}
+                                            />
+                                            {/* Overlay */}
+                                            <div className="absolute inset-0 bg-black/10 group-hover/card:bg-black/0 transition-colors duration-300"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Price Badge (Gold Tag) */}
+                                    <div className="absolute top-6 right-6 bg-luminous-gold text-white font-bold py-1 px-3 rounded-full shadow-md z-20 transform rotate-3 group-hover/card:rotate-0 transition-transform duration-300 border border-white/30 backdrop-blur-sm">
+                                        ₹{product.price}
+                                    </div>
+                                </Link>
+
+                                {/* Add to Cart Button (Floating) */}
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        addToCart(product);
+                                    }}
+                                    className="absolute bottom-24 right-6 w-12 h-12 bg-luminous-maroon text-white rounded-full flex items-center justify-center shadow-lg translate-y-20 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-500 hover:bg-luminous-saffron z-20"
+                                >
+                                    <ShoppingBag size={20} />
+                                </button>
+
+                                {/* Product Info (Below Card) */}
+                                <div className="mt-6 text-center whitespace-normal px-2">
+                                    <Link to={`/product/${product.id}`}>
+                                        <h3 className="text-xl font-display font-bold text-luminous-maroon mb-1 group-hover/card:text-luminous-gold transition-colors duration-300 leading-tight">
+                                            {product.name}
+                                        </h3>
+                                    </Link>
+                                    <div className="flex justify-center gap-1 mt-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <Star key={star} size={12} className="text-luminous-gold fill-current" />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Track 2 (Duplicate for Seamless Loop) */}
+                    <div className="flex gap-8 animate-marquee-reverse whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0" aria-hidden="true">
+                        {[...royalTreasuryProducts, ...royalTreasuryProducts, ...royalTreasuryProducts].map((product, idx) => (
+                            <div key={`rt2-${idx}`} className="inline-block w-72 md:w-80 flex-shrink-0 group/card mx-4 relative">
+                                {/* Floating Glass Card */}
+                                <Link to={`/product/${product.id}`} className="block relative aspect-[4/5] rounded-xl overflow-hidden bg-white border border-luminous-gold/20 shadow-lg group-hover/card:shadow-2xl transition-all duration-500 transform group-hover/card:-translate-y-3 group-hover/card:rotate-1">
+
+                                    {/* Image */}
+                                    <div className="absolute inset-0 p-3">
+                                        <div className="w-full h-full rounded-lg overflow-hidden relative">
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/300x400?text=' + product.name }}
+                                            />
+                                            {/* Overlay */}
+                                            <div className="absolute inset-0 bg-black/10 group-hover/card:bg-black/0 transition-colors duration-300"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Price Badge (Gold Tag) */}
+                                    <div className="absolute top-6 right-6 bg-luminous-gold text-white font-bold py-1 px-3 rounded-full shadow-md z-20 transform rotate-3 group-hover/card:rotate-0 transition-transform duration-300 border border-white/30 backdrop-blur-sm">
+                                        ₹{product.price}
+                                    </div>
+                                </Link>
+
+                                {/* Add to Cart Button (Floating) */}
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        addToCart(product);
+                                    }}
+                                    className="absolute bottom-24 right-6 w-12 h-12 bg-luminous-maroon text-white rounded-full flex items-center justify-center shadow-lg translate-y-20 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-500 hover:bg-luminous-saffron z-20"
+                                >
+                                    <ShoppingBag size={20} />
+                                </button>
+
+                                {/* Product Info (Below Card) */}
+                                <div className="mt-6 text-center whitespace-normal px-2">
+                                    <Link to={`/product/${product.id}`}>
+                                        <h3 className="text-xl font-display font-bold text-luminous-maroon mb-1 group-hover/card:text-luminous-gold transition-colors duration-300 leading-tight">
+                                            {product.name}
+                                        </h3>
+                                    </Link>
+                                    <div className="flex justify-center gap-1 mt-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <Star key={star} size={12} className="text-luminous-gold fill-current" />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="mt-12 text-center">
+                    <Button to="/shop" variant="primary" className="px-12 py-4 text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
+                        View All Treasures
+                    </Button>
+                </div>
+            </section>
+
+            {/* --- AROMATIC BLISS (INCENSE STICKS) --- */}
+            <section className="py-20 relative overflow-hidden bg-luminous-bg">
+                {/* Background Elements */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-20"></div>
+                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent z-10"></div>
+
+                <div className="text-center mb-12 relative z-10 px-6">
+                    <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-maroon mb-4">
+                        Aromatic Bliss
+                    </h2>
+                    <p className="text-luminous-text/70 text-lg mt-4 max-w-2xl mx-auto font-medium">
+                        Immerse yourself in a symphony of divine fragrances.
+                    </p>
+                </div>
+
+                {/* Dual Marquee Container */}
+                <div className="relative w-full flex flex-col gap-8 overflow-hidden py-8">
+                    {/* Gradient Masks */}
+                    <div className="absolute top-0 left-0 h-full w-16 md:w-32 bg-gradient-to-r from-luminous-bg to-transparent z-20 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 h-full w-16 md:w-32 bg-gradient-to-l from-luminous-bg to-transparent z-20 pointer-events-none"></div>
+
+                    {/* Row 1: Floral Scents (Left to Right) */}
+                    <div className="flex gap-6 animate-marquee whitespace-nowrap px-4 min-w-full shrink-0">
+                        {[
+                            { name: 'Rose', color: '#FFB7B2', icon: Flower },
+                            { name: 'Jasmine', color: '#FFFFFF', icon: Star },
+                            { name: 'Lavender', color: '#E6E6FA', icon: Wind },
+                            { name: 'Mogra', color: '#F0FFF0', icon: Sun },
+                            { name: 'Lotus', color: '#FFC0CB', icon: Flower },
+                            { name: 'Marigold', color: '#FFA500', icon: Sun },
+                            { name: 'Hibiscus', color: '#FF69B4', icon: Flower },
+                            { name: 'Champa', color: '#FFFACD', icon: Star },
+                        ].concat([
+                            { name: 'Rose', color: '#FFB7B2', icon: Flower },
+                            { name: 'Jasmine', color: '#FFFFFF', icon: Star },
+                            { name: 'Lavender', color: '#E6E6FA', icon: Wind },
+                            { name: 'Mogra', color: '#F0FFF0', icon: Sun },
+                            { name: 'Lotus', color: '#FFC0CB', icon: Flower },
+                            { name: 'Marigold', color: '#FFA500', icon: Sun },
+                            { name: 'Hibiscus', color: '#FF69B4', icon: Flower },
+                            { name: 'Champa', color: '#FFFACD', icon: Star },
+                        ]).map((scent, idx) => (
+                            <Link to="/shop?category=Incense" key={`s1-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
+                                <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
+                                    <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color }}></div>
+                                    <div className="relative z-10 flex items-center gap-3">
+                                        <scent.icon className="text-luminous-maroon" size={24} />
+                                        <span className="text-xl font-display font-bold text-luminous-maroon">{scent.name}</span>
+                                    </div>
+                                    {/* Smoke Effect on Hover */}
+                                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-gray-200 blur-2xl opacity-0 group-hover/scent:opacity-40 transition-opacity duration-700 animate-pulse"></div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Row 2: Woody & Earthy Scents (Right to Left) */}
+                    <div className="flex gap-6 animate-marquee-reverse whitespace-nowrap px-4 min-w-full shrink-0">
+                        {[
+                            { name: 'Sandalwood', color: '#D2B48C', icon: Wind },
+                            { name: 'Musk', color: '#8B4513', icon: Star },
+                            { name: 'Patchouli', color: '#DEB887', icon: Flower },
+                            { name: 'Amber', color: '#FFBF00', icon: Sun },
+                            { name: 'Frankincense', color: '#F5DEB3', icon: Wind },
+                            { name: 'Myrrh', color: '#CD853F', icon: Star },
+                            { name: 'Cedar', color: '#A0522D', icon: Flower },
+                            { name: 'Oudh', color: '#5D4037', icon: Sun },
+                        ].concat([
+                            { name: 'Sandalwood', color: '#D2B48C', icon: Wind },
+                            { name: 'Musk', color: '#8B4513', icon: Star },
+                            { name: 'Patchouli', color: '#DEB887', icon: Flower },
+                            { name: 'Amber', color: '#FFBF00', icon: Sun },
+                            { name: 'Frankincense', color: '#F5DEB3', icon: Wind },
+                            { name: 'Myrrh', color: '#CD853F', icon: Star },
+                            { name: 'Cedar', color: '#A0522D', icon: Flower },
+                            { name: 'Oudh', color: '#5D4037', icon: Sun },
+                        ]).map((scent, idx) => (
+                            <Link to="/shop?category=Incense" key={`s2-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
+                                <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
+                                    <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color }}></div>
+                                    <div className="relative z-10 flex items-center gap-3">
+                                        <scent.icon className="text-luminous-maroon" size={24} />
+                                        <span className="text-xl font-display font-bold text-luminous-maroon">{scent.name}</span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* --- PURE ESSENCE (TEMPLE CORRIDOR DHOOP) --- */}
+            <section className="py-24 relative overflow-hidden bg-[#1a0f0a] text-luminous-bg">
+                {/* Deep Stone Texture Background */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-40"></div>
+
+                {/* Floating Smoke Layers */}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                    <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 w-[200%] h-full bg-[url('https://raw.githubusercontent.com/soju22/codepen-assets/main/fog1.png')] opacity-30 animate-marquee-reverse"></div>
+                </div>
+
+                <div className="container mx-auto px-6 relative z-20 mb-12 text-center">
+                    <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-gold mb-4 tracking-widest uppercase drop-shadow-lg">
+                        The Temple Corridor
+                    </h2>
+                    <p className="text-luminous-gold/60 text-lg max-w-2xl mx-auto font-display tracking-wide">
+                        Walk through the path of purity. Ancient dhoop recipes for your sacred space.
+                    </p>
+                </div>
+
+                {/* The Corridor (Infinite Scroll) */}
+                <div className="relative w-full flex overflow-hidden z-20 py-12">
+                    {/* Track 1 */}
+                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused]">
+                        {[
+                            { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Cow Dung', img: 'https://images.unsplash.com/photo-1618422386284-262225343735?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Loban', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Chandan', img: 'https://images.unsplash.com/photo-1602526430780-782d6b17d382?q=80&w=600&auto=format&fit=crop' },
+                        ].map((item, idx) => (
+                            <Link to="/shop?category=Incense" key={`c1-${idx}`} className="flex items-end mx-4">
+                                {/* The Pillar */}
+                                <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
+                                    <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">
+                                        <Sun className="text-luminous-gold animate-spin-slow" size={20} />
+                                    </div>
+                                    <div className="w-[1px] h-full bg-luminous-gold/20"></div>
+                                </div>
+
+                                {/* The Pedestal & Product */}
+                                <div className="w-64 md:w-80 mx-4 relative group/item cursor-pointer">
+                                    {/* Product Image on Pedestal */}
+                                    <div className="relative h-72 w-full rounded-t-full overflow-hidden border-4 border-luminous-gold/20 group-hover/item:border-luminous-gold transition-all duration-500 shadow-[0_0_30px_rgba(212,175,55,0.1)] group-hover/item:shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-black">
+                                        <img
+                                            src={item.img}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover opacity-70 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+
+                                        {/* Title Overlay */}
+                                        <div className="absolute bottom-4 left-0 w-full text-center">
+                                            <h3 className="text-2xl font-display font-bold text-luminous-gold tracking-wider">{item.title}</h3>
+                                        </div>
+                                    </div>
+
+                                    {/* The Stone Pedestal Base */}
+                                    <div className="h-12 w-full bg-gradient-to-b from-[#3d2b25] to-[#1a0f0a] border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Track 2 (Duplicate) */}
+                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused]" aria-hidden="true">
+                        {[
+                            { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Cow Dung', img: 'https://images.unsplash.com/photo-1618422386284-262225343735?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Loban', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600&auto=format&fit=crop' },
+                            { title: 'Chandan', img: 'https://images.unsplash.com/photo-1602526430780-782d6b17d382?q=80&w=600&auto=format&fit=crop' },
+                        ].map((item, idx) => (
+                            <Link to="/shop?category=Incense" key={`c2-${idx}`} className="flex items-end mx-4">
+                                {/* The Pillar */}
+                                <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
+                                    <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">
+                                        <Sun className="text-luminous-gold animate-spin-slow" size={20} />
+                                    </div>
+                                    <div className="w-[1px] h-full bg-luminous-gold/20"></div>
+                                </div>
+
+                                {/* The Pedestal & Product */}
+                                <div className="w-64 md:w-80 mx-4 relative group/item cursor-pointer">
+                                    {/* Product Image on Pedestal */}
+                                    <div className="relative h-72 w-full rounded-t-full overflow-hidden border-4 border-luminous-gold/20 group-hover/item:border-luminous-gold transition-all duration-500 shadow-[0_0_30px_rgba(212,175,55,0.1)] group-hover/item:shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-black">
+                                        <img
+                                            src={item.img}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover opacity-70 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+
+                                        {/* Title Overlay */}
+                                        <div className="absolute bottom-4 left-0 w-full text-center">
+                                            <h3 className="text-2xl font-display font-bold text-luminous-gold tracking-wider">{item.title}</h3>
+                                        </div>
+                                    </div>
+
+                                    {/* The Stone Pedestal Base */}
+                                    <div className="h-12 w-full bg-gradient-to-b from-[#3d2b25] to-[#1a0f0a] border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="text-center mt-12 relative z-20">
+                    <Button to="/shop" variant="primary" className="bg-transparent border border-luminous-gold text-luminous-gold hover:bg-luminous-gold hover:text-luminous-maroon px-8 py-3 rounded-full transition-all duration-300">
+                        Enter the Sanctum
+                    </Button>
+                </div>
+            </section>
+
+            {/* --- DIVINE ESSENTIALS --- */}
+            <section className="py-20 relative bg-stone-900 text-white overflow-hidden">
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-gold mb-4">Divine Essentials</h2>
+                        <div className="w-24 h-1 bg-luminous-gold mx-auto"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                        {
+                            divineEssentials.map((item, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 50 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, margin: "-50px" }}
+                                    transition={{ duration: 0.6, delay: index * 0.05 }}
+                                >
+                                    <motion.div
+                                        animate={{ y: [0, -10, 0] }}
+                                        transition={{
+                                            duration: 4,
+                                            repeat: Infinity,
+                                            ease: "easeInOut",
+                                            delay: Math.random() * 2 // Random delay for natural floating
+                                        }}
+                                        className="h-full"
+                                    >
+                                        <Link to={item.link} className="group block relative h-80 rounded-[2rem] overflow-hidden border border-luminous-gold/30 bg-black/40 backdrop-blur-sm shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:border-luminous-gold transition-all duration-500">
+                                            {/* Image Container */}
+                                            <div className="absolute inset-0">
+                                                <img
+                                                    src={item.img}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="absolute bottom-0 left-0 w-full p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                                                <div className="w-12 h-1 bg-luminous-gold mb-4 w-0 group-hover:w-12 transition-all duration-500"></div>
+                                                <h3 className="text-2xl font-display font-bold text-white mb-1 group-hover:text-luminous-gold transition-colors">{item.title}</h3>
+                                                <p className="text-luminous-gold/80 text-sm font-medium tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                                                    {item.desc}
+                                                </p>
+                                            </div>
+
+                                            {/* Shine Effect */}
+                                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                                        </Link>
+                                    </motion.div>
+                                </motion.div>
+                            ))
+                        }
+                    </div >
+
+                    <div className="text-center mt-20">
+                        <Button to="/shop" variant="primary" className="px-12 py-4 text-lg bg-luminous-gold text-luminous-maroon hover:bg-white hover:text-luminous-maroon shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_40px_rgba(212,175,55,0.6)] transition-all duration-300 rounded-full font-bold tracking-wider">
+                            Explore The Treasury
+                        </Button>
+                    </div>
+                </div >
+            </section >
+        </div >
+    );
+};
+
+export default Home;
