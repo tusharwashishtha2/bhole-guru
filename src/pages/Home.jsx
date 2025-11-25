@@ -31,7 +31,7 @@ const Home = () => {
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="bg-white/20 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-xl relative z-20"
+                        className="relative z-20"
                     >
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 bg-luminous-gold/10 border border-luminous-gold/20 rounded-full px-4 py-1.5 mb-6">
@@ -41,12 +41,12 @@ const Home = () => {
 
                         {/* Hindi Heading */}
                         <h1 className="flex flex-col font-bold leading-tight">
-                            <span className="text-6xl md:text-8xl text-luminous-maroon font-serif mb-2">भोले गुरु</span>
-                            <span className="text-5xl md:text-7xl text-luminous-saffron font-serif">पूजन सामग्री</span>
+                            <span className="text-6xl md:text-8xl text-luminous-maroon font-serif mb-2 drop-shadow-md">भोले गुरु</span>
+                            <span className="text-5xl md:text-7xl text-luminous-saffron font-serif drop-shadow-md">पूजन सामग्री</span>
                         </h1>
 
                         {/* Description */}
-                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg mt-6 leading-relaxed">
+                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg mt-6 leading-relaxed drop-shadow-sm font-medium">
                             Experience the divine connection with our authentically crafted spiritual essentials, designed to bring peace, purity, and prosperity to your home.
                         </p>
 
@@ -506,7 +506,7 @@ const Home = () => {
             </section>
 
             {/* --- PURE ESSENCE (TEMPLE CORRIDOR DHOOP) --- */}
-            <section className="py-24 relative overflow-hidden bg-gradient-to-b from-luminous-bg to-luminous-goldLight text-luminous-maroon">
+            <section className="py-24 relative overflow-hidden bg-[#FFF8E7] text-luminous-maroon">
                 {/* Deep Stone Texture Background */}
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
@@ -527,7 +527,7 @@ const Home = () => {
                 {/* The Corridor (Infinite Scroll) */}
                 <div className="relative w-full flex overflow-hidden z-20 py-12">
                     {/* Track 1 */}
-                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused]">
+                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] will-change-transform">
                         {[
                             { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
                             { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
@@ -570,7 +570,7 @@ const Home = () => {
                     </div>
 
                     {/* Track 2 (Duplicate) */}
-                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused]" aria-hidden="true">
+                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] will-change-transform" aria-hidden="true">
                         {[
                             { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
                             { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
