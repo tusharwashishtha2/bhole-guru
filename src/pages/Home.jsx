@@ -25,16 +25,18 @@ const Home = () => {
             {/* --- HERO SECTION --- */}
             <section className="relative min-h-[60vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-24 md:pt-0 pb-8 md:pb-0">
 
-                {/* Left Content */}
-                <div className="relative z-10 w-full md:w-1/2 flex flex-col items-start text-left space-y-6 md:space-y-8">
+                {/* Left Content - Split for Mobile */}
+                <div className="relative z-10 w-full h-full md:w-1/2 flex flex-col justify-between md:justify-center items-start text-left md:space-y-8 py-4 md:py-0">
+
+                    {/* Top Section: Title */}
                     <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="relative z-20"
+                        className="relative z-20 mt-4 md:mt-0"
                     >
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 bg-luminous-gold/10 border border-luminous-gold/20 rounded-full px-4 py-1.5 mb-6">
+                        <div className="inline-flex items-center gap-2 bg-luminous-gold/10 border border-luminous-gold/20 rounded-full px-4 py-1.5 mb-4 md:mb-6 backdrop-blur-sm">
                             <Sparkles className="text-luminous-maroon w-4 h-4" />
                             <span className="text-xs md:text-sm font-bold tracking-widest text-luminous-maroon uppercase">Premium Spiritual Collection</span>
                         </div>
@@ -44,18 +46,26 @@ const Home = () => {
                             <span className="text-6xl md:text-8xl text-luminous-maroon font-serif mb-2 drop-shadow-md">भोले गुरु</span>
                             <span className="text-5xl md:text-7xl text-luminous-saffron font-serif drop-shadow-md">पूजन सामग्री</span>
                         </h1>
+                    </motion.div>
 
+                    {/* Bottom Section: Description & Buttons */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="relative z-20 mb-8 md:mb-0"
+                    >
                         {/* Description */}
-                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg mt-6 leading-relaxed drop-shadow-sm font-medium">
+                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg mt-6 leading-relaxed drop-shadow-sm font-medium bg-white/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-2 md:p-0 rounded-lg">
                             Experience the divine connection with our authentically crafted spiritual essentials, designed to bring peace, purity, and prosperity to your home.
                         </p>
 
                         {/* Buttons */}
-                        <div className="flex flex-wrap gap-4 mt-8">
+                        <div className="flex flex-wrap gap-4 mt-6 md:mt-8">
                             <Button to="/shop" variant="primary" className="bg-luminous-saffron hover:bg-luminous-maroon text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                                 Shop Collection
                             </Button>
-                            <Button to="/about" variant="outline" className="border-2 border-luminous-maroon text-luminous-maroon hover:bg-luminous-maroon hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300">
+                            <Button to="/about" variant="outline" className="border-2 border-luminous-maroon text-luminous-maroon hover:bg-luminous-maroon hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 bg-white/40 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none">
                                 Our Story
                             </Button>
                         </div>
@@ -91,93 +101,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* --- GRAND ROYAL TORAN & DIVINE ATMOSPHERE --- */}
-            <div className="relative w-full h-auto min-h-[12rem] md:h-48 mt-0 mb-8 z-20 pointer-events-none overflow-hidden pb-8 md:pb-0">
-                {/* Background Glow for the Gap */}
-                <div className="absolute inset-0 bg-gradient-to-b from-luminous-gold/5 via-transparent to-transparent opacity-40"></div>
 
-                {/* Full Width Hanging Arrangement */}
-                <div className="absolute top-0 left-0 w-full h-full flex justify-between items-start px-0 md:px-4">
-
-                    {/* Left Decorative Pillar/Anchor */}
-                    <div className="hidden md:flex flex-col items-center w-16 pt-2">
-                        <div className="w-1 h-24 bg-gradient-to-b from-luminous-maroon to-transparent"></div>
-                        <Star className="text-luminous-gold animate-spin-slow" size={24} fill="#D4AF37" />
-                    </div>
-
-                    {/* Main Toran Garland - Spanning Full Width */}
-                    <div className="flex-1 flex justify-between items-start px-2 md:px-8">
-                        {
-                            Array.from({ length: 8 }).map((_, i) => (
-                                <div key={i} className="flex flex-col items-center relative group" style={{
-                                    marginTop: i % 2 === 0 ? '-5px' : '15px', // Zig-zag pattern
-                                }}>
-                                    {/* String */}
-                                    <div className="w-[1px] h-12 md:h-20 bg-luminous-gold/60"></div>
-
-                                    {/* Hanging Element */}
-                                    <div className="relative -mt-1 z-10 transform transition-transform duration-1000 hover:scale-110">
-                                        {i % 3 === 0 ? (
-                                            // Golden Bell
-                                            <div className="relative animate-swing" style={{ animationDelay: `${i * 0.2}s` }}>
-                                                <div className="absolute inset-0 bg-luminous-gold blur-md opacity-40 rounded-full"></div>
-                                                <Bell className="text-luminous-gold drop-shadow-lg" size={24} fill="#D4AF37" />
-                                            </div>
-                                        ) : i % 3 === 1 ? (
-                                            // Marigold Flower
-                                            <div className="relative animate-bounce-slow" style={{ animationDelay: `${i * 0.3}s` }}>
-                                                <Flower className="text-luminous-saffron drop-shadow-md" size={28} fill="#FF9933" />
-                                            </div>
-                                        ) : (
-                                            // Glowing Diya
-                                            <div className="relative animate-pulse" style={{ animationDelay: `${i * 0.4}s` }}>
-                                                <div className="absolute inset-0 bg-luminous-saffron blur-lg opacity-50 rounded-full"></div>
-                                                <div className="w-8 h-8 bg-white/90 rounded-full border border-luminous-gold flex items-center justify-center shadow-[0_0_15px_rgba(255,107,53,0.6)]">
-                                                    <Flame className="text-luminous-saffron" size={14} fill="currentColor" />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Extra Sparkle for some items */}
-                                    {i % 4 === 0 && (
-                                        <Sparkles className="absolute -bottom-6 text-luminous-gold animate-ping opacity-60" size={12} />
-                                    )}
-                                </div>
-                            ))
-                        }
-                    </div>
-
-                    {/* Right Decorative Pillar/Anchor */}
-                    <div className="hidden md:flex flex-col items-center w-16 pt-2">
-                        <div className="w-1 h-24 bg-gradient-to-b from-luminous-maroon to-transparent"></div>
-                        <Star className="text-luminous-gold animate-spin-slow" size={24} fill="#D4AF37" />
-                    </div>
-                </div>
-
-                {/* Floating Particles Filling the Void */}
-                <div className="absolute inset-0 w-full h-full overflow-hidden">
-                    {
-                        Array.from({ length: 15 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="absolute w-1 h-1 bg-luminous-gold rounded-full animate-pulse"
-                                style={{
-                                    top: `${Math.random() * 100}%`,
-                                    left: `${Math.random() * 100}%`,
-                                    animationDelay: `${Math.random() * 3}s`,
-                                    opacity: 0.4 + Math.random() * 0.4
-                                }}
-                            ></div>
-                        ))
-                    }
-
-                </div>
-
-
-
-
-            </div>
 
             {/* --- DIVINE FAVORITES (BESTSELLERS) --- */}
             <section className="py-20 relative overflow-hidden bg-gradient-to-b from-white to-luminous-bg">
