@@ -7,7 +7,7 @@ const About = () => {
         <div className="bg-luminous-bg min-h-screen overflow-hidden">
 
             {/* --- HERO SECTION: IMMERSIVE & MYSTICAL --- */}
-            <section className="relative h-screen flex items-center justify-center overflow-hidden">
+            <section className="relative min-h-[60vh] md:min-h-[70vh] flex items-center justify-center overflow-hidden py-20">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
@@ -15,7 +15,7 @@ const About = () => {
                         alt="Divine Atmosphere"
                         className="w-full h-full object-cover opacity-40 scale-110 animate-float-slow"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-luminous-maroon/90 via-luminous-maroon/60 to-luminous-bg"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-luminous-maroon/95 via-luminous-maroon/70 to-luminous-bg"></div>
                 </div>
 
                 {/* Floating Particles (CSS Animation) */}
@@ -35,7 +35,7 @@ const About = () => {
                             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
                                 Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
                             </h1>
-                            <p className="text-xl md:text-2xl text-luminous-goldLight/80 max-w-3xl mx-auto font-light leading-relaxed">
+                            <p className="text-xl md:text-2xl text-luminous-goldLight max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
                                 Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
                             </p>
                         </motion.div>
@@ -44,21 +44,7 @@ const About = () => {
                 </div>
             </section >
 
-            {/* --- DIVINE VALUES MARQUEE (FILLING THE GAP) --- */}
-            < div className="bg-luminous-maroon text-white py-4 overflow-hidden relative z-20 border-y border-luminous-gold/30" >
-                <div className="animate-marquee whitespace-nowrap flex gap-16 items-center">
-                    {[...Array(8)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-6 text-sm md:text-base font-display tracking-[0.2em] uppercase">
-                            <span className="text-luminous-gold">✦</span>
-                            <span>Pure & Authentic</span>
-                            <span className="text-luminous-gold">✦</span>
-                            <span>Handcrafted with Devotion</span>
-                            <span className="text-luminous-gold">✦</span>
-                            <span>Premium Quality</span>
-                        </div>
-                    ))}
-                </div>
-            </div >
+
 
             {/* --- STORYTELLING SECTION --- */}
             < section className="py-24 relative" >
