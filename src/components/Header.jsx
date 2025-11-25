@@ -83,7 +83,11 @@ const Header = () => {
         >
             <div className="container mx-auto px-6 flex justify-between items-center gap-4">
                 {/* Logo */}
-                <Link to="/" className="text-2xl md:text-3xl font-display font-bold text-luminous-maroon dark:text-luminous-gold tracking-tight transition-colors flex-shrink-0">
+                <Link
+                    to="/"
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="text-2xl md:text-3xl font-display font-bold text-luminous-maroon dark:text-luminous-gold tracking-tight transition-colors flex-shrink-0"
+                >
                     Bhole Guru
                 </Link>
 

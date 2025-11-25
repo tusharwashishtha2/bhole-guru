@@ -12,6 +12,10 @@ const Home = () => {
     const { products } = useProduct();
     const { sacredOfferings, heroSection, divineFavorites, divineEssentials } = useContent();
 
+    React.useEffect(() => {
+        console.log("Home component updated");
+    }, []);
+
     // Get top rated products for Royal Treasury
     const royalTreasuryProducts = products.filter(p => p.rating >= 4.8).slice(0, 5);
 
@@ -19,7 +23,7 @@ const Home = () => {
         <div className="min-h-screen bg-luminous-bg overflow-x-hidden">
 
             {/* --- HERO SECTION --- */}
-            <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-20 md:pt-0">
+            <section className="relative min-h-[85vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-24 md:pt-0">
 
                 {/* Left Content */}
                 <div className="relative z-10 w-full md:w-1/2 flex flex-col items-start text-left space-y-6 md:space-y-8">
@@ -73,7 +77,7 @@ const Home = () => {
 
                 {/* Scroll Indicator */}
                 <motion.div
-                    className="absolute bottom-8 left-1/2 -translate-x-1/2 text-luminous-maroon/50 flex flex-col items-center gap-2"
+                    className="absolute bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 text-luminous-maroon/50 flex flex-col items-center gap-2 z-20"
                     animate={{ y: [0, 10, 0] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                 >
@@ -95,7 +99,7 @@ const Home = () => {
             </div>
 
             {/* --- GRAND ROYAL TORAN & DIVINE ATMOSPHERE --- */}
-            <div className="relative w-full h-48 mt-0 mb-8 z-20 pointer-events-none overflow-hidden">
+            <div className="relative w-full h-auto min-h-[12rem] md:h-48 mt-0 mb-8 z-20 pointer-events-none overflow-hidden pb-8 md:pb-0">
                 {/* Background Glow for the Gap */}
                 <div className="absolute inset-0 bg-gradient-to-b from-luminous-gold/5 via-transparent to-transparent opacity-40"></div>
 
@@ -111,7 +115,7 @@ const Home = () => {
                     {/* Main Toran Garland - Spanning Full Width */}
                     <div className="flex-1 flex justify-between items-start px-2 md:px-8">
                         {
-                            Array.from({ length: 12 }).map((_, i) => (
+                            Array.from({ length: 8 }).map((_, i) => (
                                 <div key={i} className="flex flex-col items-center relative group" style={{
                                     marginTop: i % 2 === 0 ? '-5px' : '15px', // Zig-zag pattern
                                 }}>
@@ -177,92 +181,9 @@ const Home = () => {
 
                 </div>
 
-                {/* Carousel Container */}
-                <div className="relative w-full flex overflow-hidden group">
-                    {/* Gradient Masks for Smooth Edges */}
-                    <div className="absolute top-0 left-0 h-full w-16 md:w-32 bg-gradient-to-r from-luminous-bg to-transparent z-20 pointer-events-none"></div>
-                    <div className="absolute top-0 right-0 h-full w-16 md:w-32 bg-gradient-to-l from-luminous-bg to-transparent z-20 pointer-events-none"></div>
 
-                    {/* Track 1 */}
-                    <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0">
-                        {sacredOfferings.map((cat, idx) => (
-                            <Link to={`/shop?category=${cat.category}`} key={`t1-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4">
-                                <div className="flex flex-col items-center">
-                                    {/* The Divine Arch Card */}
-                                    <div className="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-luminous-gold/30 group-hover/card:border-luminous-gold transition-all duration-500 shadow-md group-hover/card:shadow-[0_0_25px_rgba(212,175,55,0.4)] bg-white transform group-hover/card:-translate-y-2">
 
-                                        {/* Image Container */}
-                                        <div className="absolute inset-0 overflow-hidden">
-                                            <img
-                                                src={cat.img}
-                                                alt={cat.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
-                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=' + cat.title }}
-                                            />
-                                            {/* Gradient Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-luminous-maroon/90 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
-                                        </div>
 
-                                        {/* Hover Reveal Content */}
-                                        <div className="absolute inset-0 flex flex-col justify-end items-center p-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-20">
-                                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500 delay-100">
-                                                <ArrowRight className="text-white" size={24} />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Title Outside the Card */}
-                                    <div className="mt-6 text-center relative">
-                                        <h3 className="text-xl font-display font-bold text-luminous-maroon tracking-wide group-hover/card:text-luminous-saffron transition-colors duration-300">
-                                            {cat.title}
-                                        </h3>
-                                        <div className="w-0 h-[2px] bg-luminous-gold mx-auto mt-2 transition-all duration-500 group-hover/card:w-full"></div>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Track 2 (Duplicate) */}
-                    <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0" aria-hidden="true">
-                        {sacredOfferings.map((cat, idx) => (
-                            <Link to={`/shop?category=${cat.category}`} key={`t2-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4">
-                                <div className="flex flex-col items-center">
-                                    {/* The Divine Arch Card */}
-                                    <div className="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-luminous-gold/30 group-hover/card:border-luminous-gold transition-all duration-500 shadow-md group-hover/card:shadow-[0_0_25px_rgba(212,175,55,0.4)] bg-white transform group-hover/card:-translate-y-2">
-
-                                        {/* Image Container */}
-                                        <div className="absolute inset-0 overflow-hidden">
-                                            <img
-                                                src={cat.img}
-                                                alt={cat.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
-                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=' + cat.title }}
-                                            />
-                                            {/* Gradient Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-luminous-maroon/90 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
-                                        </div>
-
-                                        {/* Hover Reveal Content */}
-                                        <div className="absolute inset-0 flex flex-col justify-end items-center p-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-20">
-                                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500 delay-100">
-                                                <ArrowRight className="text-white" size={24} />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Title Outside the Card */}
-                                    <div className="mt-6 text-center relative">
-                                        <h3 className="text-xl font-display font-bold text-luminous-maroon tracking-wide group-hover/card:text-luminous-saffron transition-colors duration-300">
-                                            {cat.title}
-                                        </h3>
-                                        <div className="w-0 h-[2px] bg-luminous-gold mx-auto mt-2 transition-all duration-500 group-hover/card:w-full"></div>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
             </div>
 
             {/* --- DIVINE FAVORITES (BESTSELLERS) --- */}
@@ -283,6 +204,97 @@ const Home = () => {
                     <p className="text-luminous-text/70 text-lg mt-4 font-medium">
                         Exquisite artifacts loved by devotees worldwide.
                     </p>
+                </div>
+
+
+                {/* --- SACRED OFFERINGS (DIVINE ARCH) --- */}
+                <div className="relative w-full py-12">
+                    {/* Carousel Container */}
+                    <div className="relative w-full flex overflow-hidden group">
+                        {/* Gradient Masks for Smooth Edges */}
+                        <div className="absolute top-0 left-0 h-full w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none"></div>
+                        <div className="absolute top-0 right-0 h-full w-16 md:w-32 bg-gradient-to-l from-luminous-bg to-transparent z-20 pointer-events-none"></div>
+
+                        {/* Track 1 */}
+                        <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0">
+                            {sacredOfferings.map((cat, idx) => (
+                                <Link to={`/shop?category=${cat.category}`} key={`t1-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4 pointer-events-auto">
+                                    <div className="flex flex-col items-center">
+                                        {/* The Divine Arch Card */}
+                                        <div className="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-luminous-gold/30 group-hover/card:border-luminous-gold transition-all duration-500 shadow-sm md:shadow-md group-hover/card:shadow-[0_0_25px_rgba(212,175,55,0.4)] bg-white transform group-hover/card:-translate-y-2">
+
+                                            {/* Image Container */}
+                                            <div className="absolute inset-0 overflow-hidden">
+                                                <img
+                                                    src={cat.img}
+                                                    alt={cat.title}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=' + cat.title }}
+                                                />
+                                                {/* Gradient Overlay */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-luminous-maroon/90 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
+                                            </div>
+
+                                            {/* Hover Reveal Content */}
+                                            <div className="absolute inset-0 flex flex-col justify-end items-center p-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-20">
+                                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500 delay-100">
+                                                    <ArrowRight className="text-white" size={24} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Title Outside the Card */}
+                                        <div className="mt-6 text-center relative">
+                                            <h3 className="text-xl font-display font-bold text-luminous-maroon tracking-wide group-hover/card:text-luminous-saffron transition-colors duration-300">
+                                                {cat.title}
+                                            </h3>
+                                            <div className="w-0 h-[2px] bg-luminous-gold mx-auto mt-2 transition-all duration-500 group-hover/card:w-full"></div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+
+                        {/* Track 2 (Duplicate) */}
+                        <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0" aria-hidden="true">
+                            {sacredOfferings.map((cat, idx) => (
+                                <Link to={`/shop?category=${cat.category}`} key={`t2-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4 pointer-events-auto">
+                                    <div className="flex flex-col items-center">
+                                        {/* The Divine Arch Card */}
+                                        <div className="relative w-full aspect-[3/4] rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-luminous-gold/30 group-hover/card:border-luminous-gold transition-all duration-500 shadow-sm md:shadow-md group-hover/card:shadow-[0_0_25px_rgba(212,175,55,0.4)] bg-white transform group-hover/card:-translate-y-2">
+
+                                            {/* Image Container */}
+                                            <div className="absolute inset-0 overflow-hidden">
+                                                <img
+                                                    src={cat.img}
+                                                    alt={cat.title}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600?text=' + cat.title }}
+                                                />
+                                                {/* Gradient Overlay */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-luminous-maroon/90 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
+                                            </div>
+
+                                            {/* Hover Reveal Content */}
+                                            <div className="absolute inset-0 flex flex-col justify-end items-center p-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-20">
+                                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500 delay-100">
+                                                    <ArrowRight className="text-white" size={24} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Title Outside the Card */}
+                                        <div className="mt-6 text-center relative">
+                                            <h3 className="text-xl font-display font-bold text-luminous-maroon tracking-wide group-hover/card:text-luminous-saffron transition-colors duration-300">
+                                                {cat.title}
+                                            </h3>
+                                            <div className="w-0 h-[2px] bg-luminous-gold mx-auto mt-2 transition-all duration-500 group-hover/card:w-full"></div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Full Width Carousel Container */}
@@ -633,16 +645,7 @@ const Home = () => {
                                     viewport={{ once: true, margin: "-50px" }}
                                     transition={{ duration: 0.6, delay: index * 0.05 }}
                                 >
-                                    <motion.div
-                                        animate={{ y: [0, -10, 0] }}
-                                        transition={{
-                                            duration: 4,
-                                            repeat: Infinity,
-                                            ease: "easeInOut",
-                                            delay: Math.random() * 2 // Random delay for natural floating
-                                        }}
-                                        className="h-full"
-                                    >
+                                    <div className="h-full">
                                         <Link to={item.link} className="group block relative h-80 rounded-[2rem] overflow-hidden border border-luminous-gold/30 bg-black/40 backdrop-blur-sm shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:border-luminous-gold transition-all duration-500">
                                             {/* Image Container */}
                                             <div className="absolute inset-0">
@@ -666,7 +669,7 @@ const Home = () => {
                                             {/* Shine Effect */}
                                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
                                         </Link>
-                                    </motion.div>
+                                    </div>
                                 </motion.div>
                             ))
                         }

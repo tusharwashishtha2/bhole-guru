@@ -1,86 +1,142 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useToast } from './ToastContext';
 
 const OrderContext = createContext();
 
 export const useOrder = () => useContext(OrderContext);
 
 export const OrderProvider = ({ children }) => {
-    // Load orders from localStorage or start empty
-    const [orders, setOrders] = useState(() => {
-        const savedOrders = localStorage.getItem('orders');
-        return savedOrders ? JSON.parse(savedOrders) : [];
-    });
+    const [orders, setOrders] = useState([]);
+    const [currentOrderId, setCurrentOrderId] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const { addToast } = useToast();
+    const API_URL = 'http://localhost:5000/api/orders';
 
-    const [currentOrderId, setCurrentOrderId] = useState(() => {
-        return localStorage.getItem('currentOrderId') || null;
-    });
+    const getToken = () => localStorage.getItem('bhole_guru_token');
 
-    useEffect(() => {
-        localStorage.setItem('orders', JSON.stringify(orders));
-    }, [orders]);
+    const fetchMyOrders = async () => {
+        const token = getToken();
+        if (!token) return;
 
-    useEffect(() => {
-        if (currentOrderId) {
-            localStorage.setItem('currentOrderId', currentOrderId);
-        }
-    }, [currentOrderId]);
-
-    // Add a new order
-    const addOrder = (orderData, userEmail) => {
-        const newOrder = {
-            id: `BG-${Math.floor(1000 + Math.random() * 9000)}`,
-            date: new Date().toISOString(),
-            status: 'Order Placed', // Initial status
-            userEmail: userEmail || 'guest', // Associate with user
-            timeline: [
-                { status: 'Order Placed', time: new Date().toISOString() }
-            ],
-            ...orderData
-        };
-        setOrders(prev => [newOrder, ...prev]);
-        setCurrentOrderId(newOrder.id);
-        return newOrder.id;
-    };
-
-    // Get orders for specific user
-    const getUserOrders = (userEmail) => {
-        if (!userEmail) return [];
-        return orders.filter(o => o.userEmail === userEmail);
-    };
-
-    // Update order status
-    const updateOrderStatus = (orderId, newStatus) => {
-        setOrders(prev => prev.map(order => {
-            if (order.id === orderId) {
-                // Don't add if status is same
-                if (order.status === newStatus) return order;
-
-                return {
-                    ...order,
-                    status: newStatus,
-                    timeline: [...(order.timeline || []), { status: newStatus, time: new Date().toISOString() }]
-                };
+        try {
+            const response = await fetch(`${API_URL}/myorders`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setOrders(data);
             }
-            return order;
-        }));
-    };
-
-    // Delete order
-    const deleteOrder = (orderId) => {
-        setOrders(prev => prev.filter(o => o.id !== orderId));
-        if (currentOrderId === orderId) {
-            setCurrentOrderId(null);
-            localStorage.removeItem('currentOrderId');
+        } catch (error) {
+            console.error("Failed to fetch orders", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Get specific order
+    // Fetch all orders for Admin
+    const fetchAllOrders = async () => {
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const response = await fetch(API_URL, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setOrders(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch all orders", error);
+        }
+    };
+
+    useEffect(() => {
+        // Initial fetch handled by components or explicit calls
+        setLoading(false);
+    }, []);
+
+    const addOrder = async (orderData) => {
+        const token = getToken();
+        if (!token) {
+            addToast('Please login to place an order', 'error');
+            return null;
+        }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(orderData),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setOrders(prev => [data, ...prev]);
+                setCurrentOrderId(data._id);
+                addToast('Order placed successfully!', 'success');
+                return data._id;
+            } else {
+                addToast(data.message || 'Failed to place order', 'error');
+                return null;
+            }
+        } catch (error) {
+            console.error("Error placing order:", error);
+            addToast('Error placing order', 'error');
+            return null;
+        }
+    };
+
+    const updateOrderStatus = async (orderId, newStatus) => {
+        const token = getToken();
+        try {
+            const response = await fetch(`${API_URL}/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setOrders(prev => prev.map(order =>
+                    order._id === orderId ? data : order
+                ));
+                addToast('Order status updated', 'success');
+            } else {
+                addToast('Failed to update status', 'error');
+            }
+        } catch (error) {
+            console.error("Error updating order status:", error);
+            addToast('Error updating status', 'error');
+        }
+    };
+
     const getOrder = (orderId) => {
-        return orders.find(o => o.id === orderId);
+        return orders.find(o => o._id === orderId || o.id === orderId);
     };
 
     return (
-        <OrderContext.Provider value={{ orders, addOrder, updateOrderStatus, deleteOrder, getOrder, getUserOrders, currentOrderId, setCurrentOrderId }}>
+        <OrderContext.Provider value={{
+            orders,
+            addOrder,
+            updateOrderStatus,
+            getOrder,
+            fetchMyOrders,
+            fetchAllOrders,
+            currentOrderId,
+            setCurrentOrderId,
+            loading
+        }}>
             {children}
         </OrderContext.Provider>
     );

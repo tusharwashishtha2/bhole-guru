@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router-dom';
 
 const ScrollToTop = () => {
     const { pathname, search } = useLocation();
+    const navType = useNavigationType();
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [pathname, search]);
+        if (navType !== 'POP') {
+            window.scrollTo(0, 0);
+        }
+    }, [pathname, search, navType]);
 
     return null;
 };

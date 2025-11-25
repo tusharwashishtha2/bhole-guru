@@ -26,8 +26,8 @@ export default {
       },
       animation: {
         'spin-slow': 'spin 20s linear infinite',
-        'marquee': 'marquee 25s linear infinite',
-        'marquee-reverse': 'marquee-reverse 25s linear infinite',
+        'marquee': 'marquee 10s linear infinite',
+        'marquee-reverse': 'marquee-reverse 10s linear infinite',
         'shimmer': 'shimmer 2s linear infinite',
         'float-slow': 'float 8s ease-in-out infinite',
       },
