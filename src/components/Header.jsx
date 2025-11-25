@@ -78,7 +78,7 @@ const Header = () => {
         <header
             className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled
                 ? 'bg-luminous-bg/95 dark:bg-stone-950/95 backdrop-blur-md shadow-sm py-3'
-                : 'bg-transparent py-5'
+                : 'bg-luminous-bg/80 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none py-5'
                 }`}
         >
             <div className="container mx-auto px-6 flex justify-between items-center gap-4">

@@ -23,7 +23,7 @@ const Home = () => {
         <div className="min-h-screen bg-luminous-bg overflow-x-hidden">
 
             {/* --- HERO SECTION --- */}
-            <section className="relative min-h-[85vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-24 md:pt-0">
+            <section className="relative min-h-[75vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-24 md:pt-0 pb-12 md:pb-0">
 
                 {/* Left Content */}
                 <div className="relative z-10 w-full md:w-1/2 flex flex-col items-start text-left space-y-6 md:space-y-8">
@@ -77,7 +77,7 @@ const Home = () => {
 
                 {/* Scroll Indicator */}
                 <motion.div
-                    className="absolute bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 text-luminous-maroon/50 flex flex-col items-center gap-2 z-20"
+                    className="absolute bottom-12 md:bottom-8 left-1/2 transform -translate-x-1/2 text-luminous-maroon/50 flex flex-col items-center gap-2 z-20"
                     animate={{ y: [0, 10, 0] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                 >
@@ -513,7 +513,7 @@ const Home = () => {
             </section>
 
             {/* --- PURE ESSENCE (TEMPLE CORRIDOR DHOOP) --- */}
-            <section className="py-24 relative overflow-hidden bg-[#1a0f0a] text-luminous-bg">
+            <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#2D1810] to-[#4A0404] text-luminous-bg">
                 {/* Deep Stone Texture Background */}
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-40"></div>
 
