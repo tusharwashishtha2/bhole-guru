@@ -23,7 +23,7 @@ const Home = () => {
         <div className="min-h-screen bg-luminous-bg overflow-x-hidden">
 
             {/* --- HERO SECTION --- */}
-            <section className="relative min-h-[75vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-24 md:pt-0 pb-12 md:pb-0">
+            <section className="relative min-h-[60vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 overflow-hidden pt-24 md:pt-0 pb-8 md:pb-0">
 
                 {/* Left Content */}
                 <div className="relative z-10 w-full md:w-1/2 flex flex-col items-start text-left space-y-6 md:space-y-8">
@@ -31,6 +31,7 @@ const Home = () => {
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
+                        className="bg-white/20 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-xl relative z-20"
                     >
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 bg-luminous-gold/10 border border-luminous-gold/20 rounded-full px-4 py-1.5 mb-6">
@@ -70,20 +71,12 @@ const Home = () => {
                             className="w-full h-full object-cover object-center"
                         />
                         {/* Gradient Blend - Middle to Right (Left side of image fades into bg) */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-luminous-bg via-luminous-bg/60 to-transparent"></div>
-                        <div className="absolute inset-0 bg-gradient-to-b from-luminous-bg/20 via-transparent to-luminous-bg/20"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-luminous-bg/40 via-transparent to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-b from-luminous-bg/10 via-transparent to-luminous-bg/10"></div>
                     </div>
                 </div>
 
-                {/* Scroll Indicator */}
-                <motion.div
-                    className="absolute bottom-12 md:bottom-8 left-1/2 transform -translate-x-1/2 text-luminous-maroon/50 flex flex-col items-center gap-2 z-20"
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                >
-                    <span className="text-xs tracking-widest uppercase font-semibold">Scroll</span>
-                    <ArrowRight className="rotate-90 w-5 h-5" />
-                </motion.div>
+
             </section>
 
             {/* --- SHUBH AARAMBH (Welcome Banner) --- */}
@@ -513,21 +506,20 @@ const Home = () => {
             </section>
 
             {/* --- PURE ESSENCE (TEMPLE CORRIDOR DHOOP) --- */}
-            <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#2D1810] to-[#4A0404] text-luminous-bg">
+            <section className="py-24 relative overflow-hidden bg-gradient-to-b from-luminous-bg to-luminous-goldLight text-luminous-maroon">
                 {/* Deep Stone Texture Background */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-40"></div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
                 {/* Floating Smoke Layers */}
                 <div className="absolute inset-0 z-10 pointer-events-none">
-                    <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black/80 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 w-[200%] h-full bg-[url('https://raw.githubusercontent.com/soju22/codepen-assets/main/fog1.png')] opacity-30 animate-marquee-reverse"></div>
+                    <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-white/80 to-transparent"></div>
                 </div>
 
                 <div className="container mx-auto px-6 relative z-20 mb-12 text-center">
-                    <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-gold mb-4 tracking-widest uppercase drop-shadow-lg">
+                    <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-maroon mb-4 tracking-widest uppercase drop-shadow-sm">
                         The Temple Corridor
                     </h2>
-                    <p className="text-luminous-gold/60 text-lg max-w-2xl mx-auto font-display tracking-wide">
+                    <p className="text-luminous-maroon/80 text-lg max-w-2xl mx-auto font-display tracking-wide">
                         Walk through the path of purity. Ancient dhoop recipes for your sacred space.
                     </p>
                 </div>
@@ -559,7 +551,8 @@ const Home = () => {
                                         <img
                                             src={item.img}
                                             alt={item.title}
-                                            className="w-full h-full object-cover opacity-70 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                            className="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                            loading="eager"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
@@ -570,7 +563,7 @@ const Home = () => {
                                     </div>
 
                                     {/* The Stone Pedestal Base */}
-                                    <div className="h-12 w-full bg-gradient-to-b from-[#3d2b25] to-[#1a0f0a] border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
+                                    <div className="h-12 w-full bg-gradient-to-b from-luminous-gold to-luminous-maroon border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
                                 </div>
                             </Link>
                         ))}
@@ -587,8 +580,8 @@ const Home = () => {
                         ].map((item, idx) => (
                             <Link to="/shop?category=Incense" key={`c2-${idx}`} className="flex items-end mx-4">
                                 {/* The Pillar */}
-                                <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
-                                    <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">
+                                <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-luminous-maroon via-[#8B4513] to-luminous-maroon border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
+                                    <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4 bg-luminous-maroon">
                                         <Sun className="text-luminous-gold animate-spin-slow" size={20} />
                                     </div>
                                     <div className="w-[1px] h-full bg-luminous-gold/20"></div>
@@ -601,7 +594,8 @@ const Home = () => {
                                         <img
                                             src={item.img}
                                             alt={item.title}
-                                            className="w-full h-full object-cover opacity-70 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                            className="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                            loading="eager"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
@@ -612,7 +606,7 @@ const Home = () => {
                                     </div>
 
                                     {/* The Stone Pedestal Base */}
-                                    <div className="h-12 w-full bg-gradient-to-b from-[#3d2b25] to-[#1a0f0a] border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
+                                    <div className="h-12 w-full bg-gradient-to-b from-luminous-gold to-luminous-maroon border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
                                 </div>
                             </Link>
                         ))}
