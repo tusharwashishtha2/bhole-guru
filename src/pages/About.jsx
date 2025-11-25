@@ -23,34 +23,45 @@ const About = () => {
                     <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-luminous-gold rounded-full animate-pulse"></div>
                     <div className="absolute top-3/4 right-1/3 w-3 h-3 bg-luminous-saffron rounded-full animate-pulse delay-700"></div>
                     <div className="absolute top-1/2 left-2/3 w-1 h-1 bg-white rounded-full animate-pulse delay-300"></div>
-                </div>
-
-                <div className="container mx-auto px-6 relative z-10 text-center">
-                    {/* Rotating Mandala Animation */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-20 pointer-events-none -z-10">
-                        <Sun className="w-full h-full text-luminous-gold animate-spin-slow" strokeWidth={0.5} />
+                    <div className="container mx-auto px-6 relative z-10 text-center">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1 }}
+                        >
+                            <div className="inline-block mb-6 p-3 rounded-full border border-luminous-gold/30 bg-white/5 backdrop-blur-sm">
+                                <Sparkles className="text-luminous-gold animate-spin-slow" size={24} />
+                            </div>
+                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
+                                Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
+                            </h1>
+                            <p className="text-xl md:text-2xl text-luminous-goldLight/80 max-w-3xl mx-auto font-light leading-relaxed">
+                                Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
+                            </p>
+                        </motion.div>
                     </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1 }}
-                    >
-                        <div className="inline-block mb-6 p-3 rounded-full border border-luminous-gold/30 bg-white/5 backdrop-blur-sm">
-                            <Sparkles className="text-luminous-gold animate-spin-slow" size={24} />
-                        </div>
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
-                            Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
-                        </h1>
-                        <p className="text-xl md:text-2xl text-luminous-goldLight/80 max-w-3xl mx-auto font-light leading-relaxed">
-                            Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
-                        </p>
-                    </motion.div>
                 </div>
-            </section>
+            </section >
+
+            {/* --- DIVINE VALUES MARQUEE (FILLING THE GAP) --- */}
+            < div className="bg-luminous-maroon text-white py-4 overflow-hidden relative z-20 border-y border-luminous-gold/30" >
+                <div className="animate-marquee whitespace-nowrap flex gap-16 items-center">
+                    {[...Array(8)].map((_, i) => (
+                        <div key={i} className="flex items-center gap-6 text-sm md:text-base font-display tracking-[0.2em] uppercase">
+                            <span className="text-luminous-gold">✦</span>
+                            <span>Pure & Authentic</span>
+                            <span className="text-luminous-gold">✦</span>
+                            <span>Handcrafted with Devotion</span>
+                            <span className="text-luminous-gold">✦</span>
+                            <span>Premium Quality</span>
+                        </div>
+                    ))}
+                </div>
+            </div >
 
             {/* --- STORYTELLING SECTION --- */}
-            <section className="py-24 relative">
+            < section className="py-24 relative" >
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col lg:flex-row items-center gap-16">
                         <motion.div
@@ -97,10 +108,10 @@ const About = () => {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* --- QUOTE PARALLAX SECTION --- */}
-            <section className="relative py-32 bg-fixed bg-cover bg-center overflow-hidden" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1518154334286-2b7f94f6b71b?q=80&w=1920&auto=format&fit=crop')" }}>
+            < section className="relative py-32 bg-fixed bg-cover bg-center overflow-hidden" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1518154334286-2b7f94f6b71b?q=80&w=1920&auto=format&fit=crop')" }}>
                 <div className="absolute inset-0 bg-black/60"></div>
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <motion.div
@@ -115,10 +126,10 @@ const About = () => {
                         <div className="w-32 h-1 bg-gradient-to-r from-transparent via-luminous-gold to-transparent mx-auto mt-10"></div>
                     </motion.div>
                 </div>
-            </section>
+            </section >
 
             {/* --- VALUES GRID --- */}
-            <section className="py-24 bg-white relative">
+            < section className="py-24 bg-white relative" >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-luminous-gold/5 rounded-full blur-3xl"></div>
                 <div className="container mx-auto px-6">
                     <div className="text-center mb-16">
@@ -148,9 +159,9 @@ const About = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
-        </div>
+        </div >
     );
 };
 
