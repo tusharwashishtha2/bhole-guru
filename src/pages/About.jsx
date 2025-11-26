@@ -29,6 +29,13 @@ const About = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1 }}
                         >
+                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
+                                Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
+                            </h1>
+                            <p className="text-xl md:text-2xl text-luminous-goldLight max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
+                                Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
+                            </p>
+
                             {/* Scroll Down Indicator */}
                             <motion.div
                                 initial={{ opacity: 0 }}
