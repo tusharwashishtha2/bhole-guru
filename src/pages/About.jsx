@@ -38,6 +38,23 @@ const About = () => {
                             <p className="text-xl md:text-2xl text-luminous-goldLight max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
                                 Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
                             </p>
+
+                            {/* Scroll Down Indicator */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1.5, duration: 1 }}
+                                className="mt-12 flex flex-col items-center gap-2"
+                            >
+                                <span className="text-xs font-bold tracking-[0.2em] text-luminous-gold uppercase opacity-80">Scroll to Explore</span>
+                                <div className="w-6 h-10 border-2 border-luminous-gold/30 rounded-full flex justify-center p-1 bg-black/20 backdrop-blur-sm">
+                                    <motion.div
+                                        animate={{ y: [0, 12, 0] }}
+                                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                                        className="w-1.5 h-1.5 bg-luminous-gold rounded-full"
+                                    />
+                                </div>
+                            </motion.div>
                         </motion.div>
                     </div>
 
