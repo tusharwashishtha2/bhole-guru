@@ -7,7 +7,7 @@ const About = () => {
         <div className="bg-luminous-bg min-h-screen overflow-hidden">
 
             {/* --- HERO SECTION: IMMERSIVE & MYSTICAL --- */}
-            <section className="relative min-h-screen flex items-start justify-center overflow-hidden pt-60 pb-20">
+            <section className="relative min-h-screen flex items-start justify-center overflow-hidden pt-32 md:pt-48 lg:pt-64 pb-20">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
@@ -29,7 +29,7 @@ const About = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1 }}
                         >
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
+                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl mt-10 md:mt-0">
                                 Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
                             </h1>
                             <p className="text-xl md:text-2xl text-luminous-goldLight max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
