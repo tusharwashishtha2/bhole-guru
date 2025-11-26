@@ -6,57 +6,75 @@ const About = () => {
     return (
         <div className="bg-luminous-bg min-h-screen overflow-hidden">
 
-            {/* --- HERO SECTION: IMMERSIVE & MYSTICAL --- */}
-            <section className="relative min-h-screen flex items-start justify-center overflow-hidden pt-[200px] md:pt-[300px] pb-20">
-                {/* Background Image with Overlay */}
-                <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1604916479528-725f30243744?q=80&w=1920&auto=format&fit=crop"
-                        alt="Divine Atmosphere"
-                        className="w-full h-full object-cover opacity-40 scale-110 animate-float-slow"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-luminous-maroon/95 via-luminous-maroon/70 to-luminous-bg"></div>
-                </div>
+            {/* --- HERO SECTION: NEW SPLIT LAYOUT (Robust & Elegant) --- */}
+            <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
+                {/* Background Decor */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-luminous-gold/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-luminous-maroon/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
 
-                {/* Floating Particles (CSS Animation) */}
-                <div className="absolute inset-0 z-0 opacity-30">
-                    <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-luminous-gold rounded-full animate-pulse"></div>
-                    <div className="absolute top-3/4 right-1/3 w-3 h-3 bg-luminous-saffron rounded-full animate-pulse delay-700"></div>
-                    <div className="absolute top-1/2 left-2/3 w-1 h-1 bg-white rounded-full animate-pulse delay-300"></div>
-                    <div className="container mx-auto px-6 relative z-10 text-center">
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+                        {/* Left: Text Content */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 1 }}
+                            className="text-left"
                         >
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
-                                Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-luminous-gold/10 border border-luminous-gold/20 mb-6">
+                                <Sparkles size={14} className="text-luminous-maroon" />
+                                <span className="text-xs font-bold tracking-widest text-luminous-maroon uppercase">Est. 2024</span>
+                            </div>
+
+                            <h1 className="text-5xl md:text-7xl font-display font-bold text-luminous-maroon mb-6 leading-tight drop-shadow-sm">
+                                Where Faith <br />
+                                <span className="text-luminous-gold italic font-serif">Finds a Home</span>
                             </h1>
-                            <p className="text-xl md:text-2xl text-luminous-goldLight max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
+
+                            <p className="text-lg md:text-xl text-luminous-text/80 mb-8 leading-relaxed max-w-lg">
                                 Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
                             </p>
 
-                            {/* Scroll Down Indicator */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 1.5, duration: 1 }}
-                                className="mt-12 flex flex-col items-center gap-2"
-                            >
-                                <span className="text-xs font-bold tracking-[0.2em] text-black uppercase opacity-80 drop-shadow-sm">Scroll to Explore</span>
-                                <motion.div
-                                    animate={{ y: [0, 10, 0] }}
-                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                    className="p-2 bg-white/20 backdrop-blur-sm rounded-full"
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="px-8 py-4 bg-luminous-maroon text-luminous-gold font-bold rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                                 >
-                                    <ChevronDown className="text-black w-6 h-6" />
-                                </motion.div>
-                            </motion.div>
+                                    Explore Our Story <ChevronDown size={18} />
+                                </motion.button>
+                            </div>
                         </motion.div>
-                    </div>
 
+                        {/* Right: Image Composition */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, delay: 0.2 }}
+                            className="relative"
+                        >
+                            <div className="relative z-10 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/50 transform rotate-2 hover:rotate-0 transition-transform duration-700">
+                                <img
+                                    src="https://images.unsplash.com/photo-1604916479528-725f30243744?q=80&w=800&auto=format&fit=crop"
+                                    alt="Temple Atmosphere"
+                                    className="w-full h-[500px] object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                <div className="absolute bottom-8 left-8 text-white">
+                                    <p className="font-serif italic text-lg opacity-90">"Purity in every particle"</p>
+                                </div>
+                            </div>
+
+                            {/* Decorative Elements behind image */}
+                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-luminous-saffron/20 rounded-full blur-xl -z-10"></div>
+                            <div className="absolute -bottom-5 -left-5 w-full h-full border-2 border-luminous-gold/30 rounded-[2.5rem] -z-10 transform -rotate-3"></div>
+                        </motion.div>
+
+                    </div>
                 </div>
-            </section >
+            </section>
 
 
 
