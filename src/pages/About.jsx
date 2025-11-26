@@ -7,7 +7,7 @@ const About = () => {
         <div className="bg-luminous-bg min-h-screen overflow-hidden">
 
             {/* --- HERO SECTION: IMMERSIVE & MYSTICAL --- */}
-            <section className="relative min-h-screen flex items-end justify-center overflow-hidden pb-32 pt-32">
+            <section className="relative min-h-screen flex items-start justify-center overflow-hidden pt-60 pb-20">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
