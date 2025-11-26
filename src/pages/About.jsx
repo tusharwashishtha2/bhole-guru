@@ -46,12 +46,12 @@ const About = () => {
                                 transition={{ delay: 1.5, duration: 1 }}
                                 className="mt-12 flex flex-col items-center gap-2"
                             >
-                                <span className="text-xs font-bold tracking-[0.2em] text-luminous-gold uppercase opacity-80">Scroll to Explore</span>
-                                <div className="w-6 h-10 border-2 border-luminous-gold/30 rounded-full flex justify-center p-1 bg-black/20 backdrop-blur-sm">
+                                <span className="text-xs font-bold tracking-[0.2em] text-luminous-gold uppercase opacity-100 drop-shadow-md">Scroll to Explore</span>
+                                <div className="w-6 h-10 border-2 border-luminous-gold rounded-full flex justify-center p-1 bg-black/40 backdrop-blur-md shadow-lg">
                                     <motion.div
                                         animate={{ y: [0, 12, 0] }}
                                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                        className="w-1.5 h-1.5 bg-luminous-gold rounded-full"
+                                        className="w-1.5 h-1.5 bg-luminous-gold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.8)]"
                                     />
                                 </div>
                             </motion.div>

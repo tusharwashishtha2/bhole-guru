@@ -56,7 +56,8 @@ const Home = () => {
                         className="relative z-20 mb-8 md:mb-0"
                     >
                         {/* Description */}
-                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg mt-6 leading-relaxed drop-shadow-sm font-medium bg-white/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-2 md:p-0 rounded-lg">
+                        {/* Description */}
+                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg lg:max-w-md mt-6 leading-relaxed drop-shadow-sm font-medium bg-white/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-2 md:p-0 rounded-lg">
                             Experience the divine connection with our authentically crafted spiritual essentials, designed to bring peace, purity, and prosperity to your home.
                         </p>
 

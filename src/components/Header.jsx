@@ -146,11 +146,11 @@ const Header = () => {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden lg:flex items-center space-x-6 flex-shrink-0">
-                    <Link to="/" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors">Home</Link>
-                    <Link to="/shop" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors">Shop</Link>
-                    <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors">About</Link>
+                    <Link to="/" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Home</Link>
+                    <Link to="/shop" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Shop</Link>
+                    <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">About</Link>
                     {user && !user.isAdmin && (
-                        <Link to="/track-order" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors">Track</Link>
+                        <Link to="/track-order" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Track</Link>
                     )}
                 </nav>
 
