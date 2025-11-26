@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Heart, Users, Sparkles, Sun, Moon, Flower } from 'lucide-react';
+import { Star, Heart, Users, Sparkles, Sun, Moon, Flower, ChevronDown } from 'lucide-react';
 
 const About = () => {
     return (
@@ -29,16 +29,6 @@ const About = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1 }}
                         >
-                            <div className="inline-block mb-6 p-3 rounded-full border border-luminous-gold/30 bg-white/5 backdrop-blur-sm">
-                                <Sparkles className="text-luminous-gold animate-spin-slow" size={24} />
-                            </div>
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide drop-shadow-2xl">
-                                Where Faith <br /> <span className="text-luminous-gold italic font-serif">Finds a Home</span>
-                            </h1>
-                            <p className="text-xl md:text-2xl text-luminous-goldLight max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
-                                Bhole Guru is not just a store; it is a sanctuary for the soul. We bridge the gap between ancient vedic traditions and the modern spiritual seeker.
-                            </p>
-
                             {/* Scroll Down Indicator */}
                             <motion.div
                                 initial={{ opacity: 0 }}
@@ -46,14 +36,14 @@ const About = () => {
                                 transition={{ delay: 1.5, duration: 1 }}
                                 className="mt-12 flex flex-col items-center gap-2"
                             >
-                                <span className="text-xs font-bold tracking-[0.2em] text-luminous-gold uppercase opacity-100 drop-shadow-md">Scroll to Explore</span>
-                                <div className="w-6 h-10 border-2 border-luminous-gold rounded-full flex justify-center p-1 bg-black/40 backdrop-blur-md shadow-lg">
-                                    <motion.div
-                                        animate={{ y: [0, 12, 0] }}
-                                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                        className="w-1.5 h-1.5 bg-luminous-gold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.8)]"
-                                    />
-                                </div>
+                                <span className="text-xs font-bold tracking-[0.2em] text-black uppercase opacity-80 drop-shadow-sm">Scroll to Explore</span>
+                                <motion.div
+                                    animate={{ y: [0, 10, 0] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                                    className="p-2 bg-white/20 backdrop-blur-sm rounded-full"
+                                >
+                                    <ChevronDown className="text-black w-6 h-6" />
+                                </motion.div>
                             </motion.div>
                         </motion.div>
                     </div>
