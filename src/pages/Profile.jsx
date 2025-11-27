@@ -187,6 +187,11 @@ const Profile = () => {
                                             {order.status}
                                         </span>
                                     </div>
+                                    {order.trackingNumber && (
+                                        <div className="mb-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                                            <span className="font-bold">Tracking:</span> {order.trackingNumber} ({order.courierName})
+                                        </div>
+                                    )}
                                     <div className="space-y-2 mb-4">
                                         {order.items.map((item, idx) => (
                                             <div key={idx} className="flex justify-between text-sm">

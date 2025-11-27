@@ -140,6 +140,12 @@ exports.updateOrderStatus = async (req, res) => {
                 order.isDelivered = true;
                 order.deliveredAt = Date.now();
             }
+            if (req.body.trackingNumber) {
+                order.trackingNumber = req.body.trackingNumber;
+            }
+            if (req.body.courierName) {
+                order.courierName = req.body.courierName;
+            }
             const updatedOrder = await order.save();
             res.json(updatedOrder);
         } else {

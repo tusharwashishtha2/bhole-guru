@@ -94,7 +94,7 @@ export const OrderProvider = ({ children }) => {
         }
     };
 
-    const updateOrderStatus = async (orderId, newStatus) => {
+    const updateOrderStatus = async (orderId, newStatus, trackingData = {}) => {
         const token = getToken();
         try {
             const response = await fetch(`${API_URL}/${orderId}/status`, {
@@ -103,7 +103,7 @@ export const OrderProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({ status: newStatus, ...trackingData }),
             });
             const data = await response.json();
 

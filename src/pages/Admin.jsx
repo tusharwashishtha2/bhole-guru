@@ -39,6 +39,7 @@ const Admin = () => {
         switch (status) {
             case 'Order Placed': return 'bg-blue-100 text-blue-800 border-blue-200';
             case 'Packed': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'Shipped': return 'bg-blue-100 text-blue-800 border-blue-200';
             case 'Out for Delivery': return 'bg-purple-100 text-purple-800 border-purple-200';
             case 'Delivered': return 'bg-green-100 text-green-800 border-green-200';
             default: return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -268,9 +269,26 @@ const Admin = () => {
                                             </button>
 
                                             <button
-                                                onClick={() => updateOrderStatus(order.id, 'Out for Delivery')}
+                                                onClick={() => {
+                                                    const tracking = prompt('Enter Tracking Number:');
+                                                    if (tracking) {
+                                                        const courier = prompt('Enter Courier Name (e.g., DTDC, BlueDart):');
+                                                        updateOrderStatus(order.id, 'Shipped', { trackingNumber: tracking, courierName: courier });
+                                                    }
+                                                }}
                                                 disabled={order.status !== 'Packed'}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Packed'
+                                                    ? 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                                                    : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                <Truck size={18} /> Mark Shipped
+                                            </button>
+
+                                            <button
+                                                onClick={() => updateOrderStatus(order.id, 'Out for Delivery')}
+                                                disabled={order.status !== 'Shipped'}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Shipped'
                                                     ? 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100'
                                                     : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
                                                     }`}
