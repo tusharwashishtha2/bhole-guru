@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile = () => {
     const { user, logout, updateUserProfile, sendOtp, verifyOtp } = useAuth();
-    const { getUserOrders } = useOrder();
+    const { orders, fetchMyOrders } = useOrder();
     const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState('orders');
 
@@ -35,7 +35,13 @@ const Profile = () => {
     const [otp, setOtp] = useState('');
     const [otpTarget, setOtpTarget] = useState(''); // 'email' or 'phone'
 
-    const userOrders = getUserOrders(user?.email);
+    React.useEffect(() => {
+        if (user) {
+            fetchMyOrders();
+        }
+    }, [user]);
+
+    const userOrders = orders;
 
     if (!user) {
         return (
