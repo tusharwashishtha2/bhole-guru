@@ -22,7 +22,46 @@ const ProductDetail = () => {
     const [comment, setComment] = useState('');
     const [hoverRating, setHoverRating] = useState(0);
 
-    const product = products.find(p => p.id === parseInt(id));
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [activeImage, setActiveImage] = useState('');
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                // Try to fetch from API first (for wishlist compatibility)
+                const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000');
+                const response = await fetch(`${API_URL}/api/products/lookup/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setProduct(data);
+                    setActiveImage(data.image);
+                } else {
+                    // Fallback to static data if API fails or not found (e.g. during dev before seed)
+                    const staticProduct = products.find(p => p.id === parseInt(id));
+                    if (staticProduct) {
+                        setProduct(staticProduct);
+                        setActiveImage(staticProduct.image);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch product", error);
+                // Fallback
+                const staticProduct = products.find(p => p.id === parseInt(id));
+                if (staticProduct) {
+                    setProduct(staticProduct);
+                    setActiveImage(staticProduct.image);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProduct();
+    }, [id]);
+
+    if (loading) {
+        return <div className="min-h-screen pt-24 flex justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-luminous-maroon"></div></div>;
+    }
 
     // Handle case where product is not found
     if (!product) {
@@ -30,15 +69,10 @@ const ProductDetail = () => {
     }
 
     const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
-    const [activeImage, setActiveImage] = useState(product.image);
 
     const reviews = getProductReviews(product.id);
     const averageRating = reviews.length > 0 ? getAverageRating(product.id) : product.rating;
-    const reviewCount = reviews.length > 0 ? reviews.length : product.reviews;
-
-    useEffect(() => {
-        setActiveImage(product.image);
-    }, [product]);
+    const reviewCount = reviews.length > 0 ? reviews.length : (product.reviews ? product.reviews.length : product.numReviews);
 
     const handleQuantityChange = (type) => {
         if (type === 'decrease' && quantity > 1) setQuantity(quantity - 1);
@@ -96,8 +130,8 @@ const ProductDetail = () => {
                                 <button
                                     onClick={() => toggleWishlist(product)}
                                     className={`p-3 rounded-full border border-luminous-gold/20 transition-all duration-300 ${isWishlisted
-                                            ? 'bg-luminous-gold text-luminous-maroon'
-                                            : 'bg-luminous-maroon/50 text-luminous-gold hover:bg-luminous-gold hover:text-luminous-maroon'
+                                        ? 'bg-luminous-gold text-luminous-maroon'
+                                        : 'bg-luminous-maroon/50 text-luminous-gold hover:bg-luminous-gold hover:text-luminous-maroon'
                                         }`}
                                 >
                                     <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} />

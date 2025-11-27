@@ -10,13 +10,14 @@ const ProductCard = ({ product }) => {
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { openQuickView } = useQuickView();
 
-    const isWishlisted = isInWishlist(product.id);
+    const isWishlisted = isInWishlist(product.id || product._id);
+    const productId = product.id || product._id;
 
     return (
         <div className="group relative bg-white dark:bg-stone-900 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 dark:border-stone-800">
             {/* Image Container */}
             <div className="relative h-72 overflow-hidden bg-gray-100 dark:bg-stone-800">
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${productId}`}>
                     <img
                         src={product.image}
                         alt={product.name}
@@ -50,8 +51,8 @@ const ProductCard = ({ product }) => {
                 <button
                     onClick={() => toggleWishlist(product)}
                     className={`absolute top-3 right-3 p-2 rounded-full transition-all shadow-md ${isWishlisted
-                            ? 'bg-luminous-maroon text-white'
-                            : 'bg-white/80 dark:bg-black/50 backdrop-blur-sm text-gray-600 dark:text-gray-300 hover:bg-luminous-maroon hover:text-white'
+                        ? 'bg-luminous-maroon text-white'
+                        : 'bg-white/80 dark:bg-black/50 backdrop-blur-sm text-gray-600 dark:text-gray-300 hover:bg-luminous-maroon hover:text-white'
                         }`}
                 >
                     <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
@@ -70,7 +71,7 @@ const ProductCard = ({ product }) => {
                 <div className="text-xs font-bold text-luminous-gold uppercase tracking-wider mb-1">
                     {product.category}
                 </div>
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${productId}`}>
                     <h3 className="font-serif font-bold text-lg text-gray-900 dark:text-white mb-2 group-hover:text-luminous-maroon dark:group-hover:text-luminous-gold transition-colors line-clamp-1">
                         {product.name}
                     </h3>
