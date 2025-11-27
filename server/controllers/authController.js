@@ -8,6 +8,8 @@ const generateToken = (id) => {
     });
 };
 
+const sendEmail = require('../utils/emailService');
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -29,6 +31,18 @@ exports.register = async (req, res) => {
         });
 
         if (user) {
+            // Send Welcome Email
+            try {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'Welcome to Bhole Guru! 🙏',
+                    message: `<h1>Namaste ${user.name},</h1><p>Thank you for joining Bhole Guru. We are delighted to have you on our spiritual journey.</p><p>Explore our collection of divine essentials.</p>`
+                });
+            } catch (emailError) {
+                console.error('Email send failed:', emailError);
+                // Don't fail registration if email fails
+            }
+
             res.status(201).json({
                 _id: user._id,
                 name: user.name,

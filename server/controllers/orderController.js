@@ -3,6 +3,11 @@ const Order = require('../models/Order');
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
+const sendEmail = require('../utils/emailService');
+
+// @desc    Create new order
+// @route   POST /api/orders
+// @access  Private
 exports.createOrder = async (req, res) => {
     try {
         const {
@@ -32,6 +37,21 @@ exports.createOrder = async (req, res) => {
         });
 
         const createdOrder = await order.save();
+
+        // Send Order Confirmation Email
+        try {
+            await sendEmail({
+                email: req.user.email,
+                subject: `Order Confirmed - #${createdOrder._id}`,
+                message: `<h1>Thank you for your order, ${req.user.name}!</h1>
+                <p>We have received your order for <strong>₹${totalPrice}</strong>.</p>
+                <p>Order ID: ${createdOrder._id}</p>
+                <p>We will notify you when it ships.</p>`
+            });
+        } catch (emailError) {
+            console.error('Order email failed:', emailError);
+        }
+
         res.status(201).json(createdOrder);
 
     } catch (error) {
