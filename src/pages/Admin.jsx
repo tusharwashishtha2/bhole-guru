@@ -32,9 +32,7 @@ const Admin = () => {
         category: 'Pooja Essentials',
         image: '',
         description: '',
-        countInStock: 0,
-        isBestSeller: false,
-        isNewArrival: false
+        features: ''
     });
 
     const getStatusColor = (status) => {
@@ -67,9 +65,9 @@ const Admin = () => {
         e.preventDefault();
         const newProduct = {
             ...formData,
-            price: Number(formData.price),
-            originalPrice: Number(formData.originalPrice),
-            countInStock: Number(formData.countInStock)
+            price: parseInt(formData.price),
+            originalPrice: parseInt(formData.originalPrice),
+            features: formData.features.split(',').map(f => f.trim()).filter(f => f)
         };
         addProduct(newProduct);
         setShowAddForm(false);
@@ -85,9 +83,7 @@ const Admin = () => {
             category: product.category,
             image: product.image,
             description: product.description,
-            countInStock: product.countInStock || 0,
-            isBestSeller: product.isBestSeller || false,
-            isNewArrival: product.isNewArrival || false
+            features: product.features ? product.features.join(', ') : ''
         });
         setShowAddForm(true);
         // Scroll to form
@@ -98,9 +94,9 @@ const Admin = () => {
         e.preventDefault();
         const updatedFields = {
             ...formData,
-            price: Number(formData.price),
-            originalPrice: Number(formData.originalPrice),
-            countInStock: Number(formData.countInStock)
+            price: parseInt(formData.price),
+            originalPrice: parseInt(formData.originalPrice),
+            features: formData.features.split(',').map(f => f.trim()).filter(f => f)
         };
         updateProduct(isEditing, updatedFields);
         setIsEditing(null);
@@ -116,9 +112,7 @@ const Admin = () => {
             category: 'Pooja Essentials',
             image: '',
             description: '',
-            countInStock: 0,
-            isBestSeller: false,
-            isNewArrival: false
+            features: ''
         });
         setIsEditing(null);
     };
@@ -389,19 +383,9 @@ const Admin = () => {
                                                     <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
                                                     <textarea required name="description" value={formData.description} onChange={handleInputChange} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none h-24" placeholder="Product details..." />
                                                 </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div>
-                                                        <label className="block text-sm font-bold text-gray-700 mb-1">Stock Quantity</label>
-                                                        <input required type="number" name="countInStock" value={formData.countInStock} onChange={handleInputChange} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none" placeholder="10" />
-                                                    </div>
-                                                    <div className="flex items-center gap-2 pt-6">
-                                                        <input type="checkbox" name="isBestSeller" id="isBestSeller" checked={formData.isBestSeller} onChange={(e) => setFormData(prev => ({ ...prev, isBestSeller: e.target.checked }))} className="w-5 h-5 text-luminous-maroon focus:ring-luminous-gold rounded" />
-                                                        <label htmlFor="isBestSeller" className="text-sm font-bold text-gray-700 cursor-pointer">Best Seller</label>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 pt-6">
-                                                        <input type="checkbox" name="isNewArrival" id="isNewArrival" checked={formData.isNewArrival} onChange={(e) => setFormData(prev => ({ ...prev, isNewArrival: e.target.checked }))} className="w-5 h-5 text-luminous-maroon focus:ring-luminous-gold rounded" />
-                                                        <label htmlFor="isNewArrival" className="text-sm font-bold text-gray-700 cursor-pointer">New Arrival</label>
-                                                    </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Features (comma separated)</label>
+                                                    <input name="features" value={formData.features} onChange={handleInputChange} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none" placeholder="Handmade, Pure Brass, Washable" />
                                                 </div>
                                             </div>
                                             <div className="md:col-span-2 flex justify-end gap-4 mt-4">

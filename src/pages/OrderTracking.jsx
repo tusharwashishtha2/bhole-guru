@@ -2,21 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Package, Truck, MapPin, Phone, Star, ArrowRight, X } from 'lucide-react';
 import Button from '../components/ui/Button';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
 import confetti from 'canvas-confetti';
 
 const OrderTracking = () => {
-    const { id } = useParams();
     const { getOrder, currentOrderId } = useOrder();
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [showDeliveredPopup, setShowDeliveredPopup] = useState(false);
 
     useEffect(() => {
-        const targetOrderId = id || currentOrderId;
-        if (targetOrderId) {
-            const currentOrder = getOrder(targetOrderId);
+        if (currentOrderId) {
+            const currentOrder = getOrder(currentOrderId);
             setOrder(currentOrder);
 
             // Check if just delivered to show popup
@@ -91,9 +89,8 @@ const OrderTracking = () => {
 
     // Handle loading or no order state
     if (!order) {
-        const targetOrderId = id || currentOrderId;
-        // If there's no ID, show empty state immediately
-        if (!targetOrderId) {
+        // If there's no currentOrderId, show empty state immediately
+        if (!currentOrderId) {
             return (
                 <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
                     <div className="text-center">

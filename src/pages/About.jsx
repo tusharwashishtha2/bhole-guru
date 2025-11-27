@@ -6,59 +6,80 @@ const About = () => {
     return (
         <div className="bg-luminous-bg min-h-screen overflow-hidden">
 
-            {/* --- HERO SECTION: TEXT-ONLY ANIMATED SANCTUARY --- */}
-            <section className="relative min-h-[80vh] flex flex-col items-center justify-center pt-40 pb-20 overflow-hidden">
-                {/* Background Decor - Subtle & Spiritual */}
+            {/* --- HERO SECTION: THE VERTICAL SANCTUARY (Premium & Safe) --- */}
+            <section className="relative min-h-screen flex flex-col items-center justify-start pt-40 pb-20 overflow-hidden">
+                {/* Background Decor */}
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-luminous-gold/5 rounded-full blur-[150px] animate-pulse-slow"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-luminous-gold/10 rounded-full blur-[120px] -z-10"></div>
 
                 <div className="container mx-auto px-6 relative z-10 text-center">
 
-                    {/* Animated Title */}
+                    {/* 1. Typography (Safe Zone) */}
                     <motion.div
-                        initial={{ opacity: 0, y: 40 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className="mb-12"
+                        transition={{ duration: 0.8 }}
+                        className="mb-16"
                     >
-                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold text-luminous-maroon mb-6 leading-tight drop-shadow-sm">
+                        <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-luminous-gold/10 border border-luminous-gold/30 mb-8 backdrop-blur-sm">
+                            <Sparkles size={14} className="text-luminous-gold" />
+                            <span className="text-xs font-bold tracking-[0.2em] text-luminous-gold uppercase">Est. 2024 • Vedic Heritage</span>
+                            <Sparkles size={14} className="text-luminous-gold" />
+                        </div>
+
+                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-8 leading-tight drop-shadow-2xl">
                             Where Faith <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-luminous-gold via-luminous-saffron to-luminous-gold italic font-serif">Finds a Home</span>
                         </h1>
-                    </motion.div>
 
-                    {/* Animated Description - The Focus */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-                        className="max-w-4xl mx-auto relative"
-                    >
-                        {/* Decorative Quotes */}
-                        <span className="absolute -top-8 -left-8 text-8xl text-luminous-gold/10 font-serif">"</span>
-                        <span className="absolute -bottom-12 -right-8 text-8xl text-luminous-gold/10 font-serif rotate-180">"</span>
-
-                        <p className="text-xl md:text-3xl text-luminous-text/80 leading-relaxed font-medium font-serif italic">
-                            Bhole Guru is not just a store; it is a sanctuary for the soul. <br className="hidden md:block" />
-                            We bridge the gap between <span className="text-luminous-maroon font-semibold">ancient vedic traditions</span> and the <span className="text-luminous-maroon font-semibold">modern spiritual seeker</span>.
+                        <p className="text-lg md:text-xl text-luminous-text/80 max-w-2xl mx-auto leading-relaxed font-medium">
+                            A sanctuary for the soul, bridging the gap between ancient vedic traditions and the modern spiritual seeker.
                         </p>
                     </motion.div>
 
-                    {/* Subtle Scroll Indicator */}
+                    {/* 2. Visuals: The Three Arches */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto"
+                    >
+                        {[
+                            { img: "https://images.unsplash.com/photo-1604916479528-725f30243744?q=80&w=600&auto=format&fit=crop", title: "Sacred Rituals", delay: 0 },
+                            { img: "https://images.unsplash.com/photo-1582560475093-6f09a302501d?q=80&w=600&auto=format&fit=crop", title: "Divine Idols", delay: 0.1 },
+                            { img: "https://images.unsplash.com/photo-1605634289890-50b38d72ac58?q=80&w=600&auto=format&fit=crop", title: "Pure Essence", delay: 0.2 }
+                        ].map((item, idx) => (
+                            <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 + item.delay, duration: 0.6 }}
+                                whileHover={{ y: -10 }}
+                                className="group relative h-[400px] rounded-t-[10rem] rounded-b-3xl overflow-hidden border border-luminous-gold/20 shadow-2xl"
+                            >
+                                <img
+                                    src={item.img}
+                                    alt={item.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                <div className="absolute bottom-6 left-0 w-full text-center">
+                                    <h3 className="text-2xl font-display font-bold text-luminous-gold mb-1">{item.title}</h3>
+                                    <div className="w-12 h-0.5 bg-luminous-gold mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    {/* Scroll Indicator */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 2, duration: 1 }}
-                        className="mt-24 flex flex-col items-center gap-3"
+                        transition={{ delay: 1.5, duration: 1 }}
+                        className="mt-16 flex flex-col items-center gap-2"
                     >
-                        <span className="text-xs font-bold tracking-[0.3em] text-luminous-maroon/60 uppercase">Begin Your Journey</span>
-                        <div className="w-[1px] h-16 bg-gradient-to-b from-luminous-maroon/0 via-luminous-maroon/50 to-luminous-maroon/0 relative overflow-hidden">
-                            <motion.div
-                                animate={{ y: [-20, 60] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                className="w-full h-1/2 bg-luminous-maroon absolute top-0"
-                            ></motion.div>
-                        </div>
+                        <span className="text-xs font-bold tracking-[0.2em] text-luminous-text/60 uppercase">Explore Our Legacy</span>
+                        <ChevronDown className="text-luminous-gold w-6 h-6 animate-bounce" />
                     </motion.div>
 
                 </div>
@@ -112,10 +133,10 @@ const About = () => {
                         </motion.div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* --- QUOTE PARALLAX SECTION --- */}
-            < section className="relative py-32 bg-fixed bg-cover bg-center overflow-hidden" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1518154334286-2b7f94f6b71b?q=80&w=1920&auto=format&fit=crop')" }}>
+            <section className="relative py-32 bg-fixed bg-cover bg-center overflow-hidden" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1518154334286-2b7f94f6b71b?q=80&w=1920&auto=format&fit=crop')" }}>
                 <div className="absolute inset-0 bg-black/60"></div>
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <motion.div
@@ -130,10 +151,10 @@ const About = () => {
                         <div className="w-32 h-1 bg-gradient-to-r from-transparent via-luminous-gold to-transparent mx-auto mt-10"></div>
                     </motion.div>
                 </div>
-            </section >
+            </section>
 
             {/* --- VALUES GRID --- */}
-            < section className="py-24 bg-white relative" >
+            <section className="py-24 bg-white relative">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-luminous-gold/5 rounded-full blur-3xl"></div>
                 <div className="container mx-auto px-6">
                     <div className="text-center mb-16">
@@ -163,9 +184,9 @@ const About = () => {
                         ))}
                     </div>
                 </div>
-            </section >
+            </section>
 
-        </div >
+        </div>
     );
 };
 

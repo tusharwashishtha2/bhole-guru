@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
 import { useToast } from '../context/ToastContext';
@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile = () => {
     const { user, logout, updateUserProfile, sendOtp, verifyOtp } = useAuth();
-    const { orders, fetchMyOrders } = useOrder();
+    const { getUserOrders } = useOrder();
     const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState('orders');
 
@@ -35,11 +35,7 @@ const Profile = () => {
     const [otp, setOtp] = useState('');
     const [otpTarget, setOtpTarget] = useState(''); // 'email' or 'phone'
 
-    useEffect(() => {
-        fetchMyOrders();
-    }, []);
-
-    const userOrders = orders;
+    const userOrders = getUserOrders(user?.email);
 
     if (!user) {
         return (
@@ -172,11 +168,11 @@ const Profile = () => {
                             </div>
                         ) : (
                             userOrders.map((order) => (
-                                <div key={order._id || order.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                <div key={order.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 className="font-bold text-lg text-gray-900">Order #{order._id || order.id}</h3>
-                                            <p className="text-sm text-gray-500">{new Date(order.createdAt || order.date).toLocaleDateString()}</p>
+                                            <h3 className="font-bold text-lg text-gray-900">Order #{order.id}</h3>
+                                            <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
                                         </div>
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
                                             order.status === 'Order Placed' ? 'bg-blue-100 text-blue-700' :
@@ -186,7 +182,7 @@ const Profile = () => {
                                         </span>
                                     </div>
                                     <div className="space-y-2 mb-4">
-                                        {(order.orderItems || order.items).map((item, idx) => (
+                                        {order.items.map((item, idx) => (
                                             <div key={idx} className="flex justify-between text-sm">
                                                 <span className="text-gray-600">{item.name} x {item.quantity}</span>
                                                 <span className="font-medium">₹{item.price * item.quantity}</span>
@@ -194,8 +190,8 @@ const Profile = () => {
                                         ))}
                                     </div>
                                     <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                                        <span className="font-bold text-gray-900">Total: ₹{order.totalPrice || order.total}</span>
-                                        <Link to={`/track-order/${order._id || order.id}`} className="text-luminous-maroon font-bold text-sm hover:underline">
+                                        <span className="font-bold text-gray-900">Total: ₹{order.total}</span>
+                                        <Link to="/order-tracking" className="text-luminous-maroon font-bold text-sm hover:underline">
                                             Track Order
                                         </Link>
                                     </div>
@@ -297,7 +293,7 @@ const Profile = () => {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user.addresses?.map(addr => (
+                                {user.addresses.map(addr => (
                                     <div key={addr.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative group">
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex items-center gap-2">
@@ -330,7 +326,7 @@ const Profile = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-xl font-bold text-gray-900">{user.name}</h3>
-                                        <p className="text-gray-500 text-sm">Member since {user._id ? new Date(parseInt(user._id.substring(0, 8), 16) * 1000).getFullYear() : '2024'}</p>
+                                        <p className="text-gray-500 text-sm">Member since {new Date(user.id).getFullYear()}</p>
                                     </div>
                                 </div>
 
