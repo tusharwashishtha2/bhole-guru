@@ -3,7 +3,7 @@ const Order = require('../models/Order');
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
-const addOrderItems = async (req, res) => {
+exports.createOrder = async (req, res) => {
     try {
         const {
             orderItems,
@@ -18,22 +18,22 @@ const addOrderItems = async (req, res) => {
         if (orderItems && orderItems.length === 0) {
             res.status(400).json({ message: 'No order items' });
             return;
-        } else {
-            const order = new Order({
-                orderItems,
-                user: req.user._id,
-                shippingAddress,
-                paymentMethod,
-                itemsPrice,
-                taxPrice,
-                shippingPrice,
-                totalPrice,
-                timeline: [{ status: 'Order Placed' }]
-            });
-
-            const createdOrder = await order.save();
-            res.status(201).json(createdOrder);
         }
+
+        const order = new Order({
+            user: req.user._id,
+            orderItems,
+            shippingAddress,
+            paymentMethod,
+            itemsPrice,
+            taxPrice,
+            shippingPrice,
+            totalPrice
+        });
+
+        const createdOrder = await order.save();
+        res.status(201).json(createdOrder);
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -42,7 +42,7 @@ const addOrderItems = async (req, res) => {
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
 // @access  Private
-const getOrderById = async (req, res) => {
+exports.getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id).populate('user', 'name email');
 
@@ -59,43 +59,43 @@ const getOrderById = async (req, res) => {
 // @desc    Get logged in user orders
 // @route   GET /api/orders/myorders
 // @access  Private
-const getMyOrders = async (req, res) => {
+exports.getMyOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ user: req.user._id });
+        const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Get all orders (Admin)
+// @desc    Get all orders
 // @route   GET /api/orders
 // @access  Private/Admin
-const getOrders = async (req, res) => {
+exports.getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find({}).populate('user', 'id name');
+        const orders = await Order.find({}).populate('user', 'id name').sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Update order status
-// @route   PUT /api/orders/:id/status
-// @access  Private/Admin
-const updateOrderStatus = async (req, res) => {
+// @desc    Update order to paid
+// @route   PUT /api/orders/:id/pay
+// @access  Private
+exports.updateOrderToPaid = async (req, res) => {
     try {
-        const { status } = req.body;
         const order = await Order.findById(req.params.id);
 
         if (order) {
-            order.status = status;
-            order.timeline.push({ status, time: Date.now() });
-
-            if (status === 'Delivered') {
-                order.isDelivered = true;
-                order.deliveredAt = Date.now();
-            }
+            order.isPaid = true;
+            order.paidAt = Date.now();
+            order.paymentResult = {
+                id: req.body.id,
+                status: req.body.status,
+                update_time: req.body.update_time,
+                email_address: req.body.email_address
+            };
 
             const updatedOrder = await order.save();
             res.json(updatedOrder);
@@ -107,10 +107,25 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-module.exports = {
-    addOrderItems,
-    getOrderById,
-    getMyOrders,
-    getOrders,
-    updateOrderStatus
+// @desc    Update order status (Admin)
+// @route   PUT /api/orders/:id/status
+// @access  Private/Admin
+exports.updateOrderStatus = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (order) {
+            order.status = req.body.status;
+            if (req.body.status === 'Delivered') {
+                order.isDelivered = true;
+                order.deliveredAt = Date.now();
+            }
+            const updatedOrder = await order.save();
+            res.json(updatedOrder);
+        } else {
+            res.status(404).json({ message: 'Order not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };

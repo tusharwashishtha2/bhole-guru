@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema({
+const orderSchema = mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -23,7 +23,8 @@ const orderSchema = new mongoose.Schema({
         address: { type: String, required: true },
         city: { type: String, required: true },
         postalCode: { type: String, required: true },
-        country: { type: String, required: true }
+        country: { type: String, required: true },
+        phone: { type: String, required: true }
     },
     paymentMethod: {
         type: String,
@@ -73,18 +74,11 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        required: true,
-        default: 'Order Placed',
-        enum: ['Order Placed', 'Packed', 'Out for Delivery', 'Delivered']
-    },
-    timeline: [
-        {
-            status: { type: String },
-            time: { type: Date, default: Date.now }
-        }
-    ]
-}, { timestamps: true });
+        enum: ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+        default: 'Processing'
+    }
+}, {
+    timestamps: true
+});
 
-const Order = mongoose.model('Order', orderSchema);
-
-module.exports = Order;
+module.exports = mongoose.model('Order', orderSchema);

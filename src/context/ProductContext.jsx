@@ -9,13 +9,18 @@ export const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const { addToast } = useToast();
-    const API_URL = 'http://localhost:5000/api/products';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/products';
 
     const fetchProducts = async () => {
         try {
             const response = await fetch(API_URL);
             const data = await response.json();
-            setProducts(data);
+            // Map _id to id for frontend compatibility
+            const mappedProducts = data.map(product => ({
+                ...product,
+                id: product._id
+            }));
+            setProducts(mappedProducts);
             setLoading(false);
         } catch (error) {
             console.error("Failed to fetch products", error);
@@ -39,7 +44,8 @@ export const ProductProvider = ({ children }) => {
             const data = await response.json();
 
             if (response.ok) {
-                setProducts(prev => [data, ...prev]);
+                const newProduct = { ...data, id: data._id };
+                setProducts(prev => [newProduct, ...prev]);
                 addToast(`Product "${data.name}" added successfully`, 'success');
             } else {
                 addToast('Failed to add product', 'error');
@@ -62,8 +68,9 @@ export const ProductProvider = ({ children }) => {
             const data = await response.json();
 
             if (response.ok) {
+                const updatedProduct = { ...data, id: data._id };
                 setProducts(prev => prev.map(prod =>
-                    prod._id === id ? data : prod
+                    prod._id === id ? updatedProduct : prod
                 ));
                 addToast('Product updated successfully', 'success');
             } else {

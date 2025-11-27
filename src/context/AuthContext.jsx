@@ -7,7 +7,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const API_URL = 'http://localhost:5000/api/auth';
+    const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth';
 
     useEffect(() => {
         // Check for saved user and token in localStorage on mount
@@ -44,24 +44,8 @@ export const AuthProvider = ({ children }) => {
             setUser(data);
             return data;
         } catch (error) {
-            console.warn("API Login failed, falling back to MOCK AUTH for demo:", error);
-
-            // --- MOCK AUTH FALLBACK ---
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const mockUser = {
-                _id: 'mock-user-id-' + Date.now(),
-                name: 'Demo User',
-                email: email,
-                isAdmin: email.includes('admin'), // Grant admin if email contains 'admin'
-                token: 'mock-jwt-token'
-            };
-
-            localStorage.setItem('bhole_guru_user', JSON.stringify(mockUser));
-            localStorage.setItem('bhole_guru_token', mockUser.token);
-            setUser(mockUser);
-            return mockUser;
+            console.error("Login failed:", error);
+            throw error;
         }
     };
 
@@ -88,24 +72,8 @@ export const AuthProvider = ({ children }) => {
             setUser(data);
             return data;
         } catch (error) {
-            console.warn("API Signup failed, falling back to MOCK AUTH for demo:", error);
-
-            // --- MOCK AUTH FALLBACK ---
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const mockUser = {
-                _id: 'mock-user-id-' + Date.now(),
-                name: userData.name,
-                email: userData.email,
-                phone: userData.phone,
-                isAdmin: userData.email.includes('admin'),
-                token: 'mock-jwt-token'
-            };
-
-            localStorage.setItem('bhole_guru_user', JSON.stringify(mockUser));
-            localStorage.setItem('bhole_guru_token', mockUser.token);
-            setUser(mockUser);
-            return mockUser;
+            console.error("Registration failed:", error);
+            throw error;
         }
     };
 
@@ -124,6 +92,24 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const sendOtp = async (email) => {
+        // Simulate sending OTP
+        return new Promise((resolve) => setTimeout(resolve, 1000));
+    };
+
+    const verifyOtp = async (email, otp) => {
+        // Simulate verifying OTP
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (otp === '123456') {
+                    resolve(true);
+                } else {
+                    reject(new Error('Invalid OTP. Please enter 123456'));
+                }
+            }, 1000);
+        });
+    };
+
     const updateUserProfile = async (updatedData) => {
         // Placeholder: In a real app, you would call a PUT /api/users/profile endpoint
         // For now, we'll just update the local state to keep the UI responsive
@@ -134,7 +120,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile }}>
+        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, sendOtp, verifyOtp, loading, updateUserProfile }}>
             {!loading && children}
         </AuthContext.Provider>
     );
