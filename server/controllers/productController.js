@@ -8,7 +8,7 @@ const getProducts = async (req, res) => {
         const products = await Product.find({});
         res.json(products);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -18,13 +18,14 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
+
         if (product) {
             res.json(product);
         } else {
             res.status(404).json({ message: 'Product not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -33,44 +34,24 @@ const getProductById = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
     try {
-        const { name, price, description, category, image } = req.body;
+        const { name, price, description, image, category, countInStock, isNewArrival, isBestSeller } = req.body;
+
         const product = new Product({
             name,
             price,
             description,
+            image,
             category,
-            image
+            countInStock,
+            isNewArrival,
+            isBestSeller,
+            user: req.user._id, // Assumes authMiddleware attaches user
         });
 
         const createdProduct = await product.save();
         res.status(201).json(createdProduct);
     } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Update a product
-// @route   PUT /api/products/:id
-// @access  Private/Admin
-const updateProduct = async (req, res) => {
-    try {
-        const { name, price, description, category, image } = req.body;
-        const product = await Product.findById(req.params.id);
-
-        if (product) {
-            product.name = name || product.name;
-            product.price = price || product.price;
-            product.description = description || product.description;
-            product.category = category || product.category;
-            product.image = image || product.image;
-
-            const updatedProduct = await product.save();
-            res.json(updatedProduct);
-        } else {
-            res.status(404).json({ message: 'Product not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Server Error: ' + error.message });
     }
 };
 
@@ -88,7 +69,36 @@ const deleteProduct = async (req, res) => {
             res.status(404).json({ message: 'Product not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Update a product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+const updateProduct = async (req, res) => {
+    try {
+        const { name, price, description, image, category, countInStock, isNewArrival, isBestSeller } = req.body;
+
+        const product = await Product.findById(req.params.id);
+
+        if (product) {
+            product.name = name || product.name;
+            product.price = price || product.price;
+            product.description = description || product.description;
+            product.image = image || product.image;
+            product.category = category || product.category;
+            product.countInStock = countInStock || product.countInStock;
+            product.isNewArrival = isNewArrival !== undefined ? isNewArrival : product.isNewArrival;
+            product.isBestSeller = isBestSeller !== undefined ? isBestSeller : product.isBestSeller;
+
+            const updatedProduct = await product.save();
+            res.json(updatedProduct);
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -96,6 +106,6 @@ module.exports = {
     getProducts,
     getProductById,
     createProduct,
+    deleteProduct,
     updateProduct,
-    deleteProduct
 };

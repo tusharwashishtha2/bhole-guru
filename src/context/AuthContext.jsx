@@ -44,24 +44,8 @@ export const AuthProvider = ({ children }) => {
             setUser(data);
             return data;
         } catch (error) {
-            console.warn("API Login failed, falling back to MOCK AUTH for demo:", error);
-
-            // --- MOCK AUTH FALLBACK ---
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const mockUser = {
-                _id: 'mock-user-id-' + Date.now(),
-                name: 'Demo User',
-                email: email,
-                isAdmin: email.includes('admin'), // Grant admin if email contains 'admin'
-                token: 'mock-jwt-token'
-            };
-
-            localStorage.setItem('bhole_guru_user', JSON.stringify(mockUser));
-            localStorage.setItem('bhole_guru_token', mockUser.token);
-            setUser(mockUser);
-            return mockUser;
+            console.error("Login failed:", error);
+            throw error;
         }
     };
 
@@ -88,24 +72,8 @@ export const AuthProvider = ({ children }) => {
             setUser(data);
             return data;
         } catch (error) {
-            console.warn("API Signup failed, falling back to MOCK AUTH for demo:", error);
-
-            // --- MOCK AUTH FALLBACK ---
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const mockUser = {
-                _id: 'mock-user-id-' + Date.now(),
-                name: userData.name,
-                email: userData.email,
-                phone: userData.phone,
-                isAdmin: userData.email.includes('admin'),
-                token: 'mock-jwt-token'
-            };
-
-            localStorage.setItem('bhole_guru_user', JSON.stringify(mockUser));
-            localStorage.setItem('bhole_guru_token', mockUser.token);
-            setUser(mockUser);
-            return mockUser;
+            console.error("Signup failed:", error);
+            throw error;
         }
     };
 
@@ -133,8 +101,31 @@ export const AuthProvider = ({ children }) => {
         return updatedUser;
     };
 
+    const sendOtp = async (email) => {
+        // Mock OTP sending
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log(`OTP sent to ${email}: 123456`);
+                resolve(true);
+            }, 1000);
+        });
+    };
+
+    const verifyOtp = async (email, otp) => {
+        // Mock OTP verification
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (otp === '123456') {
+                    resolve(true);
+                } else {
+                    reject(new Error('Invalid OTP'));
+                }
+            }, 1000);
+        });
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile }}>
+        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile, sendOtp, verifyOtp }}>
             {!loading && children}
         </AuthContext.Provider>
     );

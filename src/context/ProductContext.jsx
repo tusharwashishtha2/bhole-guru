@@ -29,10 +29,12 @@ export const ProductProvider = ({ children }) => {
 
     const addProduct = async (newProduct) => {
         try {
+            const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(newProduct),
             });
@@ -41,21 +43,27 @@ export const ProductProvider = ({ children }) => {
             if (response.ok) {
                 setProducts(prev => [data, ...prev]);
                 addToast(`Product "${data.name}" added successfully`, 'success');
+                return { success: true };
             } else {
-                addToast('Failed to add product', 'error');
+                console.error("Failed to add product:", data);
+                addToast(data.message || 'Failed to add product', 'error');
+                return { success: false, message: data.message };
             }
         } catch (error) {
             console.error("Error adding product:", error);
             addToast('Error adding product', 'error');
+            return { success: false, message: error.message };
         }
     };
 
     const updateProduct = async (id, updatedFields) => {
         try {
+            const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(`${API_URL}/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(updatedFields),
             });
@@ -77,8 +85,12 @@ export const ProductProvider = ({ children }) => {
 
     const deleteProduct = async (id) => {
         try {
+            const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(`${API_URL}/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (response.ok) {

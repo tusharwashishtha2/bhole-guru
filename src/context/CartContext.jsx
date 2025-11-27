@@ -21,12 +21,14 @@ export const CartProvider = ({ children }) => {
         let type = 'success';
 
         setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id);
+            const productId = product._id || product.id;
+            const existingItem = prevCart.find(item => (item._id || item.id) === productId);
+
             if (existingItem) {
                 message = `Updated quantity for ${product.name}`;
                 type = 'info';
                 return prevCart.map(item =>
-                    item.id === product.id
+                    (item._id || item.id) === productId
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
@@ -44,7 +46,8 @@ export const CartProvider = ({ children }) => {
         // OR just duplicate the check logic outside.
 
         // Let's do this:
-        const isExisting = cart.some(item => item.id === product.id);
+        const productId = product._id || product.id;
+        const isExisting = cart.some(item => (item._id || item.id) === productId);
         if (isExisting) {
             addToast(`Updated quantity for ${product.name}`, 'info');
         } else {
@@ -53,7 +56,7 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromCart = (productId) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== productId));
+        setCart(prevCart => prevCart.filter(item => (item._id || item.id) !== productId));
         addToast('Item removed from cart', 'info');
     };
 
@@ -64,7 +67,7 @@ export const CartProvider = ({ children }) => {
         }
         setCart(prevCart =>
             prevCart.map(item =>
-                item.id === productId ? { ...item, quantity: newQuantity } : item
+                (item._id || item.id) === productId ? { ...item, quantity: newQuantity } : item
             )
         );
     };

@@ -79,13 +79,31 @@ const Checkout = () => {
         setTimeout(() => {
             setLoading(false);
 
+            const orderItems = cart.map(item => ({
+                name: item.name,
+                qty: item.quantity,
+                image: item.image,
+                price: item.price,
+                product: item._id || item.id
+            }));
+
+            const shippingAddress = {
+                address: document.getElementById('address')?.value || "123, Temple Street",
+                city: document.getElementById('city')?.value || "Varanasi",
+                postalCode: document.getElementById('pincode')?.value || "221001",
+                country: "India"
+            };
+
             // Create real order in context
             addOrder({
-                items: cart,
-                total: total,
-                paymentMethod: paymentMethod,
-                shippingAddress: "123, Temple Street, Varanasi" // Mock address for now
-            }, user?.email); // Pass user email
+                orderItems,
+                shippingAddress,
+                paymentMethod,
+                itemsPrice: subtotal,
+                taxPrice: 0,
+                shippingPrice: shipping,
+                totalPrice: total
+            });
 
             clearCart();
             setIsOrderPlaced(true); // Show success popup
@@ -288,15 +306,15 @@ const Checkout = () => {
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 1</label>
-                                    <input required type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="House No., Building, Street" />
+                                    <input required id="address" type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="House No., Building, Street" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                    <input required type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="City" />
+                                    <input required id="city" type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="City" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                                    <input required type="text" pattern="[0-9]{6}" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="123456" />
+                                    <input required id="pincode" type="text" pattern="[0-9]{6}" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="123456" />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>

@@ -149,7 +149,7 @@ const Header = () => {
                     <Link to="/" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Home</Link>
                     <Link to="/shop" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Shop</Link>
                     <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">About</Link>
-                    {user && !user.isAdmin && (
+                    {user && user.role !== 'admin' && (
                         <Link to="/track-order" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Track</Link>
                     )}
                 </nav>
@@ -186,7 +186,7 @@ const Header = () => {
 
                     {user ? (
                         <div className="flex items-center gap-3">
-                            {user.isAdmin && (
+                            {user.role === 'admin' && (
                                 <Link to="/admin" className="hidden md:block text-xs font-bold uppercase tracking-widest text-luminous-maroon dark:text-luminous-gold hover:text-luminous-saffron transition-colors">
                                     Admin
                                 </Link>
@@ -250,7 +250,7 @@ const Header = () => {
                     <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Home</Link>
                     <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Shop</Link>
                     <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">About</Link>
-                    {user && !user.isAdmin && (
+                    {user && user.role !== 'admin' && (
                         <Link to="/track-order" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Track Order</Link>
                     )}
                     <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Wishlist ({wishlist.length})</Link>
@@ -264,7 +264,7 @@ const Header = () => {
                     {user && (
                         <>
                             <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">My Profile</Link>
-                            {user.isAdmin && (
+                            {user.role === 'admin' && (
                                 <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-luminous-maroon dark:text-stone-300">Admin Dashboard</Link>
                             )}
                             <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="text-left text-lg font-bold text-red-600">Logout</button>

@@ -34,7 +34,7 @@ const Login = () => {
             await login(formData.email, formData.password);
             navigate('/');
         } catch (err) {
-            setError(err);
+            setError(err.message || 'Login failed. Please check your credentials.');
         } finally {
             setIsLoading(false);
         }
@@ -131,8 +131,8 @@ const Login = () => {
                     </p>
                     <div className="mt-4 p-3 bg-luminous-gold/10 rounded-lg text-xs text-luminous-maroon border border-luminous-gold/20">
                         <p className="font-bold">Demo Admin Access:</p>
-                        <p>Email: admin@bholeguru.com</p>
-                        <p>Password: admin123</p>
+                        <p>Email: admin@example.com</p>
+                        <p>Password: password123</p>
                     </div>
                 </div>
 
