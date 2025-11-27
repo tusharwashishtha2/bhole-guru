@@ -10,7 +10,7 @@ export const OrderProvider = ({ children }) => {
     const [currentOrderId, setCurrentOrderId] = useState(null);
     const [loading, setLoading] = useState(true);
     const { addToast } = useToast();
-    const API_URL = 'http://localhost:5000/api/orders';
+    const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders';
 
     const getToken = () => localStorage.getItem('bhole_guru_token');
 
