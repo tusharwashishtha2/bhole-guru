@@ -50,14 +50,31 @@ const Admin = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
-            };
-            reader.readAsDataURL(file);
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                // Show loading state or toast if needed
+                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                const response = await fetch(`${API_URL}/api/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    setFormData(prev => ({ ...prev, image: data.imageUrl }));
+                } else {
+                    console.error('Upload failed:', data.message);
+                    alert('Image upload failed');
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Error uploading image');
+            }
         }
     };
 
