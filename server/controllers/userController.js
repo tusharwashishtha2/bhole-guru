@@ -14,7 +14,8 @@ exports.getUserProfile = async (req, res) => {
                 role: user.role,
                 phone: user.phone,
                 address: user.address,
-                wishlist: user.wishlist
+                wishlist: user.wishlist,
+                image: user.image
             });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -36,6 +37,7 @@ exports.updateUserProfile = async (req, res) => {
             user.email = req.body.email || user.email;
             user.phone = req.body.phone || user.phone;
             user.address = req.body.address || user.address;
+            user.image = req.body.image || user.image;
 
             if (req.body.password) {
                 user.password = req.body.password;
@@ -50,6 +52,7 @@ exports.updateUserProfile = async (req, res) => {
                 role: updatedUser.role,
                 phone: updatedUser.phone,
                 address: updatedUser.address,
+                image: updatedUser.image,
                 token: generateToken(updatedUser._id) // Optional: issue new token
             });
         } else {

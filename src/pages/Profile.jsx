@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
 import { useToast } from '../context/ToastContext';
-import { User, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, ShoppingBag, Plus, Edit2, Trash2, Save, X, Phone, Mail, KeyRound } from 'lucide-react';
+import { User, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, ShoppingBag, Plus, Edit2, Trash2, Save, X, Phone, Mail, KeyRound, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +34,35 @@ const Profile = () => {
     const [otpStep, setOtpStep] = useState(false);
     const [otp, setOtp] = useState('');
     const [otpTarget, setOtpTarget] = useState(''); // 'email' or 'phone'
+    const [uploading, setUploading] = useState(false);
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        setUploading(true);
+        try {
+            const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000');
+            const uploadRes = await fetch(`${API_URL}/api/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!uploadRes.ok) throw new Error('Image upload failed');
+
+            const data = await uploadRes.json();
+            await updateUserProfile({ image: data.imageUrl });
+            addToast('Profile picture updated', 'success');
+        } catch (error) {
+            console.error(error);
+            addToast('Failed to upload image', 'error');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     React.useEffect(() => {
         if (user) {
@@ -332,12 +361,26 @@ const Profile = () => {
                         {!isEditingProfile ? (
                             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-6">
                                 <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
-                                    <div className="w-16 h-16 bg-luminous-maroon text-white rounded-full flex items-center justify-center font-bold text-2xl">
-                                        {user.name ? user.name[0].toUpperCase() : 'U'}
+                                    <div className="relative group">
+                                        <div className="w-20 h-20 bg-luminous-maroon text-white rounded-full flex items-center justify-center font-bold text-3xl overflow-hidden border-2 border-luminous-gold">
+                                            {user.image ? (
+                                                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                user.name ? user.name[0].toUpperCase() : 'U'
+                                            )}
+                                        </div>
+                                        <label className="absolute bottom-0 right-0 bg-white text-luminous-maroon p-1.5 rounded-full shadow-lg cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200">
+                                            {uploading ? (
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-luminous-maroon"></div>
+                                            ) : (
+                                                <Camera size={14} />
+                                            )}
+                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                        </label>
                                     </div>
                                     <div>
                                         <h3 className="text-xl font-bold text-gray-900">{user.name}</h3>
-                                        <p className="text-gray-500 text-sm">Member since {new Date(user.id).getFullYear()}</p>
+                                        <p className="text-gray-500 text-sm">Member since {new Date(user.createdAt || Date.now()).getFullYear()}</p>
                                     </div>
                                 </div>
 
@@ -450,8 +493,12 @@ const Profile = () => {
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="p-6 border-b border-gray-100 bg-luminous-bg/50">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-luminous-maroon text-white rounded-full flex items-center justify-center font-bold text-xl">
-                                        {user.name ? user.name[0].toUpperCase() : 'U'}
+                                    <div className="w-12 h-12 bg-luminous-maroon text-white rounded-full flex items-center justify-center font-bold text-xl overflow-hidden border border-luminous-gold/30">
+                                        {user.image ? (
+                                            <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            user.name ? user.name[0].toUpperCase() : 'U'
+                                        )}
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Hello,</p>
