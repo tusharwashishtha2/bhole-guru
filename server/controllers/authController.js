@@ -32,16 +32,12 @@ exports.register = async (req, res) => {
 
         if (user) {
             // Send Welcome Email
-            try {
-                await sendEmail({
-                    email: user.email,
-                    subject: 'Welcome to Bhole Guru! 🙏',
-                    message: `<h1>Namaste ${user.name},</h1><p>Thank you for joining Bhole Guru. We are delighted to have you on our spiritual journey.</p><p>Explore our collection of divine essentials.</p>`
-                });
-            } catch (emailError) {
-                console.error('Email send failed:', emailError);
-                // Don't fail registration if email fails
-            }
+            // Send Welcome Email (Non-blocking)
+            sendEmail({
+                email: user.email,
+                subject: 'Welcome to Bhole Guru! 🙏',
+                message: `<h1>Namaste ${user.name},</h1><p>Thank you for joining Bhole Guru. We are delighted to have you on our spiritual journey.</p><p>Explore our collection of divine essentials.</p>`
+            }).catch(err => console.error('Email send failed:', err));
 
             res.status(201).json({
                 _id: user._id,
