@@ -26,6 +26,99 @@ const Admin = () => {
     const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories'
     const [newCategory, setNewCategory] = useState('');
 
+    // Product Form State
+    const [isEditing, setIsEditing] = useState(null); // ID of product being edited
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        price: '',
+        originalPrice: '',
+        category: 'Thali Sets',
+        image: '',
+        description: '',
+        features: ''
+    });
+
+    // Helper Functions
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Order Placed': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'Packed': return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'Shipped': return 'bg-purple-100 text-purple-800 border-purple-200';
+            case 'Out for Delivery': return 'bg-orange-100 text-orange-800 border-orange-200';
+            case 'Delivered': return 'bg-green-100 text-green-800 border-green-200';
+            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, image: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleAddProduct = (e) => {
+        e.preventDefault();
+        addProduct({
+            ...formData,
+            price: Number(formData.price),
+            originalPrice: Number(formData.originalPrice),
+            rating: 0,
+            reviews: 0
+        });
+        setShowAddForm(false);
+        resetForm();
+    };
+
+    const startEditing = (product) => {
+        setIsEditing(product.id);
+        setFormData({
+            name: product.name,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            category: product.category,
+            image: product.image,
+            description: product.description || '',
+            features: product.features ? product.features.join(', ') : ''
+        });
+        setShowAddForm(true);
+    };
+
+    const handleUpdateProduct = (e) => {
+        e.preventDefault();
+        updateProduct(isEditing, {
+            ...formData,
+            price: Number(formData.price),
+            originalPrice: Number(formData.originalPrice)
+        });
+        setIsEditing(null);
+        setShowAddForm(false);
+        resetForm();
+    };
+
+    const resetForm = () => {
+        setFormData({
+            name: '',
+            price: '',
+            originalPrice: '',
+            category: categories[0] || 'Thali Sets',
+            image: '',
+            description: '',
+            features: ''
+        });
+        setIsEditing(null);
+    };
+
     return (
         <div className="bg-gray-50 min-h-screen pb-20 pt-24">
             <div className="container mx-auto px-4">
