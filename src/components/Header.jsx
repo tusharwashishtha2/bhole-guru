@@ -149,7 +149,7 @@ const Header = () => {
                     <Link to="/" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Home</Link>
                     <Link to="/shop" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Shop</Link>
                     <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">About</Link>
-                    {user && !user.isAdmin && (
+                    {user && (!user.isAdmin && user.role !== 'admin') && (
                         <Link to="/track-order" className="text-xs font-bold uppercase tracking-widest text-luminous-text dark:text-stone-300 hover:text-luminous-saffron dark:hover:text-luminous-gold transition-colors drop-shadow-sm">Track</Link>
                     )}
                 </nav>
@@ -186,7 +186,7 @@ const Header = () => {
 
                     {user ? (
                         <div className="flex items-center gap-3">
-                            {user.isAdmin && (
+                            {(user.isAdmin || user.role === 'admin') && (
                                 <Link to="/admin" className="hidden md:block text-xs font-bold uppercase tracking-widest text-luminous-maroon dark:text-luminous-gold hover:text-luminous-saffron transition-colors">
                                     Admin
                                 </Link>
