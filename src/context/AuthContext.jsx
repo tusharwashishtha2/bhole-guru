@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 const AuthContext = createContext();
 
@@ -92,22 +94,52 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const sendOtp = async (email) => {
-        // Simulate sending OTP
-        return new Promise((resolve) => setTimeout(resolve, 1000));
+
+
+    const [confirmationResult, setConfirmationResult] = useState(null);
+
+    const setupRecaptcha = (elementId) => {
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
+                'size': 'invisible',
+                'callback': (response) => {
+                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                }
+            });
+        }
     };
 
-    const verifyOtp = async (email, otp) => {
-        // Simulate verifying OTP
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (otp === '123456') {
-                    resolve(true);
-                } else {
-                    reject(new Error('Invalid OTP. Please enter 123456'));
-                }
-            }, 1000);
-        });
+    const sendOtp = async (phoneNumber) => {
+        try {
+            // Ensure phone number has country code if not present
+            const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
+
+            // We need a DOM element for Recaptcha. 
+            // Ideally, this should be passed or we assume a specific ID exists.
+            // Let's assume the calling component sets up a div with id 'recaptcha-container'
+            setupRecaptcha('recaptcha-container');
+
+            const appVerifier = window.recaptchaVerifier;
+            const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+            setConfirmationResult(confirmation);
+            return confirmation;
+        } catch (error) {
+            console.error("Error sending OTP:", error);
+            throw error;
+        }
+    };
+
+    const verifyOtp = async (otp) => {
+        if (!confirmationResult) {
+            throw new Error("No OTP request found. Please request OTP first.");
+        }
+        try {
+            const result = await confirmationResult.confirm(otp);
+            return result.user;
+        } catch (error) {
+            console.error("Error verifying OTP:", error);
+            throw error;
+        }
     };
 
     const updateUserProfile = async (updatedData) => {

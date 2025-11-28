@@ -31,12 +31,11 @@ const Signup = () => {
         setError('');
 
         try {
-            await sendOtp(formData.email);
+            await sendOtp(formData.phone);
             setStep('otp');
-            addToast(`OTP sent to ${formData.email}`, 'success');
-            // In a real app, we wouldn't show the code, but for demo/simulation:
-            alert("Your OTP is 123456");
+            addToast(`OTP sent to ${formData.phone}`, 'success');
         } catch (err) {
+            console.error(err);
             setError(err.message || 'Failed to send OTP');
         } finally {
             setIsLoading(false);
@@ -49,7 +48,7 @@ const Signup = () => {
         setError('');
 
         try {
-            await verifyOtp(formData.email, formData.otp);
+            await verifyOtp(formData.otp);
             await signup({
                 name: formData.name,
                 email: formData.email,
@@ -171,8 +170,8 @@ const Signup = () => {
                     ) : (
                         <div className="space-y-4">
                             <div className="text-center mb-4">
-                                <p className="text-sm text-gray-600">We've sent a verification code to <span className="font-bold">{formData.email}</span></p>
-                                <button type="button" onClick={() => setStep('details')} className="text-xs text-luminous-maroon hover:underline mt-1">Change Email</button>
+                                <p className="text-sm text-gray-600">We've sent a verification code to <span className="font-bold">{formData.phone}</span></p>
+                                <button type="button" onClick={() => setStep('details')} className="text-xs text-luminous-maroon hover:underline mt-1">Change Phone</button>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Enter OTP</label>
@@ -207,6 +206,7 @@ const Signup = () => {
                         </Button>
                     </div>
                 </form>
+                <div id="recaptcha-container"></div>
 
                 <div className="text-center mt-4">
                     <p className="text-sm text-gray-500">
