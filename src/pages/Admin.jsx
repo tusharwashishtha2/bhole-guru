@@ -125,6 +125,31 @@ const Admin = () => {
                 <div className="text-center mb-8">
                     <h1 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Admin Dashboard</h1>
                     <p className="text-gray-500">Manage orders, inventory, and site content</p>
+                    <button
+                        onClick={async () => {
+                            try {
+                                const token = localStorage.getItem('bhole_guru_token');
+                                const res = await fetch('https://bhole-guru.onrender.com/api/auth/make-admin', {
+                                    method: 'PUT',
+                                    headers: { 'Authorization': `Bearer ${token}` }
+                                });
+                                const data = await res.json();
+                                if (res.ok) {
+                                    localStorage.setItem('bhole_guru_token', data.token);
+                                    localStorage.setItem('bhole_guru_user', JSON.stringify(data));
+                                    alert('Success! You are now an Admin. Please refresh the page.');
+                                    window.location.reload();
+                                } else {
+                                    alert('Failed: ' + data.message);
+                                }
+                            } catch (e) {
+                                alert('Error: ' + e.message);
+                            }
+                        }}
+                        className="mt-4 text-xs text-blue-500 underline"
+                    >
+                        (Debug) Fix Admin Permissions
+                    </button>
                 </div>
 
                 {/* Stats Overview */}

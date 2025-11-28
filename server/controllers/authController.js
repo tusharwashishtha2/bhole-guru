@@ -91,3 +91,27 @@ exports.getMe = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// @desc    Make current user admin (Temporary for setup)
+// @route   PUT /api/auth/make-admin
+// @access  Private
+exports.makeMeAdmin = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (user) {
+            user.role = 'admin';
+            await user.save();
+
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                token: generateToken(user._id),
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
