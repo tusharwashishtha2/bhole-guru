@@ -17,128 +17,14 @@ const Admin = () => {
         divineFavorites,
         updateDivineFavorites,
         divineEssentials,
-        updateDivineEssential
+        updateDivineEssential,
+        categories,
+        addCategory,
+        removeCategory
     } = useContent();
 
-    const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content'
-
-    // Product Form State
-    const [isEditing, setIsEditing] = useState(null); // ID of product being edited
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        price: '',
-        originalPrice: '',
-        category: 'Pooja Essentials',
-        image: '',
-        description: '',
-        features: ''
-    });
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'Order Placed': return 'bg-blue-100 text-blue-800 border-blue-200';
-            case 'Packed': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'Shipped': return 'bg-blue-100 text-blue-800 border-blue-200';
-            case 'Out for Delivery': return 'bg-purple-100 text-purple-800 border-purple-200';
-            case 'Delivered': return 'bg-green-100 text-green-800 border-green-200';
-            default: return 'bg-gray-100 text-gray-800 border-gray-200';
-        }
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleImageUpload = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const formData = new FormData();
-            formData.append('image', file);
-
-            try {
-                // Show loading state or toast if needed
-                const API_URL = import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com';
-                const response = await fetch(`${API_URL}/api/upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    setFormData(prev => ({ ...prev, image: data.imageUrl }));
-                } else {
-                    console.error('Upload failed:', data.message);
-                    alert('Image upload failed');
-                }
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                alert('Error uploading image');
-            }
-        }
-    };
-
-    const handleAddProduct = (e) => {
-        e.preventDefault();
-        const newProduct = {
-            ...formData,
-            price: parseInt(formData.price),
-            originalPrice: parseInt(formData.originalPrice),
-            features: formData.features.split(',').map(f => f.trim()).filter(f => f)
-        };
-        addProduct(newProduct);
-        setShowAddForm(false);
-        resetForm();
-    };
-
-    const startEditing = (product) => {
-        setIsEditing(product.id);
-        setFormData({
-            name: product.name,
-            price: product.price,
-            originalPrice: product.originalPrice,
-            category: product.category,
-            image: product.image,
-            description: product.description,
-            features: product.features ? product.features.join(', ') : ''
-        });
-        setShowAddForm(true);
-        // Scroll to form
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleUpdateProduct = (e) => {
-        e.preventDefault();
-        const updatedFields = {
-            ...formData,
-            price: parseInt(formData.price),
-            originalPrice: parseInt(formData.originalPrice),
-            features: formData.features.split(',').map(f => f.trim()).filter(f => f)
-        };
-        updateProduct(isEditing, updatedFields);
-        setIsEditing(null);
-        setShowAddForm(false);
-        resetForm();
-    };
-
-    const resetForm = () => {
-        setFormData({
-            name: '',
-            price: '',
-            originalPrice: '',
-            category: 'Pooja Essentials',
-            image: '',
-            description: '',
-            features: ''
-        });
-        setIsEditing(null);
-    };
-
-    const categories = [
-        'Thali Sets', 'Diyas', 'Incense', 'Attar', 'Havan', 'Idols',
-        'Sacred Threads', 'Vastras', 'Pooja Essentials', 'Ganga Jal'
-    ];
+    const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories'
+    const [newCategory, setNewCategory] = useState('');
 
     return (
         <div className="bg-gray-50 min-h-screen pb-20 pt-24">
@@ -203,12 +89,56 @@ const Admin = () => {
                             Site Content
                             {activeTab === 'content' && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 w-full h-1 bg-luminous-maroon rounded-t-full" />}
                         </button>
+                        <button
+                            onClick={() => setActiveTab('categories')}
+                            className={`pb-4 px-4 font-bold text-lg transition-colors relative ${activeTab === 'categories' ? 'text-luminous-maroon' : 'text-gray-400 hover:text-gray-600'}`}
+                        >
+                            Categories
+                            {activeTab === 'categories' && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 w-full h-1 bg-luminous-maroon rounded-t-full" />}
+                        </button>
                     </div>
                 </div>
 
                 {/* Tab Content */}
                 <div className="max-w-6xl mx-auto">
-                    {activeTab === 'orders' ? (
+                    {activeTab === 'categories' ? (
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Manage Categories</h2>
+
+                            <div className="flex gap-4 mb-8">
+                                <input
+                                    value={newCategory}
+                                    onChange={(e) => setNewCategory(e.target.value)}
+                                    placeholder="New Category Name"
+                                    className="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                />
+                                <Button onClick={() => {
+                                    if (newCategory.trim()) {
+                                        addCategory(newCategory.trim());
+                                        setNewCategory('');
+                                    }
+                                }}>
+                                    <Plus size={20} className="mr-2" /> Add
+                                </Button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {categories.map((cat, index) => (
+                                    <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                        <span className="font-medium text-gray-800">{cat}</span>
+                                        <button
+                                            onClick={() => {
+                                                if (window.confirm(`Delete category "${cat}"?`)) removeCategory(cat);
+                                            }}
+                                            className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-full transition-colors"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : activeTab === 'orders' ? (
                         <div className="space-y-6">
                             {orders.length === 0 ? (
                                 <div className="bg-white p-12 rounded-xl shadow-sm text-center border border-gray-200">
