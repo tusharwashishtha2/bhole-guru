@@ -92,7 +92,7 @@ const Checkout = () => {
                     order_id: data.razorpayOrderId,
                     handler: async function (response) {
                         try {
-                            const verifyUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders/verify';
+                            const verifyUrl = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com') + '/api/orders/verify';
                             const verifyRes = await fetch(verifyUrl, {
                                 method: 'POST',
                                 headers: {

@@ -59,7 +59,7 @@ const Admin = () => {
 
             try {
                 // Show loading state or toast if needed
-                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                const API_URL = import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com';
                 const response = await fetch(`${API_URL}/api/upload`, {
                     method: 'POST',
                     body: formData,

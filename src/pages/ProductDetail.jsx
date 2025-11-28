@@ -30,7 +30,7 @@ const ProductDetail = () => {
         const fetchProduct = async () => {
             try {
                 // Try to fetch from API first (for wishlist compatibility)
-                const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000');
+                const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
                 const response = await fetch(`${API_URL}/api/products/lookup/${id}`);
                 if (response.ok) {
                     const data = await response.json();

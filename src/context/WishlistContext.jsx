@@ -8,7 +8,7 @@ export const useWishlist = () => useContext(WishlistContext);
 export const WishlistProvider = ({ children }) => {
     const [wishlist, setWishlist] = useState([]);
     const { addToast } = useToast();
-    const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/users/wishlist';
+    const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com') + '/api/users/wishlist';
 
     const getToken = () => localStorage.getItem('bhole_guru_token');
 
