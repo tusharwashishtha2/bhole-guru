@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
 import { useToast } from '../context/ToastContext';
-import { User, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, ShoppingBag, Plus, Edit2, Trash2, Save, X, Phone, Mail, KeyRound, Camera } from 'lucide-react';
+import { User, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, ShoppingBag, Plus, Edit2, Trash2, Save, X, Phone, Mail, KeyRound, Camera, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -537,6 +537,20 @@ const Profile = () => {
                                     </div>
                                     <ChevronRight size={16} className={activeTab === 'account' ? 'opacity-100' : 'opacity-0'} />
                                 </button>
+
+                                {(user.isAdmin || user.role === 'admin') && (
+                                    <Link
+                                        to="/admin"
+                                        className="w-full flex items-center justify-between p-4 rounded-xl text-luminous-maroon hover:bg-luminous-bg/50 transition-all font-bold"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <ShieldCheck size={20} />
+                                            <span>Admin Dashboard</span>
+                                        </div>
+                                        <ChevronRight size={16} />
+                                    </Link>
+                                )}
+
                                 <div className="my-2 border-t border-gray-100"></div>
                                 <button
                                     onClick={logout}
