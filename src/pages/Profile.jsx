@@ -19,7 +19,7 @@ const Profile = () => {
         }
     }, []);
 
-    console.log("Current User Data:", user); // Debugging Admin Access
+
 
     // Address State
     const [showAddressForm, setShowAddressForm] = useState(false);
@@ -506,83 +506,68 @@ const Profile = () => {
                                             <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                                         ) : (
                                             user.name ? user.name[0].toUpperCase() : 'U'
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Hello,</p>
-                                        <h3 className="font-bold text-gray-900">{user.name || 'User'}</h3>
-                                        <p className="text-[10px] text-gray-400">
-                                            Role: {user.role || 'user'} |
-                                            {user.email === 'tusharwashishtha2@gmail.com' ? ' Email Match' : ' No Match'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <nav className="p-2">
-                                <button
-                                    onClick={() => setActiveTab('orders')}
                                     className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-luminous-bg text-luminous-maroon font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <Package size={20} />
-                                        <span>Orders</span>
-                                    </div>
-                                    <ChevronRight size={16} className={activeTab === 'orders' ? 'opacity-100' : 'opacity-0'} />
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('addresses')}
-                                    className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${activeTab === 'addresses' ? 'bg-luminous-bg text-luminous-maroon font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <MapPin size={20} />
-                                        <span>Addresses</span>
-                                    </div>
-                                    <ChevronRight size={16} className={activeTab === 'addresses' ? 'opacity-100' : 'opacity-0'} />
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('account')}
-                                    className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${activeTab === 'account' ? 'bg-luminous-bg text-luminous-maroon font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <User size={20} />
-                                        <span>Account Settings</span>
-                                    </div>
-                                    <ChevronRight size={16} className={activeTab === 'account' ? 'opacity-100' : 'opacity-0'} />
-                                </button>
-
-                                {(user.isAdmin || user.role === 'admin' || user.email === 'tusharwashishtha2@gmail.com') && (
-                                    <Link
-                                        to="/admin"
-                                        className="w-full flex items-center justify-between p-4 rounded-xl text-luminous-maroon hover:bg-luminous-bg/50 transition-all font-bold"
+                                        <div className="flex items-center gap-3">
+                                            <Package size={20} />
+                                            <span>Orders</span>
+                                        </div>
+                                        <ChevronRight size={16} className={activeTab === 'orders' ? 'opacity-100' : 'opacity-0'} />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('addresses')}
+                                        className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${activeTab === 'addresses' ? 'bg-luminous-bg text-luminous-maroon font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <ShieldCheck size={20} />
-                                            <span>Admin Dashboard</span>
+                                            <MapPin size={20} />
+                                            <span>Addresses</span>
                                         </div>
-                                        <ChevronRight size={16} />
-                                    </Link>
-                                )}
+                                        <ChevronRight size={16} className={activeTab === 'addresses' ? 'opacity-100' : 'opacity-0'} />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('account')}
+                                        className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${activeTab === 'account' ? 'bg-luminous-bg text-luminous-maroon font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <User size={20} />
+                                            <span>Account Settings</span>
+                                        </div>
+                                        <ChevronRight size={16} className={activeTab === 'account' ? 'opacity-100' : 'opacity-0'} />
+                                    </button>
 
-                                <div className="my-2 border-t border-gray-100"></div>
-                                <button
-                                    onClick={logout}
-                                    className="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 hover:bg-red-50 transition-all font-medium"
-                                >
-                                    <LogOut size={20} />
-                                    <span>Logout</span>
-                                </button>
-                            </nav>
+                                    {(user.isAdmin || user.role === 'admin' || user.email === 'tusharwashishtha2@gmail.com') && (
+                                        <Link
+                                            to="/admin"
+                                            className="w-full flex items-center justify-between p-4 rounded-xl text-luminous-maroon hover:bg-luminous-bg/50 transition-all font-bold"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <ShieldCheck size={20} />
+                                                <span>Admin Dashboard</span>
+                                            </div>
+                                            <ChevronRight size={16} />
+                                        </Link>
+                                    )}
+
+                                    <div className="my-2 border-t border-gray-100"></div>
+                                    <button
+                                        onClick={logout}
+                                        className="w-full flex items-center gap-3 p-4 rounded-xl text-red-600 hover:bg-red-50 transition-all font-medium"
+                                    >
+                                        <LogOut size={20} />
+                                        <span>Logout</span>
+                                    </button>
+                                </nav>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Content Area */}
-                    <div className="md:w-3/4">
-                        {renderContent()}
+                        {/* Content Area */}
+                        <div className="md:w-3/4">
+                            {renderContent()}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+            );
 };
 
-export default Profile;
+            export default Profile;
