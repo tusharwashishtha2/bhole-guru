@@ -1,6 +1,6 @@
-import Order from '../models/Order.js';
-import Razorpay from 'razorpay';
-import crypto from 'crypto';
+const Order = require('../models/Order');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -10,7 +10,7 @@ const razorpay = new Razorpay({
 // @desc    Create new order (Razorpay)
 // @route   POST /api/orders
 // @access  Private
-export const createOrder = async (req, res) => {
+exports.createOrder = async (req, res) => {
     try {
         const {
             orderItems,
@@ -69,7 +69,7 @@ export const createOrder = async (req, res) => {
 // @desc    Verify Razorpay Payment
 // @route   POST /api/orders/verify
 // @access  Private
-export const verifyPayment = async (req, res) => {
+exports.verifyPayment = async (req, res) => {
     try {
         const {
             razorpay_order_id,
@@ -116,7 +116,7 @@ export const verifyPayment = async (req, res) => {
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
 // @access  Private
-export const getOrderById = async (req, res) => {
+exports.getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id).populate('user', 'name email');
 
@@ -133,7 +133,7 @@ export const getOrderById = async (req, res) => {
 // @desc    Get logged in user orders
 // @route   GET /api/orders/myorders
 // @access  Private
-export const getMyOrders = async (req, res) => {
+exports.getMyOrders = async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
         res.json(orders);
@@ -145,7 +145,7 @@ export const getMyOrders = async (req, res) => {
 // @desc    Get all orders
 // @route   GET /api/orders
 // @access  Private/Admin
-export const getOrders = async (req, res) => {
+exports.getOrders = async (req, res) => {
     try {
         const orders = await Order.find({}).populate('user', 'id name').sort({ createdAt: -1 });
         res.json(orders);
@@ -157,7 +157,7 @@ export const getOrders = async (req, res) => {
 // @desc    Update order to paid
 // @route   PUT /api/orders/:id/pay
 // @access  Private
-export const updateOrderToPaid = async (req, res) => {
+exports.updateOrderToPaid = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
 
@@ -184,7 +184,7 @@ export const updateOrderToPaid = async (req, res) => {
 // @desc    Update order status (Admin)
 // @route   PUT /api/orders/:id/status
 // @access  Private/Admin
-export const updateOrderStatus = async (req, res) => {
+exports.updateOrderStatus = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
 
@@ -212,7 +212,7 @@ export const updateOrderStatus = async (req, res) => {
 // @desc    Cancel order
 // @route   PUT /api/orders/:id/cancel
 // @access  Private
-export const cancelOrder = async (req, res) => {
+exports.cancelOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
 
