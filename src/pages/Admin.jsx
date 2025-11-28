@@ -6,9 +6,12 @@ import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 
+import { useToast } from '../context/ToastContext';
+
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
+    const { addToast } = useToast();
     const {
         sacredOfferings,
         updateSacredOffering,
@@ -25,6 +28,97 @@ const Admin = () => {
 
     const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories'
     const [newCategory, setNewCategory] = useState('');
+
+    // Product Form State
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        price: '',
+        originalPrice: '',
+        category: 'Puja Thali',
+        image: '',
+        description: '',
+        features: ''
+    });
+
+    const resetForm = () => {
+        setFormData({
+            name: '',
+            price: '',
+            originalPrice: '',
+            category: categories[0] || 'Puja Thali',
+            image: '',
+            description: '',
+            features: ''
+        });
+        setIsEditing(false);
+        setEditingId(null);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, image: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleAddProduct = async (e) => {
+        e.preventDefault();
+        try {
+            await addProduct({
+                ...formData,
+                price: Number(formData.price),
+                originalPrice: Number(formData.originalPrice),
+                features: formData.features.split(',').map(f => f.trim())
+            });
+            setShowAddForm(false);
+            resetForm();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleUpdateProduct = async (e) => {
+        e.preventDefault();
+        try {
+            await updateProduct(editingId, {
+                ...formData,
+                price: Number(formData.price),
+                originalPrice: Number(formData.originalPrice),
+                features: formData.features.split(',').map(f => f.trim())
+            });
+            setShowAddForm(false);
+            resetForm();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const startEditing = (product) => {
+        setFormData({
+            name: product.name,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            category: product.category,
+            image: product.image,
+            description: product.description,
+            features: product.features ? product.features.join(', ') : ''
+        });
+        setEditingId(product.id || product._id);
+        setIsEditing(true);
+        setShowAddForm(true);
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen pb-20 pt-24">
