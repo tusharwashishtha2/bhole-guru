@@ -41,10 +41,11 @@ const Home = () => {
                             <span className="text-xs md:text-sm font-bold tracking-widest text-luminous-maroon uppercase">Premium Spiritual Collection</span>
                         </div>
 
-                        {/* Hindi Heading */}
+                        {/* Dynamic Heading */}
                         <h1 className="flex flex-col font-bold leading-tight">
-                            <span className="text-6xl md:text-8xl text-luminous-maroon font-serif mb-2 drop-shadow-md">भोले गुरु</span>
-                            <span className="text-5xl md:text-7xl text-luminous-saffron font-serif drop-shadow-md">पूजन सामग्री</span>
+                            <span className="text-5xl md:text-7xl text-luminous-maroon font-serif mb-2 drop-shadow-md leading-tight">
+                                {heroSection.title || "Embrace the Divine"}
+                            </span>
                         </h1>
                     </motion.div>
 
@@ -56,15 +57,14 @@ const Home = () => {
                         className="relative z-20 mb-8 md:mb-0"
                     >
                         {/* Description */}
-                        {/* Description */}
                         <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg lg:max-w-md mt-6 leading-relaxed drop-shadow-sm font-medium bg-white/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-2 md:p-0 rounded-lg">
-                            Experience the divine connection with our authentically crafted spiritual essentials, designed to bring peace, purity, and prosperity to your home.
+                            {heroSection.subtitle || "Premium Pooja Essentials for Your Spiritual Journey"}
                         </p>
 
                         {/* Buttons */}
                         <div className="flex flex-wrap gap-4 mt-6 md:mt-8">
                             <Button to="/shop" variant="primary" className="bg-luminous-saffron hover:bg-luminous-maroon text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
-                                Shop Collection
+                                {heroSection.ctaText || "Shop Collection"}
                             </Button>
                             <Button to="/about" variant="outline" className="border-2 border-luminous-maroon text-luminous-maroon hover:bg-luminous-maroon hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 bg-white/40 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none">
                                 Our Story
@@ -77,8 +77,8 @@ const Home = () => {
                 <div className="absolute top-0 right-0 w-full md:w-3/5 h-full z-0 overflow-hidden pointer-events-none">
                     <div className="relative w-full h-full">
                         <img
-                            src="/images/hero-shyam-v2.jpg"
-                            alt="Khatu Shyam Ji"
+                            src={heroSection.bgImage || "/images/hero-shyam-v2.jpg"}
+                            alt="Hero Background"
                             className="w-full h-full object-cover object-center"
                         />
                         {/* Gradient Blend - Middle to Right (Left side of image fades into bg) */}
@@ -112,7 +112,7 @@ const Home = () => {
 
                 <div className="text-center mb-16 relative z-10 px-6">
                     <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-maroon mb-4 tracking-tight">
-                        Divine Favorites
+                        {divineFavorites.title || "Divine Favorites"}
                     </h2>
                     <div className="flex items-center justify-center gap-4">
                         <div className="h-[1px] w-12 bg-luminous-gold"></div>
@@ -120,7 +120,7 @@ const Home = () => {
                         <div className="h-[1px] w-12 bg-luminous-gold"></div>
                     </div>
                     <p className="text-luminous-text/70 text-lg mt-4 font-medium">
-                        Exquisite artifacts loved by devotees worldwide.
+                        {divineFavorites.subtitle || "Exquisite artifacts loved by devotees worldwide."}
                     </p>
                 </div>
 

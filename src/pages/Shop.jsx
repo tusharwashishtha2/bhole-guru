@@ -3,10 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, ChevronDown, Search, SlidersHorizontal, X, Sparkles, ArrowUpDown } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
 import { useProduct } from '../context/ProductContext';
+import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
     const { products } = useProduct();
+    const { categories: dynamicCategories } = useContent();
     const [searchParams] = useSearchParams();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -17,19 +19,7 @@ const Shop = () => {
     const [sortBy, setSortBy] = useState('featured'); // featured, price-low-high, price-high-low, rating, newest
 
     // Expanded Categories List
-    const categories = [
-        'All',
-        'Thali Sets',
-        'Diyas',
-        'Incense',
-        'Attar',
-        'Havan',
-        'Idols',
-        'Sacred Threads',
-        'Vastras',
-        'Pooja Essentials',
-        'Ganga Jal'
-    ];
+    const categories = ['All', ...dynamicCategories];
 
     useEffect(() => {
         const categoryParam = searchParams.get('category');

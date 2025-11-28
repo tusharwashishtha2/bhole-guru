@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
-import { products } from '../data/products';
+import { useProduct } from '../context/ProductContext';
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -22,6 +22,7 @@ const Header = () => {
     const { user, logout } = useAuth();
     const { wishlist } = useWishlist();
     const { isDarkMode, toggleTheme } = useTheme();
+    const { products } = useProduct();
     const navigate = useNavigate();
 
     useEffect(() => {
