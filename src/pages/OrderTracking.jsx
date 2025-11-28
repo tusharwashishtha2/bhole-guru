@@ -6,7 +6,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
 import confetti from 'canvas-confetti';
 import Invoice from '../components/Invoice';
-import html2pdf from 'html2pdf.js';
 
 const OrderTracking = () => {
     const { getOrder, currentOrderId, cancelOrder } = useOrder();
@@ -16,7 +15,7 @@ const OrderTracking = () => {
     const invoiceRef = useRef();
     const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
 
-    const handleDownloadInvoice = () => {
+    const handleDownloadInvoice = async () => {
         const element = invoiceRef.current;
         const opt = {
             margin: 0,
@@ -27,9 +26,15 @@ const OrderTracking = () => {
         };
 
         setIsGeneratingInvoice(true);
-        html2pdf().set(opt).from(element).save().then(() => {
+        try {
+            const html2pdf = (await import('html2pdf.js')).default;
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error("Error generating invoice:", error);
+            alert("Failed to generate invoice. Please try again.");
+        } finally {
             setIsGeneratingInvoice(false);
-        });
+        }
     };
 
     useEffect(() => {
