@@ -4,7 +4,6 @@ import { CheckCircle, Package, Truck, MapPin, Phone, Star, ArrowRight, X, Downlo
 import Button from '../components/ui/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
-import confetti from 'canvas-confetti';
 import Invoice from '../components/Invoice';
 
 const OrderTracking = () => {
@@ -55,7 +54,8 @@ const OrderTracking = () => {
         }
     }, [currentOrderId, getOrder, order?.status]);
 
-    const triggerConfetti = () => {
+    const triggerConfetti = async () => {
+        const confetti = (await import('canvas-confetti')).default;
         var duration = 3 * 1000;
         var animationEnd = Date.now() + duration;
         var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
