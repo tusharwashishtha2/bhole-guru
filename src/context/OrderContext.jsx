@@ -122,6 +122,34 @@ export const OrderProvider = ({ children }) => {
         }
     };
 
+    const cancelOrder = async (orderId) => {
+        const token = getToken();
+        try {
+            const response = await fetch(`${API_URL}/${orderId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setOrders(prev => prev.map(order =>
+                    order._id === orderId ? data : order
+                ));
+                addToast('Order cancelled successfully', 'success');
+                return true;
+            } else {
+                addToast(data.message || 'Failed to cancel order', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error("Error cancelling order:", error);
+            addToast('Error cancelling order', 'error');
+            return false;
+        }
+    };
+
     const getOrder = (orderId) => {
         return orders.find(o => o._id === orderId || o.id === orderId);
     };
