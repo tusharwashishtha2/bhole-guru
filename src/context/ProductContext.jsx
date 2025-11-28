@@ -9,7 +9,7 @@ export const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const { addToast } = useToast();
-    const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com') + '/api/products';
+    const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/products';
 
     const fetchProducts = async () => {
         try {

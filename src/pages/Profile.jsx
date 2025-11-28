@@ -8,10 +8,18 @@ import Button from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile = () => {
-    const { user, logout, updateUserProfile, sendOtp, verifyOtp } = useAuth();
+    const { user, logout, updateUserProfile, sendOtp, verifyOtp, refreshUser } = useAuth();
     const { orders, fetchMyOrders } = useOrder();
     const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState('orders');
+
+    useEffect(() => {
+        if (refreshUser) {
+            refreshUser();
+        }
+    }, []);
+
+    console.log("Current User Data:", user); // Debugging Admin Access
 
     // Address State
     const [showAddressForm, setShowAddressForm] = useState(false);
@@ -503,6 +511,10 @@ const Profile = () => {
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Hello,</p>
                                         <h3 className="font-bold text-gray-900">{user.name || 'User'}</h3>
+                                        <p className="text-[10px] text-gray-400">
+                                            Role: {user.role || 'user'} |
+                                            {user.email === 'tusharwashishtha2@gmail.com' ? ' Email Match' : ' No Match'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -538,7 +550,7 @@ const Profile = () => {
                                     <ChevronRight size={16} className={activeTab === 'account' ? 'opacity-100' : 'opacity-0'} />
                                 </button>
 
-                                {(user.isAdmin || user.role === 'admin') && (
+                                {(user.isAdmin || user.role === 'admin' || user.email === 'tusharwashishtha2@gmail.com') && (
                                     <Link
                                         to="/admin"
                                         className="w-full flex items-center justify-between p-4 rounded-xl text-luminous-maroon hover:bg-luminous-bg/50 transition-all font-bold"

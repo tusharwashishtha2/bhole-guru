@@ -9,7 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com') + '/api/auth';
+    const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/auth';
 
     useEffect(() => {
         // Check for saved user and token in localStorage on mount
@@ -167,8 +167,31 @@ export const AuthProvider = ({ children }) => {
         return updatedUser;
     };
 
+    const refreshUser = async () => {
+        try {
+            const token = localStorage.getItem('bhole_guru_token');
+            if (!token) return;
+
+            const response = await fetch(`${API_URL}/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // Preserve the token, just update user data
+                const currentUser = JSON.parse(localStorage.getItem('bhole_guru_user') || '{}');
+                const updatedUser = { ...currentUser, ...data };
+                setUser(updatedUser);
+                localStorage.setItem('bhole_guru_user', JSON.stringify(updatedUser));
+            }
+        } catch (error) {
+            console.error("Failed to refresh user", error);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, sendOtp, verifyOtp, loading, updateUserProfile }}>
+        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, sendOtp, verifyOtp, loading, updateUserProfile, refreshUser }}>
             {!loading && children}
         </AuthContext.Provider>
     );

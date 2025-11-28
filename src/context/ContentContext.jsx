@@ -7,7 +7,7 @@ export const useContent = () => useContext(ContentContext);
 
 export const ContentProvider = ({ children }) => {
     const { addToast } = useToast();
-    const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com') + '/api/content';
+    const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/content';
 
     // Default States (Placeholders while loading)
     const [heroSection, setHeroSection] = useState({

@@ -31,10 +31,6 @@ const protect = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-    console.log("Admin Middleware Check:");
-    console.log("User ID:", req.user ? req.user._id : 'No User');
-    console.log("User Role:", req.user ? req.user.role : 'No Role');
-
     if (req.user && req.user.role === 'admin') {
         next();
     } else {
