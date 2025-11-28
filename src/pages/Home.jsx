@@ -41,11 +41,10 @@ const Home = () => {
                             <span className="text-xs md:text-sm font-bold tracking-widest text-luminous-maroon uppercase">Premium Spiritual Collection</span>
                         </div>
 
-                        {/* Dynamic Heading */}
+                        {/* Hindi Heading */}
                         <h1 className="flex flex-col font-bold leading-tight">
-                            <span className="text-5xl md:text-7xl text-luminous-maroon font-serif mb-2 drop-shadow-md leading-tight">
-                                {heroSection.title || "Embrace the Divine"}
-                            </span>
+                            <span className="text-6xl md:text-8xl text-luminous-maroon font-serif mb-2 drop-shadow-md">भोले गुरु</span>
+                            <span className="text-5xl md:text-7xl text-luminous-saffron font-serif drop-shadow-md">पूजन सामग्री</span>
                         </h1>
                     </motion.div>
 
@@ -58,13 +57,13 @@ const Home = () => {
                     >
                         {/* Description */}
                         <p className="text-lg md:text-xl text-luminous-text/80 max-w-lg lg:max-w-md mt-6 leading-relaxed drop-shadow-sm font-medium bg-white/30 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-2 md:p-0 rounded-lg">
-                            {heroSection.subtitle || "Premium Pooja Essentials for Your Spiritual Journey"}
+                            Experience the divine connection with our authentically crafted spiritual essentials, designed to bring peace, purity, and prosperity to your home.
                         </p>
 
                         {/* Buttons */}
                         <div className="flex flex-wrap gap-4 mt-6 md:mt-8">
                             <Button to="/shop" variant="primary" className="bg-luminous-saffron hover:bg-luminous-maroon text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
-                                {heroSection.ctaText || "Shop Collection"}
+                                Shop Collection
                             </Button>
                             <Button to="/about" variant="outline" className="border-2 border-luminous-maroon text-luminous-maroon hover:bg-luminous-maroon hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 bg-white/40 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none">
                                 Our Story
@@ -77,8 +76,8 @@ const Home = () => {
                 <div className="absolute top-0 right-0 w-full md:w-3/5 h-full z-0 overflow-hidden pointer-events-none">
                     <div className="relative w-full h-full">
                         <img
-                            src={heroSection.bgImage || "/images/hero-shyam-v2.jpg"}
-                            alt="Hero Background"
+                            src="/images/hero-shyam-v2.jpg"
+                            alt="Khatu Shyam Ji"
                             className="w-full h-full object-cover object-center"
                         />
                         {/* Gradient Blend - Middle to Right (Left side of image fades into bg) */}
