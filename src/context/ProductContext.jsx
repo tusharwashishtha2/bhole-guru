@@ -34,10 +34,12 @@ export const ProductProvider = ({ children }) => {
 
     const addProduct = async (newProduct) => {
         try {
+            const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(newProduct),
             });
@@ -48,7 +50,7 @@ export const ProductProvider = ({ children }) => {
                 setProducts(prev => [newProduct, ...prev]);
                 addToast(`Product "${data.name}" added successfully`, 'success');
             } else {
-                addToast('Failed to add product', 'error');
+                addToast(data.message || 'Failed to add product', 'error');
             }
         } catch (error) {
             console.error("Error adding product:", error);
@@ -58,10 +60,12 @@ export const ProductProvider = ({ children }) => {
 
     const updateProduct = async (id, updatedFields) => {
         try {
+            const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(`${API_URL}/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(updatedFields),
             });
@@ -74,7 +78,7 @@ export const ProductProvider = ({ children }) => {
                 ));
                 addToast('Product updated successfully', 'success');
             } else {
-                addToast('Failed to update product', 'error');
+                addToast(data.message || 'Failed to update product', 'error');
             }
         } catch (error) {
             console.error("Error updating product:", error);
@@ -84,8 +88,12 @@ export const ProductProvider = ({ children }) => {
 
     const deleteProduct = async (id) => {
         try {
+            const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(`${API_URL}/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (response.ok) {
