@@ -24,6 +24,9 @@ const Footer = () => {
                             <li><Link to="/shop" className="hover:text-luminous-gold">Collection</Link></li>
                             <li><Link to="/about" className="hover:text-luminous-gold">Our Story</Link></li>
                             <li><Link to="/order-tracking" className="hover:text-luminous-gold">Track Order</Link></li>
+                            <li><Link to="/privacy-policy" className="hover:text-luminous-gold">Privacy Policy</Link></li>
+                            <li><Link to="/terms" className="hover:text-luminous-gold">Terms & Conditions</Link></li>
+                            <li><Link to="/refund-policy" className="hover:text-luminous-gold">Refund Policy</Link></li>
                         </ul>
                     </div>
 

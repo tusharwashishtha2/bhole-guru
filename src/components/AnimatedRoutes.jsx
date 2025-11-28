@@ -18,6 +18,11 @@ import Wishlist from '../pages/Wishlist';
 import About from '../pages/About';
 import Contact from '../pages/Contact';
 
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import Terms from '../pages/Terms';
+import RefundPolicy from '../pages/RefundPolicy';
+import NotFound from '../pages/NotFound';
+
 const AnimatedRoutes = () => {
     const location = useLocation();
 
@@ -38,6 +43,10 @@ const AnimatedRoutes = () => {
                 <Route path="/wishlist" element={<PageTransition><Wishlist /></PageTransition>} />
                 <Route path="/about" element={<PageTransition><About /></PageTransition>} />
                 <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+                <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+                <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+                <Route path="/refund-policy" element={<PageTransition><RefundPolicy /></PageTransition>} />
+                <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
             </Routes>
         </AnimatePresence>
     );

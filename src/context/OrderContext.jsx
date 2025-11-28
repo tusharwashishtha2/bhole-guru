@@ -131,6 +131,7 @@ export const OrderProvider = ({ children }) => {
             orders,
             addOrder,
             updateOrderStatus,
+            cancelOrder,
             getOrder,
             fetchMyOrders,
             fetchAllOrders,

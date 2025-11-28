@@ -209,3 +209,31 @@ export const updateOrderStatus = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// @desc    Cancel order
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+export const cancelOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (order) {
+            if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+                res.status(401);
+                throw new Error('Not authorized to cancel this order');
+            }
+
+            if (order.status !== 'Processing') {
+                res.status(400);
+                throw new Error('Cannot cancel order that is already ' + order.status);
+            }
+
+            order.status = 'Cancelled';
+            const updatedOrder = await order.save();
+            res.json(updatedOrder);
+        } else {
+            res.status(404).json({ message: 'Order not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
