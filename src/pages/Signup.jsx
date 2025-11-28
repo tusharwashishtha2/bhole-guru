@@ -42,25 +42,32 @@ const Signup = () => {
         }
     };
 
+    const [loadingMessage, setLoadingMessage] = useState('');
+
     const handleVerifyAndSignup = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
         try {
+            setLoadingMessage('Verifying OTP...');
             await verifyOtp(formData.otp);
+
+            setLoadingMessage('Creating Account...');
             await signup({
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
                 password: formData.password
             });
+
             addToast('Account created successfully!', 'success');
             navigate('/');
         } catch (err) {
             setError(err.message || 'Verification failed');
         } finally {
             setIsLoading(false);
+            setLoadingMessage('');
         }
     };
 
@@ -201,7 +208,7 @@ const Signup = () => {
                             className="w-full py-4 text-lg shadow-lg shadow-luminous-saffron/20 hover:shadow-xl hover:shadow-luminous-saffron/30 transition-all"
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Processing...' : (step === 'details' ? 'Send OTP' : 'Verify & Sign Up')}
+                            {isLoading ? (loadingMessage || 'Processing...') : (step === 'details' ? 'Send OTP' : 'Verify & Sign Up')}
                             {!isLoading && <ArrowRight size={20} className="ml-2" />}
                         </Button>
                     </div>

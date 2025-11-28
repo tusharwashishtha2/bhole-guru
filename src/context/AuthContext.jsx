@@ -24,6 +24,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout for Render cold start
+
             // Try actual API first
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
@@ -31,7 +34,9 @@ export const AuthProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             const data = await response.json();
 
@@ -47,19 +52,27 @@ export const AuthProvider = ({ children }) => {
             return data;
         } catch (error) {
             console.error("Login failed:", error);
+            if (error.name === 'AbortError') {
+                throw new Error("Server took too long to respond. Please try again.");
+            }
             throw error;
         }
     };
 
     const signup = async (userData) => {
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(userData),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             const data = await response.json();
 
@@ -75,6 +88,9 @@ export const AuthProvider = ({ children }) => {
             return data;
         } catch (error) {
             console.error("Registration failed:", error);
+            if (error.name === 'AbortError') {
+                throw new Error("Server took too long to respond. Please try again.");
+            }
             throw error;
         }
     };
