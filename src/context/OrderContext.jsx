@@ -79,10 +79,11 @@ export const OrderProvider = ({ children }) => {
             const data = await response.json();
 
             if (response.ok) {
-                setOrders(prev => [data, ...prev]);
-                setCurrentOrderId(data._id);
-                addToast('Order placed successfully!', 'success');
-                return data._id;
+                setOrders(prev => [data.order || data, ...prev]);
+                setCurrentOrderId(data.order?._id || data._id);
+                // Don't show success toast yet for Razorpay, let the component handle it
+                // addToast('Order placed successfully!', 'success'); 
+                return data;
             } else {
                 addToast(data.message || 'Failed to place order', 'error');
                 return null;

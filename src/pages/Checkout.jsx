@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Banknote, MapPin, CheckCircle, Smartphone, Lock, Loader, X } from 'lucide-react';
+import { ArrowLeft, CreditCard, Banknote, MapPin, CheckCircle, Loader, ShieldCheck } from 'lucide-react';
 import Button from '../components/ui/Button';
 import SectionHeading from '../components/ui/SectionHeading';
 import { useCart } from '../context/CartContext';
 import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Checkout = () => {
@@ -13,88 +14,138 @@ const Checkout = () => {
     const { cart, getCartTotal, clearCart } = useCart();
     const { addOrder } = useOrder();
     const { user } = useAuth();
-    const [paymentMethod, setPaymentMethod] = useState('cod');
+    const { addToast } = useToast();
+    const [paymentMethod, setPaymentMethod] = useState('razorpay'); // Default to Online
     const [loading, setLoading] = useState(false);
     const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
-    // UPI State
-    const [upiId, setUpiId] = useState('');
-    const [showOtpModal, setShowOtpModal] = useState(false);
-    const [otp, setOtp] = useState('');
-    const [otpError, setOtpError] = useState('');
-
-    // Card State
-    const [showCardModal, setShowCardModal] = useState(false);
-    const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvv: '', name: '' });
-    const [processingPayment, setProcessingPayment] = useState(false);
+    // Address State
+    const [address, setAddress] = useState({
+        fullName: user?.name || '',
+        addressLine1: '',
+        city: '',
+        pincode: '',
+        phone: user?.phone || '' // Pre-fill phone if available
+    });
 
     const subtotal = getCartTotal();
     const shipping = subtotal > 500 ? 0 : 49;
     const total = subtotal + shipping;
 
-    const handlePayment = (e) => {
-        e.preventDefault();
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
 
-        if (paymentMethod === 'upi') {
-            if (!upiId.includes('@')) {
-                alert('Please enter a valid UPI ID (e.g., name@upi)');
+    const handlePayment = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const shippingAddress = `${address.addressLine1}, ${address.city}, ${address.pincode}`;
+
+        try {
+            // 1. Create Order on Backend
+            const orderData = {
+                orderItems: cart,
+                shippingAddress,
+                paymentMethod,
+                itemsPrice: subtotal,
+                taxPrice: 0,
+                shippingPrice: shipping,
+                totalPrice: total
+            };
+
+            const data = await addOrder(orderData);
+
+            if (!data) {
+                setLoading(false);
                 return;
             }
-            setLoading(true);
-            setTimeout(() => {
+
+            if (paymentMethod === 'cod') {
+                // COD Flow
+                clearCart();
+                setIsOrderPlaced(true);
                 setLoading(false);
-                setShowOtpModal(true);
-                alert(`OTP sent to your registered mobile number linked to ${upiId}`);
-            }, 1500);
-        } else if (paymentMethod === 'card') {
-            setShowCardModal(true);
-        } else {
-            processOrder();
-        }
-    };
+            } else {
+                // Razorpay Flow
+                const res = await loadRazorpayScript();
 
-    const verifyOtp = () => {
-        if (otp === '1234') {
-            setShowOtpModal(false);
-            processOrder();
-        } else {
-            setOtpError('Invalid OTP. Please try again (Hint: 1234)');
-        }
-    };
+                if (!res) {
+                    addToast('Razorpay SDK failed to load. Are you online?', 'error');
+                    setLoading(false);
+                    return;
+                }
 
-    const handleCardPayment = (e) => {
-        e.preventDefault();
-        setProcessingPayment(true);
-        // Simulate gateway processing
-        setTimeout(() => {
-            setProcessingPayment(false);
-            setShowCardModal(false);
-            processOrder();
-        }, 3000);
-    };
+                const options = {
+                    key: data.key,
+                    amount: data.amount,
+                    currency: data.currency,
+                    name: "Bhole Guru",
+                    description: "Divine Artifacts Purchase",
+                    image: "https://res.cloudinary.com/dnhb4llf9/image/upload/v1732163668/bhole-guru-logo_v2_small.png", // Use your logo URL
+                    order_id: data.razorpayOrderId,
+                    handler: async function (response) {
+                        try {
+                            const verifyUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders/verify';
+                            const verifyRes = await fetch(verifyUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('bhole_guru_token')}`
+                                },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: data.order._id
+                                })
+                            });
 
-    const processOrder = () => {
-        setLoading(true);
-        // Simulate final processing
-        setTimeout(() => {
+                            const verifyData = await verifyRes.json();
+
+                            if (verifyRes.ok) {
+                                clearCart();
+                                setIsOrderPlaced(true);
+                            } else {
+                                addToast(verifyData.message || 'Payment verification failed', 'error');
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            addToast('Payment verification failed', 'error');
+                        }
+                    },
+                    prefill: {
+                        name: address.fullName,
+                        email: user?.email,
+                        contact: address.phone
+                    },
+                    notes: {
+                        address: shippingAddress
+                    },
+                    theme: {
+                        color: "#800000" // Luminous Maroon
+                    }
+                };
+
+                const paymentObject = new window.Razorpay(options);
+                paymentObject.open();
+                setLoading(false);
+            }
+
+        } catch (error) {
+            console.error(error);
             setLoading(false);
-
-            // Create real order in context
-            addOrder({
-                items: cart,
-                total: total,
-                paymentMethod: paymentMethod,
-                shippingAddress: "123, Temple Street, Varanasi" // Mock address for now
-            }, user?.email); // Pass user email
-
-            clearCart();
-            setIsOrderPlaced(true); // Show success popup
-        }, 2000);
+            addToast('Something went wrong', 'error');
+        }
     };
 
     if (cart.length === 0 && !isOrderPlaced) {
-        // Only redirect if not order placed (to allow popup to show)
-        // We use a small timeout to avoid flash if state updates are slow
         setTimeout(() => {
             if (!isOrderPlaced) navigate('/cart');
         }, 100);
@@ -127,141 +178,6 @@ const Checkout = () => {
                 )}
             </AnimatePresence>
 
-            {/* OTP Modal */}
-            {showOtpModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-300">
-                        <h3 className="text-xl font-bold mb-4 text-center">Enter OTP</h3>
-                        <p className="text-gray-500 text-center mb-6 text-sm">
-                            Please enter the 4-digit OTP sent to your mobile number to verify payment.
-                        </p>
-                        <div className="flex justify-center mb-6">
-                            <input
-                                type="text"
-                                maxLength="4"
-                                value={otp}
-                                onChange={(e) => { setOtp(e.target.value); setOtpError(''); }}
-                                className="text-center text-3xl tracking-widest w-40 border-b-2 border-luminous-maroon focus:outline-none font-bold"
-                                placeholder="••••"
-                                autoFocus
-                            />
-                        </div>
-                        {otpError && <p className="text-red-500 text-center text-sm mb-4">{otpError}</p>}
-                        <Button onClick={verifyOtp} className="w-full mb-3">Verify & Pay</Button>
-                        <button
-                            onClick={() => setShowOtpModal(false)}
-                            className="w-full text-gray-500 text-sm hover:text-gray-800"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Card Payment Modal (Simulated Gateway) */}
-            {showCardModal && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4 backdrop-blur-md">
-                    <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 relative">
-                        {/* Header */}
-                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Lock size={16} className="text-green-600" />
-                                <span className="font-bold text-gray-700">Secure Payment Gateway</span>
-                            </div>
-                            <div className="text-sm font-bold text-gray-900">₹{total}</div>
-                        </div>
-
-                        {/* Body */}
-                        <div className="p-6">
-                            {processingPayment ? (
-                                <div className="flex flex-col items-center justify-center py-8">
-                                    <Loader className="animate-spin text-luminous-maroon mb-4" size={48} />
-                                    <h3 className="text-lg font-bold text-gray-800">Processing Payment...</h3>
-                                    <p className="text-gray-500 text-sm mt-2">Please do not close this window.</p>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleCardPayment} className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Card Number</label>
-                                        <div className="relative">
-                                            <input
-                                                required
-                                                type="text"
-                                                maxLength="19"
-                                                placeholder="0000 0000 0000 0000"
-                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none font-mono"
-                                                value={cardDetails.number}
-                                                onChange={(e) => setCardDetails({ ...cardDetails, number: e.target.value })}
-                                            />
-                                            <CreditCard className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Expiry</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                placeholder="MM/YY"
-                                                maxLength="5"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none font-mono"
-                                                value={cardDetails.expiry}
-                                                onChange={(e) => setCardDetails({ ...cardDetails, expiry: e.target.value })}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">CVV</label>
-                                            <input
-                                                required
-                                                type="password"
-                                                placeholder="123"
-                                                maxLength="3"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none font-mono"
-                                                value={cardDetails.cvv}
-                                                onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cardholder Name</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            placeholder="Name on Card"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none"
-                                            value={cardDetails.name}
-                                            onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <Button type="submit" className="w-full py-3 mt-4">
-                                        Pay ₹{total}
-                                    </Button>
-
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowCardModal(false)}
-                                        className="w-full text-center text-gray-500 text-sm mt-3 hover:text-gray-800"
-                                    >
-                                        Cancel Transaction
-                                    </button>
-                                </form>
-                            )}
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-center gap-4 opacity-50 grayscale">
-                            {/* Mock Logos */}
-                            <div className="h-6 w-10 bg-blue-600 rounded"></div>
-                            <div className="h-6 w-10 bg-red-500 rounded"></div>
-                            <div className="h-6 w-10 bg-orange-500 rounded"></div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <div className="container mx-auto px-4">
                 <button
                     onClick={() => navigate('/cart')}
@@ -284,23 +200,60 @@ const Checkout = () => {
                             <form id="checkout-form" onSubmit={handlePayment} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                    <input required type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="Enter your full name" />
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none"
+                                        placeholder="Enter your full name"
+                                        value={address.fullName}
+                                        onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
+                                    />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 1</label>
-                                    <input required type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="House No., Building, Street" />
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none"
+                                        placeholder="House No., Building, Street"
+                                        value={address.addressLine1}
+                                        onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                    <input required type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="City" />
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none"
+                                        placeholder="City"
+                                        value={address.city}
+                                        onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                                    <input required type="text" pattern="[0-9]{6}" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="123456" />
+                                    <input
+                                        required
+                                        type="text"
+                                        pattern="[0-9]{6}"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none"
+                                        placeholder="123456"
+                                        value={address.pincode}
+                                        onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
+                                    />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                                    <input required type="tel" pattern="[0-9]{10}" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none" placeholder="10-digit mobile number" />
+                                    <input
+                                        required
+                                        type="tel"
+                                        pattern="[0-9]{10}"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-maroon focus:border-transparent outline-none"
+                                        placeholder="10-digit mobile number"
+                                        value={address.phone}
+                                        onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                                    />
                                 </div>
                             </form>
                         </div>
@@ -311,6 +264,22 @@ const Checkout = () => {
                                 <CreditCard className="text-luminous-maroon" /> Payment Method
                             </h3>
                             <div className="space-y-3">
+                                <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'razorpay' ? 'border-luminous-maroon bg-luminous-bg' : 'border-gray-200 hover:border-luminous-gold/50'}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        value="razorpay"
+                                        checked={paymentMethod === 'razorpay'}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-5 h-5 text-luminous-maroon focus:ring-luminous-maroon"
+                                    />
+                                    <div className="ml-4 flex-grow">
+                                        <span className="block font-bold text-gray-900">Online Payment</span>
+                                        <span className="text-sm text-gray-500">Credit/Debit Card, UPI, Netbanking (Razorpay)</span>
+                                    </div>
+                                    <ShieldCheck className="text-blue-600" size={24} />
+                                </label>
+
                                 <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'cod' ? 'border-luminous-maroon bg-luminous-bg' : 'border-gray-200 hover:border-luminous-gold/50'}`}>
                                     <input
                                         type="radio"
@@ -325,49 +294,6 @@ const Checkout = () => {
                                         <span className="text-sm text-gray-500">Pay nicely when you receive the order</span>
                                     </div>
                                     <Banknote className="text-green-600" size={24} />
-                                </label>
-
-                                <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'upi' ? 'border-luminous-maroon bg-luminous-bg' : 'border-gray-200 hover:border-luminous-gold/50'}`}>
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value="upi"
-                                        checked={paymentMethod === 'upi'}
-                                        onChange={(e) => setPaymentMethod(e.target.value)}
-                                        className="w-5 h-5 text-luminous-maroon focus:ring-luminous-maroon"
-                                    />
-                                    <div className="ml-4 flex-grow">
-                                        <span className="block font-bold text-gray-900">UPI (GPay, PhonePe)</span>
-                                        <span className="text-sm text-gray-500">Instant payment via UPI ID</span>
-                                    </div>
-                                    <Smartphone className="text-blue-600" size={24} />
-                                </label>
-                                {paymentMethod === 'upi' && (
-                                    <div className="ml-9 mt-2 p-3 bg-gray-50 rounded-lg animate-in slide-in-from-top-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter UPI ID (e.g. name@upi)"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded outline-none focus:border-luminous-maroon"
-                                            value={upiId}
-                                            onChange={(e) => setUpiId(e.target.value)}
-                                        />
-                                    </div>
-                                )}
-
-                                <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-luminous-maroon bg-luminous-bg' : 'border-gray-200 hover:border-luminous-gold/50'}`}>
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value="card"
-                                        checked={paymentMethod === 'card'}
-                                        onChange={(e) => setPaymentMethod(e.target.value)}
-                                        className="w-5 h-5 text-luminous-maroon focus:ring-luminous-maroon"
-                                    />
-                                    <div className="ml-4 flex-grow">
-                                        <span className="block font-bold text-gray-900">Credit / Debit Card</span>
-                                        <span className="text-sm text-gray-500">Secure payment via Card</span>
-                                    </div>
-                                    <CreditCard className="text-purple-600" size={24} />
                                 </label>
                             </div>
                         </div>
@@ -422,11 +348,17 @@ const Checkout = () => {
                                 className="w-full py-4 text-lg mb-3"
                                 disabled={loading}
                             >
-                                {loading ? 'Processing...' : `Pay ₹${total}`}
+                                {loading ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Loader className="animate-spin" size={20} /> Processing...
+                                    </div>
+                                ) : (
+                                    `Pay ₹${total}`
+                                )}
                             </Button>
 
                             <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-                                <CheckCircle size={12} /> Secure Payment
+                                <ShieldCheck size={12} /> Secure Payment by Razorpay
                             </p>
                         </div>
                     </div>
