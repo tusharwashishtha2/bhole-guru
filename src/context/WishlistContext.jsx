@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+// Context for managing user wishlist
 import { useToast } from './ToastContext';
 
 const WishlistContext = createContext();
