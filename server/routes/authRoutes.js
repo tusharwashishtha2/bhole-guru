@@ -9,5 +9,6 @@ router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
 router.post('/forgotpassword', forgotPassword);
 router.put('/resetpassword/:resettoken', resetPassword);
+router.post('/claim-admin', protect, require('../controllers/authController').claimAdmin);
 
 module.exports = router;

