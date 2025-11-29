@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+
 
 const AuthContext = createContext();
 
@@ -112,59 +111,33 @@ export const AuthProvider = ({ children }) => {
 
 
 
-    const [confirmationResult, setConfirmationResult] = useState(null);
-
-    const setupRecaptcha = (elementId) => {
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-                'size': 'invisible',
-                'callback': (response) => {
-                    // reCAPTCHA solved, allow signInWithPhoneNumber.
-                }
-            });
-        }
-    };
-
-    const sendOtp = async (phoneNumber) => {
-        try {
-            // Ensure phone number has country code if not present
-            const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
-
-            // We need a DOM element for Recaptcha. 
-            // Ideally, this should be passed or we assume a specific ID exists.
-            // Let's assume the calling component sets up a div with id 'recaptcha-container'
-            setupRecaptcha('recaptcha-container');
-
-            const appVerifier = window.recaptchaVerifier;
-            const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-            setConfirmationResult(confirmation);
-            return confirmation;
-        } catch (error) {
-            console.error("Error sending OTP:", error);
-            throw error;
-        }
-    };
-
-    const verifyOtp = async (otp) => {
-        if (!confirmationResult) {
-            throw new Error("No OTP request found. Please request OTP first.");
-        }
-        try {
-            const result = await confirmationResult.confirm(otp);
-            return result.user;
-        } catch (error) {
-            console.error("Error verifying OTP:", error);
-            throw error;
-        }
-    };
-
     const updateUserProfile = async (updatedData) => {
-        // Placeholder: In a real app, you would call a PUT /api/users/profile endpoint
-        // For now, we'll just update the local state to keep the UI responsive
-        const updatedUser = { ...user, ...updatedData };
-        setUser(updatedUser);
-        localStorage.setItem('bhole_guru_user', JSON.stringify(updatedUser));
-        return updatedUser;
+        try {
+            const token = localStorage.getItem('bhole_guru_token');
+            if (!token) throw new Error("Not authenticated");
+
+            const response = await fetch(`${API_URL}/profile`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(updatedData)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to update profile');
+            }
+
+            setUser(data);
+            localStorage.setItem('bhole_guru_user', JSON.stringify(data));
+            return data;
+        } catch (error) {
+            console.error("Update profile failed:", error);
+            throw error;
+        }
     };
 
     const refreshUser = async () => {
@@ -191,7 +164,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, sendOtp, verifyOtp, loading, updateUserProfile, refreshUser }}>
+        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile, refreshUser }}>
             {!loading && children}
         </AuthContext.Provider>
     );

@@ -13,7 +13,7 @@ const Home = () => {
     const { sacredOfferings, heroSection, divineFavorites, divineEssentials } = useContent();
 
     React.useEffect(() => {
-        console.log("Home component updated");
+
     }, []);
 
     // Get top rated products for Royal Treasury

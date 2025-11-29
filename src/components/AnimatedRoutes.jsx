@@ -21,6 +21,8 @@ import Contact from '../pages/Contact';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import Terms from '../pages/Terms';
 import RefundPolicy from '../pages/RefundPolicy';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import NotFound from '../pages/NotFound';
 
 const AnimatedRoutes = () => {
@@ -46,6 +48,8 @@ const AnimatedRoutes = () => {
                 <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
                 <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
                 <Route path="/refund-policy" element={<PageTransition><RefundPolicy /></PageTransition>} />
+                <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+                <Route path="/reset-password/:resettoken" element={<PageTransition><ResetPassword /></PageTransition>} />
                 <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
             </Routes>
         </AnimatePresence>

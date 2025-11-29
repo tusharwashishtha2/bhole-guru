@@ -8,7 +8,7 @@ import Button from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile = () => {
-    const { user, logout, updateUserProfile, sendOtp, verifyOtp, refreshUser } = useAuth();
+    const { user, logout, updateUserProfile, refreshUser } = useAuth();
     const { orders, fetchMyOrders } = useOrder();
     const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState('orders');
@@ -39,10 +39,126 @@ const Profile = () => {
         email: '',
         phone: ''
     });
-    const [otpStep, setOtpStep] = useState(false);
-    const [otp, setOtp] = useState('');
-    const [otpTarget, setOtpTarget] = useState(''); // 'email' or 'phone'
     const [uploading, setUploading] = useState(false);
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        setUploading(true);
+        try {
+            const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
+            const uploadRes = await fetch(`${API_URL}/api/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!uploadRes.ok) throw new Error('Image upload failed');
+
+            const data = await uploadRes.json();
+            await updateUserProfile({ image: data.imageUrl });
+            addToast('Profile picture updated', 'success');
+        } catch (error) {
+            console.error(error);
+            addToast('Failed to upload image', 'error');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        if (user) {
+            fetchMyOrders();
+        }
+    }, [user]);
+
+    const userOrders = orders;
+
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Please Log In</h2>
+                    <p className="text-gray-500 mb-6">You need to be logged in to view your profile.</p>
+                    <Link to="/login">
+                        <Button>Log In</Button>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    // --- Address Handlers ---
+    const handleAddAddress = () => {
+        setEditingAddressId(null);
+        setAddressForm({ type: 'Home', street: '', city: '', state: '', zip: '' });
+        setShowAddressForm(true);
+    };
+
+    const handleEditAddress = (address) => {
+        setEditingAddressId(address.id);
+        setAddressForm(address);
+        setShowAddressForm(true);
+    };
+
+    const handleSaveAddress = async (e) => {
+        e.preventDefault();
+        const newAddress = { ...addressForm, id: editingAddressId || Date.now() };
+
+        let updatedAddresses;
+        if (editingAddressId) {
+            updatedAddresses = (user.addresses || []).map(addr => addr.id === editingAddressId ? newAddress : addr);
+        } else {
+            updatedAddresses = [...(user.addresses || []), newAddress];
+        }
+
+        try {
+            await updateUserProfile({ addresses: updatedAddresses });
+            setShowAddressForm(false);
+            addToast('Address saved successfully', 'success');
+        } catch (error) {
+            addToast(error, 'error');
+        }
+    };
+
+    const handleDeleteAddress = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this address?')) return;
+        const updatedAddresses = (user.addresses || []).filter(addr => addr.id !== id);
+        try {
+            await updateUserProfile({ addresses: updatedAddresses });
+            addToast('Address deleted', 'info');
+        } catch (error) {
+            addToast(error, 'error');
+        }
+    };
+
+    // --- Profile Handlers ---
+    const handleStartEditProfile = () => {
+        setProfileForm({
+            name: user.name || '',
+            email: user.email || '',
+            phone: user.phone || ''
+        });
+        setIsEditingProfile(true);
+    };
+
+    const handleSaveProfile = async (e) => {
+        e.preventDefault();
+        try {
+            await updateUserProfile({
+                name: profileForm.name,
+                email: profileForm.email,
+                phone: profileForm.phone
+            });
+            setIsEditingProfile(false);
+            addToast('Profile updated successfully', 'success');
+        } catch (error) {
+            addToast(error.message || 'Failed to update profile', 'error');
+        }
+    };
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
@@ -417,72 +533,44 @@ const Profile = () => {
                             <div className="bg-white p-6 rounded-xl border border-luminous-gold/30 shadow-md">
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-xl font-bold text-luminous-maroon">Edit Profile</h3>
-                                    <button onClick={() => { setIsEditingProfile(false); setOtpStep(false); }}><X size={20} /></button>
+                                    <button onClick={() => { setIsEditingProfile(false); }}><X size={20} /></button>
                                 </div>
 
-                                {!otpStep ? (
-                                    <form onSubmit={handleSaveProfile} className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
-                                            <input
-                                                required
-                                                value={profileForm.name}
-                                                onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                                                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
-                                            <input
-                                                required
-                                                type="email"
-                                                value={profileForm.email}
-                                                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                                                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none"
-                                            />
-                                            {profileForm.email !== user.email && (
-                                                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><KeyRound size={12} /> OTP verification required for email change</p>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
-                                            <input
-                                                type="tel"
-                                                value={profileForm.phone}
-                                                onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                                                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                placeholder="Enter phone number"
-                                            />
-                                            {profileForm.phone !== user.phone && (
-                                                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><KeyRound size={12} /> OTP verification required for phone change</p>
-                                            )}
-                                        </div>
-                                        <div className="flex justify-end gap-3 pt-4">
-                                            <Button type="button" variant="outline" onClick={() => setIsEditingProfile(false)}>Cancel</Button>
-                                            <Button type="submit">Save Changes</Button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <div className="space-y-4">
-                                        <div className="text-center mb-4">
-                                            <div className="w-12 h-12 bg-luminous-gold/20 rounded-full flex items-center justify-center mx-auto mb-3 text-luminous-maroon">
-                                                <KeyRound size={24} />
-                                            </div>
-                                            <h4 className="font-bold text-gray-900">Verify Changes</h4>
-                                            <p className="text-sm text-gray-500">Enter the OTP sent to {otpTarget}</p>
-                                        </div>
+                                <form onSubmit={handleSaveProfile} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
                                         <input
-                                            type="text"
-                                            value={otp}
-                                            onChange={(e) => setOtp(e.target.value)}
-                                            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none text-center text-2xl tracking-widest font-bold"
-                                            placeholder="• • • • • •"
-                                            maxLength={6}
+                                            required
+                                            value={profileForm.name}
+                                            onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                                            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none"
                                         />
-                                        <Button onClick={handleVerifyProfileOtp} className="w-full">Verify & Update</Button>
-                                        <button onClick={() => setOtpStep(false)} className="w-full text-center text-sm text-gray-500 hover:underline mt-2">Cancel</button>
                                     </div>
-                                )}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
+                                        <input
+                                            required
+                                            type="email"
+                                            value={profileForm.email}
+                                            onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                                            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            value={profileForm.phone}
+                                            onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                                            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="Enter phone number"
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <Button type="button" variant="outline" onClick={() => setIsEditingProfile(false)}>Cancel</Button>
+                                        <Button type="submit">Save Changes</Button>
+                                    </div>
+                                </form>
                             </div>
                         )}
                     </div>

@@ -1,6 +1,9 @@
 const Order = require('../models/Order');
+const Product = require('../models/Product');
+const User = require('../models/User');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -26,6 +29,19 @@ exports.createOrder = async (req, res) => {
             res.status(400);
             throw new Error('No order items');
         } else {
+            // Check stock availability
+            for (const item of orderItems) {
+                const product = await Product.findById(item.product);
+                if (!product) {
+                    res.status(404);
+                    throw new Error(`Product not found: ${item.name}`);
+                }
+                if (product.stock < item.quantity) {
+                    res.status(400);
+                    throw new Error(`Insufficient stock for ${item.name}`);
+                }
+            }
+
             // Create Razorpay Order
             const options = {
                 amount: Math.round(totalPrice * 100), // Amount in paise
@@ -53,6 +69,44 @@ exports.createOrder = async (req, res) => {
             });
 
             const createdOrder = await order.save();
+
+            // Decrement stock
+            for (const item of orderItems) {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    product.stock -= item.quantity;
+                    await product.save();
+                }
+            }
+
+            // Send Order Confirmation Email
+            try {
+                await sendEmail({
+                    email: req.user.email,
+                    subject: `Order Confirmed - #${createdOrder._id}`,
+                    message: `
+                        <div style="font-family: Arial, sans-serif; color: #333;">
+                            <h1 style="color: #800000;">Order Confirmed!</h1>
+                            <p>Namaste <strong>${req.user.name}</strong>,</p>
+                            <p>Your order has been successfully placed.</p>
+                            <p><strong>Order ID:</strong> ${createdOrder._id}</p>
+                            <p><strong>Total Amount:</strong> ₹${totalPrice}</p>
+                            <br>
+                            <h3>Items:</h3>
+                            <ul>
+                                ${orderItems.map(item => `<li>${item.name} x ${item.quantity}</li>`).join('')}
+                            </ul>
+                            <br>
+                            <p>You can track your order status in your profile.</p>
+                            <p>With Gratitude,</p>
+                            <p><strong>Bhole Guru Team</strong></p>
+                        </div>
+                    `
+                });
+            } catch (emailError) {
+                console.error("Failed to send order email:", emailError);
+            }
+
             res.status(201).json({
                 order: createdOrder,
                 razorpayOrderId: razorpayOrder.id,
@@ -201,6 +255,32 @@ exports.updateOrderStatus = async (req, res) => {
                 order.courierName = req.body.courierName;
             }
             const updatedOrder = await order.save();
+
+            // Send Status Update Email
+            try {
+                const user = await User.findById(order.user);
+                if (user) {
+                    const message = `
+                        <div style="font-family: Arial, sans-serif; color: #333;">
+                            <h1 style="color: #800000;">Order Status Update</h1>
+                            <p>Namaste ${user.name},</p>
+                            <p>Your order <strong>#${order._id}</strong> has been updated to: <span style="color: #800000; font-weight: bold;">${order.status}</span>.</p>
+                            <p>Track your order here: <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/track-order" style="color: #800000;">Track Order</a></p>
+                            <br>
+                            <p>Thank you for choosing Bhole Guru.</p>
+                        </div>
+                    `;
+
+                    await sendEmail({
+                        email: user.email,
+                        subject: `Order Update: ${order.status} - Bhole Guru`,
+                        message
+                    });
+                }
+            } catch (error) {
+                console.error('Error sending status update email:', error);
+            }
+
             res.json(updatedOrder);
         } else {
             res.status(404).json({ message: 'Order not found' });
@@ -209,6 +289,7 @@ exports.updateOrderStatus = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 // @desc    Cancel order
 // @route   PUT /api/orders/:id/cancel
 // @access  Private
@@ -237,6 +318,7 @@ exports.cancelOrder = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 // @desc    Delete order
 // @route   DELETE /api/orders/:id
 // @access  Private/Admin

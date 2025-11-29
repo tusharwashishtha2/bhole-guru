@@ -2,49 +2,87 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, ChevronDown, Search, SlidersHorizontal, X, Sparkles, ArrowUpDown } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
-import { useProduct } from '../context/ProductContext';
 import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
-    const { products } = useProduct();
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { categories: dynamicCategories } = useContent();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     // Filter States
     const [selectedCategories, setSelectedCategories] = useState(['All']);
     const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortBy, setSortBy] = useState('featured'); // featured, price-low-high, price-high-low, rating, newest
+    const [sortBy, setSortBy] = useState('featured');
 
     // Expanded Categories List
     const categories = ['All', ...dynamicCategories];
 
     useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
+                let url = `${API_URL}/api/products?`;
+
+                if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
+                    url += `category=${selectedCategories[0]}&`; // API currently supports single category filter, can be improved
+                }
+                if (searchQuery) {
+                    url += `search=${searchQuery}&`;
+                }
+                if (sortBy) {
+                    url += `sort=${sortBy}&`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Client-side price filtering (since backend doesn't support complex range queries yet)
+                let filtered = data;
+                if (selectedPriceRanges.length > 0) {
+                    filtered = data.filter(product => {
+                        const price = product.price;
+                        return selectedPriceRanges.some(range => {
+                            if (range === 'under-200') return price < 200;
+                            if (range === '200-500') return price >= 200 && price <= 500;
+                            if (range === '500-1000') return price > 500 && price <= 1000;
+                            if (range === 'above-1000') return price > 1000;
+                            return false;
+                        });
+                    });
+                }
+                setProducts(filtered);
+            } catch (error) {
+                console.error("Failed to fetch products", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        // Debounce search
+        const timeoutId = setTimeout(() => {
+            fetchProducts();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [selectedCategories, searchQuery, sortBy, selectedPriceRanges]);
+
+    useEffect(() => {
         const categoryParam = searchParams.get('category');
         if (categoryParam && categories.includes(categoryParam)) {
             setSelectedCategories([categoryParam]);
-            // Scroll to products section on mobile if category is selected
-            if (window.innerWidth < 1024) {
-                const element = document.getElementById('product-grid');
-                if (element) element.scrollIntoView({ behavior: 'smooth' });
-            }
         }
     }, [searchParams]);
 
     const handleCategoryChange = (category) => {
         setSelectedCategories(prev => {
             if (category === 'All') return ['All'];
-
-            let newCategories;
-            if (prev.includes(category)) {
-                newCategories = prev.filter(c => c !== category);
-            } else {
-                newCategories = [...prev.filter(c => c !== 'All'), category];
-            }
-
-            return newCategories.length === 0 ? ['All'] : newCategories;
+            // Single category selection for now as backend supports one
+            return [category];
         });
     };
 
@@ -58,56 +96,15 @@ const Shop = () => {
         });
     };
 
-    const filterProducts = (product) => {
-        // Category Filter
-        if (!selectedCategories.includes('All') && !selectedCategories.includes(product.category)) {
-            return false;
-        }
-
-        // Search Filter
-        if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-            return false;
-        }
-
-        // Price Filter
-        if (selectedPriceRanges.length > 0) {
-            const price = product.price;
-            const matchesPrice = selectedPriceRanges.some(range => {
-                if (range === 'under-200') return price < 200;
-                if (range === '200-500') return price >= 200 && price <= 500;
-                if (range === '500-1000') return price > 500 && price <= 1000;
-                if (range === 'above-1000') return price > 1000;
-                return false;
-            });
-            if (!matchesPrice) return false;
-        }
-
-        return true;
-    };
-
-    const sortProducts = (a, b) => {
-        switch (sortBy) {
-            case 'price-low-high':
-                return a.price - b.price;
-            case 'price-high-low':
-                return b.price - a.price;
-            case 'rating':
-                return b.rating - a.rating;
-            case 'newest':
-                return b.id - a.id; // Assuming higher ID is newer
-            default:
-                return 0; // Featured/Default order
-        }
-    };
-
-    const filteredProducts = products.filter(filterProducts).sort(sortProducts);
-
     const clearAllFilters = () => {
         setSelectedCategories(['All']);
         setSelectedPriceRanges([]);
         setSearchQuery('');
         setSortBy('featured');
+        setSearchParams({});
     };
+
+    const filteredProducts = products; // Already filtered by effect
 
     return (
         <div className="bg-luminous-bg dark:bg-stone-950 min-h-screen pt-20 font-sans text-luminous-text dark:text-stone-100 relative overflow-hidden transition-colors duration-300">

@@ -13,7 +13,7 @@ const Checkout = () => {
     const navigate = useNavigate();
     const { cart, getCartTotal, clearCart } = useCart();
     const { addOrder } = useOrder();
-    const { user } = useAuth();
+    const { user, updateUserProfile } = useAuth();
     const { addToast } = useToast();
     const [paymentMethod, setPaymentMethod] = useState('razorpay'); // Default to Online
     const [loading, setLoading] = useState(false);
@@ -136,6 +136,16 @@ const Checkout = () => {
                 const paymentObject = new window.Razorpay(options);
                 paymentObject.open();
                 setLoading(false);
+            }
+
+            // Auto-save address to profile if empty
+            if (user && (!user.address || !user.phone)) {
+                updateUserProfile({
+                    phone: address.phone,
+                    address: address.addressLine1,
+                    city: address.city,
+                    pincode: address.pincode
+                }).catch(err => console.error("Failed to auto-save address", err));
             }
 
         } catch (error) {

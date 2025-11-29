@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useOrder } from '../context/OrderContext';
+import { useAuth } from '../context/AuthContext';
 import { useProduct } from '../context/ProductContext';
 import { useContent } from '../context/ContentContext';
 import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X, Save, Image as ImageIcon } from 'lucide-react';
@@ -11,7 +12,19 @@ import { useToast } from '../context/ToastContext';
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
+    const { user } = useAuth();
     const { addToast } = useToast();
+
+    if (!user || (!user.isAdmin && user.role !== 'admin')) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h2>
+                    <p className="text-gray-600">You do not have permission to view this page.</p>
+                </div>
+            </div>
+        );
+    }
     const {
         sacredOfferings,
         updateSacredOffering,

@@ -7,14 +7,12 @@ import ProductCard from '../components/ui/ProductCard';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { useReview } from '../context/ReviewContext';
 import { useAuth } from '../context/AuthContext';
 
 const ProductDetail = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
-    const { addReview, getProductReviews, getAverageRating } = useReview();
     const { user } = useAuth();
 
     const [quantity, setQuantity] = useState(1);
@@ -70,31 +68,48 @@ const ProductDetail = () => {
 
     const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
 
-    const reviews = getProductReviews(product.id);
-    const averageRating = reviews.length > 0 ? getAverageRating(product.id) : product.rating;
-    const reviewCount = reviews.length > 0 ? reviews.length : (product.reviews ? product.reviews.length : product.numReviews);
+    const averageRating = product.rating || 0;
+    const reviewCount = product.numReviews || 0;
 
     const handleQuantityChange = (type) => {
         if (type === 'decrease' && quantity > 1) setQuantity(quantity - 1);
         if (type === 'increase') setQuantity(quantity + 1);
     };
 
-    const handleSubmitReview = (e) => {
+    const handleSubmitReview = async (e) => {
         e.preventDefault();
         if (!user) {
             alert('Please login to submit a review');
             return;
         }
-        const newReview = {
-            id: Date.now(),
-            user: user.name || 'Anonymous',
-            rating,
-            comment,
-            date: new Date().toLocaleDateString()
-        };
-        addReview(product.id, newReview);
-        setComment('');
-        setRating(5);
+        try {
+            const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
+            const token = localStorage.getItem('bhole_guru_token');
+            const response = await fetch(`${API_URL}/api/products/${product._id}/reviews`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ rating, comment })
+            });
+
+            if (response.ok) {
+                alert('Review submitted successfully');
+                setComment('');
+                setRating(5);
+                // Refresh product to show new review
+                const updatedProductRes = await fetch(`${API_URL}/api/products/${product._id}`);
+                const updatedProduct = await updatedProductRes.json();
+                setProduct(updatedProduct);
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Failed to submit review');
+            }
+        } catch (error) {
+            console.error("Review submission error", error);
+            alert('Something went wrong');
+        }
     };
 
     const isWishlisted = isInWishlist(product.id);
@@ -185,25 +200,31 @@ const ProductDetail = () => {
                             <div className="flex items-center border border-luminous-gold/30 rounded-full w-max bg-luminous-maroon/50">
                                 <button
                                     onClick={() => handleQuantityChange('decrease')}
-                                    className="p-4 hover:text-luminous-gold transition-colors text-white"
+                                    disabled={product.stock === 0}
+                                    className="p-4 hover:text-luminous-gold transition-colors text-white disabled:opacity-50"
                                 >
                                     <Minus size={20} />
                                 </button>
                                 <span className="w-12 text-center font-bold text-lg text-luminous-gold">{quantity}</span>
                                 <button
                                     onClick={() => handleQuantityChange('increase')}
-                                    className="p-4 hover:text-luminous-gold transition-colors text-white"
+                                    disabled={product.stock === 0 || quantity >= product.stock}
+                                    className="p-4 hover:text-luminous-gold transition-colors text-white disabled:opacity-50"
                                 >
                                     <Plus size={20} />
                                 </button>
                             </div>
                             <Button
-                                className="flex-grow gap-2 text-lg shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                                className="flex-grow gap-2 text-lg shadow-[0_0_20px_rgba(212,175,55,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={() => addToCart(product, quantity)}
+                                disabled={product.stock === 0}
                             >
-                                <ShoppingCart size={20} /> Add to Cart
+                                <ShoppingCart size={20} /> {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
                             </Button>
                         </div>
+                        {product.stock > 0 && product.stock < 10 && (
+                            <p className="text-red-400 font-bold mb-4">Hurry! Only {product.stock} left in stock.</p>
+                        )}
                     </div>
                 </div>
 
@@ -262,21 +283,21 @@ const ProductDetail = () => {
 
                         {/* Reviews List */}
                         <div className="md:col-span-2 space-y-6">
-                            {reviews.length === 0 ? (
+                            {(!product.reviews || product.reviews.length === 0) ? (
                                 <div className="text-center py-12 text-gray-500">
                                     <p>No reviews yet. Be the first to review this product!</p>
                                 </div>
                             ) : (
-                                reviews.map((review) => (
-                                    <div key={review.id} className="border-b border-gray-100 pb-6 last:border-0">
+                                product.reviews.map((review) => (
+                                    <div key={review._id} className="border-b border-gray-100 pb-6 last:border-0">
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-luminous-maroon/10 rounded-full flex items-center justify-center text-luminous-maroon font-bold">
-                                                    {review.user[0].toUpperCase()}
+                                                    {review.name ? review.name[0].toUpperCase() : 'A'}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-gray-900">{review.user}</h4>
-                                                    <p className="text-xs text-gray-500">{review.date}</p>
+                                                    <h4 className="font-bold text-gray-900">{review.name || 'Anonymous'}</h4>
+                                                    <p className="text-xs text-gray-500">{new Date(review.createdAt || Date.now()).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                             <div className="flex text-yellow-400">

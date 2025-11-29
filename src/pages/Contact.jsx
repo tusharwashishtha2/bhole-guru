@@ -93,26 +93,30 @@ const Contact = () => {
                     {/* Contact Form */}
                     <div className="bg-royal-maroon/50 border border-royal-gold/10 p-8 rounded-2xl shadow-xl backdrop-blur-sm">
                         <h3 className="text-2xl font-serif font-bold mb-6 text-royal-gold">Send Message</h3>
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={(e) => {
+                            e.preventDefault();
+                            alert("Thank you for your message! We will get back to you soon.");
+                            e.target.reset();
+                        }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-royal-ivory/80 mb-2">First Name</label>
-                                    <input type="text" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="John" />
+                                    <input required type="text" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="John" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-royal-ivory/80 mb-2">Last Name</label>
-                                    <input type="text" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="Doe" />
+                                    <input required type="text" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="Doe" />
                                 </div>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-royal-ivory/80 mb-2">Email Address</label>
-                                <input type="email" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="john@example.com" />
+                                <input required type="email" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="john@example.com" />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-royal-ivory/80 mb-2">Message</label>
-                                <textarea rows="4" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="How can we help you?"></textarea>
+                                <textarea required rows="4" className="w-full px-4 py-3 rounded-lg bg-royal-maroon/30 border border-royal-gold/20 text-royal-ivory focus:border-royal-gold focus:ring-1 focus:ring-royal-gold outline-none transition-all placeholder-royal-ivory/30" placeholder="How can we help you?"></textarea>
                             </div>
 
                             <Button type="submit" className="w-full">Send Message</Button>

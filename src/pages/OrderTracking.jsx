@@ -1,10 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Package, Truck, MapPin, Phone, Star, ArrowRight, X, Download } from 'lucide-react';
+import { CheckCircle, Package, Truck, MapPin, Phone, ArrowRight, X, Download } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
 import Invoice from '../components/Invoice';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix Leaflet default icon issue
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const OrderTracking = () => {
     const { getOrder, currentOrderId, cancelOrder } = useOrder();
@@ -13,6 +29,9 @@ const OrderTracking = () => {
     const [showDeliveredPopup, setShowDeliveredPopup] = useState(false);
     const invoiceRef = useRef();
     const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
+
+    // Mock coordinates for demo (Varanasi)
+    const position = [25.3176, 82.9739];
 
     const handleDownloadInvoice = async () => {
         const element = invoiceRef.current;
@@ -176,34 +195,18 @@ const OrderTracking = () => {
             </AnimatePresence>
 
             {/* Map Header */}
-            <div className="h-[40vh] bg-gray-200 relative overflow-hidden w-full">
-                {/* Mock Map Background */}
-                <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/75.8577,22.7196,13,0/1000x600?access_token=mock')] bg-cover bg-center opacity-60 grayscale"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50"></div>
-
-                {/* Animated Delivery Partner */}
-                {!isCancelled && (
-                    <motion.div
-                        className="absolute top-1/2 left-1/4 transform -translate-y-1/2"
-                        animate={{ left: statusStep >= 4 ? '85%' : statusStep >= 3 ? '75%' : statusStep >= 2 ? '50%' : '25%' }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
-                    >
-                        <div className="relative">
-                            <div className="w-12 h-12 bg-luminous-maroon rounded-full flex items-center justify-center text-white shadow-lg z-10 relative">
-                                <Truck size={24} />
-                            </div>
-                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-black/20 blur-sm rounded-full"></div>
-
-                            {/* Pulse Effect */}
-                            <div className="absolute inset-0 bg-luminous-maroon rounded-full animate-ping opacity-20"></div>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Destination Pin */}
-                <div className="absolute top-1/2 right-[10%] transform -translate-y-1/2 -mt-6">
-                    <MapPin size={40} className="text-red-600 drop-shadow-lg" fill="currentColor" />
-                </div>
+            <div className="h-[40vh] bg-gray-200 relative overflow-hidden w-full z-0">
+                <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={position}>
+                        <Popup>
+                            Order Location <br /> {order.shippingAddress?.city || 'Varanasi'}
+                        </Popup>
+                    </Marker>
+                </MapContainer>
             </div>
 
             <div className="container mx-auto px-4 -mt-20 relative z-10">
