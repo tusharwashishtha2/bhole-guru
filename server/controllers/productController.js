@@ -59,10 +59,61 @@ exports.getProductById = async (req, res) => {
 // @access  Private/Admin
 exports.createProduct = async (req, res) => {
     try {
+        // Remove legacy id if present to prevent duplicate key errors
+        if (req.body.id) delete req.body.id;
+
         const product = await Product.create(req.body);
         res.status(201).json(product);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Update a product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+exports.updateProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (product) {
+            product.name = req.body.name || product.name;
+            product.price = req.body.price || product.price;
+            product.description = req.body.description || product.description;
+            product.image = req.body.image || product.image;
+            product.images = req.body.images || product.images;
+            product.category = req.body.category || product.category;
+            product.countInStock = req.body.countInStock || product.countInStock;
+            product.originalPrice = req.body.originalPrice || product.originalPrice;
+            product.features = req.body.features || product.features;
+
+            const updatedProduct = await product.save();
+            res.json(updatedProduct);
+        } else {
+            res.status(404);
+            throw new Error('Product not found');
+        }
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+// @desc    Delete a product
+// @route   DELETE /api/products/:id
+// @access  Private/Admin
+exports.deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (product) {
+            await product.deleteOne();
+            res.json({ message: 'Product removed' });
+        } else {
+            res.status(404);
+            throw new Error('Product not found');
+        }
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 };
 
