@@ -35,13 +35,13 @@ const ProductDetail = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setProduct(data);
-                    setActiveImage(data.image);
+                    setActiveImage(data.images?.[0] || data.image);
                 } else {
                     // Fallback to static data if API fails or not found (e.g. during dev before seed)
                     const staticProduct = products.find(p => p.id === parseInt(id));
                     if (staticProduct) {
                         setProduct(staticProduct);
-                        setActiveImage(staticProduct.image);
+                        setActiveImage(staticProduct.images?.[0] || staticProduct.image);
                     }
                 }
             } catch (error) {
@@ -50,7 +50,7 @@ const ProductDetail = () => {
                 const staticProduct = products.find(p => p.id === parseInt(id));
                 if (staticProduct) {
                     setProduct(staticProduct);
-                    setActiveImage(staticProduct.image);
+                    setActiveImage(staticProduct.images?.[0] || staticProduct.image);
                 }
             } finally {
                 setLoading(false);

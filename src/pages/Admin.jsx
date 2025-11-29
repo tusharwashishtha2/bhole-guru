@@ -80,7 +80,8 @@ const Admin = () => {
                 ...formData,
                 price: Number(formData.price),
                 originalPrice: Number(formData.originalPrice),
-                features: formData.features.split(',').map(f => f.trim())
+                features: formData.features.split(',').map(f => f.trim()),
+                images: [formData.image]
             });
             setShowAddForm(false);
             resetForm();
@@ -96,7 +97,8 @@ const Admin = () => {
                 ...formData,
                 price: Number(formData.price),
                 originalPrice: Number(formData.originalPrice),
-                features: formData.features.split(',').map(f => f.trim())
+                features: formData.features.split(',').map(f => f.trim()),
+                images: [formData.image]
             });
             setShowAddForm(false);
             resetForm();
@@ -111,7 +113,7 @@ const Admin = () => {
             price: product.price,
             originalPrice: product.originalPrice,
             category: product.category,
-            image: product.image,
+            image: product.images?.[0] || product.image,
             description: product.description,
             features: product.features ? product.features.join(', ') : ''
         });
@@ -462,7 +464,7 @@ const Admin = () => {
                                 {products.map(product => (
                                     <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group hover:shadow-md transition-all">
                                         <div className="relative h-48 overflow-hidden bg-gray-100">
-                                            <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            <img src={product.images?.[0] || product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                             <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-gray-800">
                                                 {product.category}
                                             </div>
