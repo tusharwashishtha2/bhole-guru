@@ -150,6 +150,32 @@ export const OrderProvider = ({ children }) => {
         }
     };
 
+    const deleteOrder = async (orderId) => {
+        const token = getToken();
+        try {
+            const response = await fetch(`${API_URL}/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setOrders(prev => prev.filter(order => order._id !== orderId && order.id !== orderId));
+                addToast('Order deleted successfully', 'success');
+                return true;
+            } else {
+                const data = await response.json();
+                addToast(data.message || 'Failed to delete order', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error("Error deleting order:", error);
+            addToast('Error deleting order', 'error');
+            return false;
+        }
+    };
+
     const getOrder = (orderId) => {
         return orders.find(o => o._id === orderId || o.id === orderId);
     };
@@ -160,6 +186,7 @@ export const OrderProvider = ({ children }) => {
             addOrder,
             updateOrderStatus,
             cancelOrder,
+            deleteOrder,
             getOrder,
             fetchMyOrders,
             fetchAllOrders,

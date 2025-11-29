@@ -9,7 +9,8 @@ const {
     updateOrderToDelivered,
     verifyPayment,
     cancelOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    deleteOrder
 } = require('../controllers/orderController');
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.route('/verify').post(protect, verifyPayment);
 router.route('/myorders').get(protect, getMyOrders);
 router.route('/:id/status').put(protect, admin, updateOrderStatus);
 router.route('/:id/cancel').put(protect, cancelOrder);
+router.route('/:id').delete(protect, admin, deleteOrder);
 
 module.exports = router;
