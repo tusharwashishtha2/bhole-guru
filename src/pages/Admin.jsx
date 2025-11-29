@@ -12,16 +12,49 @@ import { useToast } from '../context/ToastContext';
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
-    const { user } = useAuth();
+    const { user, logout } = useAuth(); // Added logout
     const { addToast } = useToast();
+
+    const handleClaimAdmin = async () => {
+        try {
+            const token = localStorage.getItem('bhole_guru_token');
+            const response = await fetch((import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com') + '/api/auth/claim-admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ secretKey: 'bhole-guru-master-key-2024' })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message);
+                logout();
+                window.location.href = '/login';
+            } else {
+                alert(data.message || 'Failed to claim admin');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error claiming admin');
+        }
+    };
 
     if (!user || (!user.isAdmin && user.role !== 'admin')) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h2>
-                    <p className="text-gray-600">You do not have permission to view this page.</p>
-                    <div className="mt-4 p-4 bg-gray-100 rounded text-left text-xs font-mono">
+                    <p className="text-gray-600 mb-6">You do not have permission to view this page.</p>
+
+                    <button
+                        onClick={handleClaimAdmin}
+                        className="bg-luminous-maroon text-white px-6 py-2 rounded-lg font-bold hover:bg-red-900 transition-colors shadow-lg"
+                    >
+                        Fix Admin Access (Click Me)
+                    </button>
+
+                    <div className="mt-8 p-4 bg-gray-100 rounded text-left text-xs font-mono opacity-50">
                         <p><strong>Debug Info:</strong></p>
                         <p>User ID: {user?._id}</p>
                         <p>User Name: {user?.name}</p>
