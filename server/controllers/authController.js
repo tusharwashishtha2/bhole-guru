@@ -401,3 +401,29 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// @desc    Test Email Configuration
+// @route   GET /api/auth/test-email
+// @access  Public
+exports.testEmail = async (req, res) => {
+    try {
+        await sendEmail({
+            email: process.env.EMAIL_USER, // Send to self
+            subject: 'Test Email from Bhole Guru',
+            message: '<h1>It works!</h1><p>Your email configuration is correct.</p>'
+        });
+        res.status(200).json({ success: true, message: 'Email sent successfully to ' + process.env.EMAIL_USER });
+    } catch (error) {
+        console.error('Test Email Failed:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Email failed',
+            error: error.message,
+            stack: error.stack,
+            config: {
+                user: process.env.EMAIL_USER ? 'Set' : 'Missing',
+                pass: process.env.EMAIL_PASS ? 'Set (' + process.env.EMAIL_PASS.length + ' chars)' : 'Missing'
+            }
+        });
+    }
+};
