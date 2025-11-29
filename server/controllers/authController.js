@@ -232,36 +232,171 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-// @desc    Claim Admin Role (Emergency Backdoor)
-// @route   POST /api/auth/claim-admin
-// @access  Private
-exports.claimAdmin = async (req, res) => {
+// @desc    Authenticate a user
+// @route   POST /api/auth/login
+// @access  Public
+exports.login = async (req, res) => {
     try {
-        const { secretKey } = req.body;
+        const { email, password } = req.body;
 
-        // Hardcoded secret key for safety
-        if (secretKey !== 'bhole-guru-master-key-2024') {
-            return res.status(403).json({ message: 'Invalid secret key' });
+        // Check for user email
+        const user = await User.findOne({ email }).select('+password');
+
+        if (user && (await user.matchPassword(password))) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                token: generateToken(user._id),
+            });
+        } else {
+            res.status(401).json({ message: 'Invalid email or password' });
         }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
+// @desc    Get user data
+// @route   GET /api/auth/me
+// @access  Private
+exports.getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+    try {
         const user = await User.findById(req.user.id);
 
         if (user) {
-            user.role = 'admin';
-            await user.save();
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+            user.phone = req.body.phone || user.phone;
+            user.address = req.body.address || user.address;
+            user.city = req.body.city || user.city;
+            user.pincode = req.body.pincode || user.pincode;
+            user.image = req.body.image || user.image;
+
+            if (req.body.password) {
+                user.password = req.body.password;
+            }
+
+            const updatedUser = await user.save();
 
             res.json({
-                success: true,
-                message: 'SUCCESS: You are now an Admin! Please logout and login again.',
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    role: user.role
-                }
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                phone: updatedUser.phone,
+                address: updatedUser.address,
+                city: updatedUser.city,
+                pincode: updatedUser.pincode,
+                image: updatedUser.image,
+                role: updatedUser.role,
+                token: generateToken(updatedUser._id),
             });
         } else {
             res.status(404).json({ message: 'User not found' });
         }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Forgot Password
+// @route   POST /api/auth/forgotpassword
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Get reset token
+        const resetToken = user.getResetPasswordToken();
+
+        await user.save({ validateBeforeSave: false });
+
+        // Create reset url
+        // NOTE: In production, this should be the frontend URL
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
+
+        const message = `
+            <div style="font-family: Arial, sans-serif; color: #333;">
+                <h1 style="color: #800000;">Password Reset Request</h1>
+                <p>You are receiving this email because you (or someone else) has requested the reset of a password.</p>
+                <p>Please click on the link below to reset your password:</p>
+                <a href="${resetLink}" style="background-color: #800000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a>
+                <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+            </div>
+        `;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password Reset Token',
+                message
+            });
+
+            res.status(200).json({ success: true, data: 'Email sent' });
+        } catch (error) {
+            console.error(error);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+
+            await user.save({ validateBeforeSave: false });
+
+            return res.status(500).json({ message: 'Email could not be sent' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Reset Password
+// @route   PUT /api/auth/resetpassword/:resettoken
+// @access  Public
+exports.resetPassword = async (req, res) => {
+    try {
+        // Get hashed token
+        const resetPasswordToken = crypto
+            .createHash('sha256')
+            .update(req.params.resettoken)
+            .digest('hex');
+
+        const user = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token' });
+        }
+
+        // Set new password
+        user.password = req.body.password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            data: 'Password updated success',
+            token: generateToken(user._id)
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
