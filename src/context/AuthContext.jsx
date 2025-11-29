@@ -100,13 +100,27 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('bhole_guru_token');
     };
 
-    const forgotPassword = (email) => {
-        // Placeholder for future backend implementation
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(`Password reset link sent to ${email}`);
-            }, 1000);
-        });
+    const forgotPassword = async (email) => {
+        try {
+            const response = await fetch(`${API_URL}/forgotpassword`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to send reset email');
+            }
+
+            return data.data || 'Password reset link sent';
+        } catch (error) {
+            console.error("Forgot password failed:", error);
+            throw error.message;
+        }
     };
 
 

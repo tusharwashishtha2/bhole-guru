@@ -26,26 +26,36 @@ const ProductDetail = () => {
 
     useEffect(() => {
         const fetchProduct = async () => {
+            setLoading(true);
             try {
-                // Try to fetch from API first (for wishlist compatibility)
+                // Try to fetch from API first
                 const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
                 const response = await fetch(`${API_URL}/api/products/${id}`);
+
                 if (response.ok) {
                     const data = await response.json();
                     setProduct(data);
                     setActiveImage(data.images?.[0] || data.image);
                 } else {
-                    // Fallback to static data if API fails or not found (e.g. during dev before seed)
-                    const staticProduct = products.find(p => p.id === parseInt(id));
+                    // Fallback to static data if API fails or not found
+                    // Handle both number (static) and string (mongo) IDs
+                    const staticProduct = products.find(p =>
+                        p.id === id || p.id === parseInt(id) || p._id === id
+                    );
+
                     if (staticProduct) {
                         setProduct(staticProduct);
                         setActiveImage(staticProduct.images?.[0] || staticProduct.image);
+                    } else {
+                        console.error('Product not found in API or static data');
                     }
                 }
             } catch (error) {
                 console.error("Failed to fetch product", error);
                 // Fallback
-                const staticProduct = products.find(p => p.id === parseInt(id));
+                const staticProduct = products.find(p =>
+                    p.id === id || p.id === parseInt(id) || p._id === id
+                );
                 if (staticProduct) {
                     setProduct(staticProduct);
                     setActiveImage(staticProduct.images?.[0] || staticProduct.image);

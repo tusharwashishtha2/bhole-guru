@@ -29,7 +29,7 @@ const Shop = () => {
                 let url = `${API_URL}/api/products?`;
 
                 if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
-                    url += `category=${selectedCategories[0]}&`; // API currently supports single category filter, can be improved
+                    url += `category=${selectedCategories[0]}&`;
                 }
                 if (searchQuery) {
                     url += `search=${searchQuery}&`;
@@ -41,7 +41,6 @@ const Shop = () => {
                 const response = await fetch(url);
                 const data = await response.json();
 
-                // Client-side price filtering (since backend doesn't support complex range queries yet)
                 let filtered = data;
                 if (selectedPriceRanges.length > 0) {
                     filtered = data.filter(product => {
@@ -63,10 +62,10 @@ const Shop = () => {
             }
         };
 
-        // Debounce search
+        // Debounce only for search query
         const timeoutId = setTimeout(() => {
             fetchProducts();
-        }, 500);
+        }, searchQuery ? 500 : 0);
 
         return () => clearTimeout(timeoutId);
     }, [selectedCategories, searchQuery, sortBy, selectedPriceRanges]);
