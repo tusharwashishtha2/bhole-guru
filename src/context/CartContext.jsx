@@ -53,7 +53,7 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromCart = (productId) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== productId));
+        setCart(prevCart => prevCart.filter(item => item.id.toString() !== productId.toString()));
         addToast('Item removed from cart', 'info');
     };
 
@@ -64,7 +64,7 @@ export const CartProvider = ({ children }) => {
         }
         setCart(prevCart =>
             prevCart.map(item =>
-                item.id === productId ? { ...item, quantity: newQuantity } : item
+                item.id.toString() === productId.toString() ? { ...item, quantity: newQuantity } : item
             )
         );
     };
