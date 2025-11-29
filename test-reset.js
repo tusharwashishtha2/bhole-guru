@@ -17,7 +17,7 @@ async function checkServer() {
     console.log('\n2. Checking Email Endpoint...');
     try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
         const res = await fetch(TEST_URL, { signal: controller.signal });
         clearTimeout(timeout);
         console.log(`Email Endpoint Status: ${res.status} ${res.statusText}`);
