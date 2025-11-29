@@ -6,11 +6,7 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Please add a product name'],
         trim: true
     },
-    id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
+
     description: {
         type: String,
         required: [true, 'Please add a description']

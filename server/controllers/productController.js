@@ -52,21 +52,7 @@ exports.getProductById = async (req, res) => {
     }
 };
 
-// @desc    Get single product by Integer ID
-// @route   GET /api/products/lookup/:id
-// @access  Public
-exports.getProductByIntId = async (req, res) => {
-    try {
-        const product = await Product.findOne({ id: parseInt(req.params.id) });
-        if (product) {
-            res.status(200).json(product);
-        } else {
-            res.status(404).json({ message: 'Product not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+
 
 // @desc    Create a product
 // @route   POST /api/products
