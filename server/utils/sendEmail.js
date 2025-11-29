@@ -5,17 +5,14 @@ const sendEmail = async (options) => {
     // For Gmail, you might need an App Password if 2FA is on.
     // Alternatively, use a service like SendGrid or Mailgun for production.
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // use STARTTLS
+        service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         },
-        connectionTimeout: 10000, // 10 seconds
+        connectionTimeout: 10000,
         greetingTimeout: 10000,
-        socketTimeout: 10000,
-        family: 4 // Force IPv4
+        socketTimeout: 10000
     });
 
     // Define email options
