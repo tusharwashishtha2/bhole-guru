@@ -143,12 +143,18 @@ const ProductDetail = () => {
                         </div>
 
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="flex text-yellow-400">
-                                <Star fill="currentColor" size={20} />
-                                <span className="ml-2 text-white font-medium">{averageRating}</span>
-                            </div>
-                            <span className="text-white/20">|</span>
-                            <span className="text-white/60">{reviewCount} Reviews</span>
+                            {averageRating > 0 ? (
+                                <>
+                                    <div className="flex text-yellow-400">
+                                        <Star fill="currentColor" size={20} />
+                                        <span className="ml-2 text-white font-medium">{averageRating}</span>
+                                    </div>
+                                    <span className="text-white/20">|</span>
+                                    <span className="text-white/60">{reviewCount} Reviews</span>
+                                </>
+                            ) : (
+                                <span className="text-white/60 font-medium">No Reviews Yet</span>
+                            )}
                         </div>
 
                         <div className="flex items-end gap-4 mb-8">

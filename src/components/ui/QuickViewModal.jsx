@@ -47,7 +47,7 @@ const QuickViewModal = () => {
                         {/* Image Section */}
                         <div className="relative h-64 md:h-full bg-gray-100 dark:bg-stone-800">
                             <img
-                                src={selectedProduct.image}
+                                src={selectedProduct.images?.[0] || selectedProduct.image}
                                 alt={selectedProduct.name}
                                 className="w-full h-full object-cover"
                             />
@@ -104,8 +104,8 @@ const QuickViewModal = () => {
                                     <button
                                         onClick={() => toggleWishlist(selectedProduct)}
                                         className={`p-3 rounded-lg border transition-colors ${isWishlisted
-                                                ? 'border-luminous-maroon bg-luminous-maroon text-white'
-                                                : 'border-gray-200 dark:border-gray-700 text-gray-400 hover:border-luminous-maroon hover:text-luminous-maroon'
+                                            ? 'border-luminous-maroon bg-luminous-maroon text-white'
+                                            : 'border-gray-200 dark:border-gray-700 text-gray-400 hover:border-luminous-maroon hover:text-luminous-maroon'
                                             }`}
                                     >
                                         <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} />

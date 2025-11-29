@@ -84,9 +84,13 @@ const ProductCard = ({ product }) => {
                             <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
                         )}
                     </div>
-                    <div className="flex items-center gap-1 text-yellow-500 text-sm font-medium">
-                        <span>★</span> {product.rating}
-                    </div>
+                    {product.rating > 0 ? (
+                        <div className="flex items-center gap-1 text-yellow-500 text-sm font-medium">
+                            <span>★</span> {product.rating}
+                        </div>
+                    ) : (
+                        <span className="text-xs font-bold text-luminous-gold bg-luminous-maroon/10 px-2 py-1 rounded">NEW</span>
+                    )}
                 </div>
             </div>
         </div>
