@@ -21,6 +21,14 @@ const Admin = () => {
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h2>
                     <p className="text-gray-600">You do not have permission to view this page.</p>
+                    <div className="mt-4 p-4 bg-gray-100 rounded text-left text-xs font-mono">
+                        <p><strong>Debug Info:</strong></p>
+                        <p>User ID: {user?._id}</p>
+                        <p>User Name: {user?.name}</p>
+                        <p>User Email: {user?.email}</p>
+                        <p>User Role: {user?.role ? `"${user.role}"` : 'undefined'}</p>
+                        <p>IsAdmin: {user?.isAdmin ? 'true' : 'false'}</p>
+                    </div>
                 </div>
             </div>
         );
