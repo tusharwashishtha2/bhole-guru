@@ -2,7 +2,7 @@ import fs from 'fs';
 
 try {
     // Read as UTF-16LE
-    const content = fs.readFileSync('output_v2.txt', 'utf16le');
+    const content = fs.readFileSync('output_v3.txt', 'utf16le');
     // Find the JSON part
     const jsonStart = content.indexOf('Response: {');
     if (jsonStart !== -1) {
