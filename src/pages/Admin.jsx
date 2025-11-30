@@ -3,7 +3,7 @@ import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
 import { useProduct } from '../context/ProductContext';
 import { useContent } from '../context/ContentContext';
-// import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/ToastContext';
 import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X, Save, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
@@ -11,10 +11,40 @@ const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
     const { user, logout } = useAuth();
-    // const { addToast } = useToast(); 
-    const addToast = (msg, type) => alert(msg); // Temporary fallback
+    const { addToast } = useToast();
 
+    const {
+        sacredOfferings,
+        updateSacredOffering,
+        heroSection,
+        updateHeroSection,
+        divineFavorites,
+        updateDivineFavorites,
+        divineEssentials,
+        updateDivineEssential,
+        categories,
+        addCategory,
+        removeCategory
+    } = useContent();
+
+    const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories', 'users'
+    const [newCategory, setNewCategory] = useState('');
     const [usersList, setUsersList] = useState([]);
+
+    // Product Form State
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        price: '',
+        originalPrice: '',
+        category: 'Puja Thali',
+        image: '',
+        description: '',
+        features: ''
+    });
+
     const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/users';
 
     const fetchAllUsers = async () => {
@@ -84,37 +114,6 @@ const Admin = () => {
     const handleDeleteUser = (id) => {
         deleteUser(id);
     };
-
-    const {
-        sacredOfferings,
-        updateSacredOffering,
-        heroSection,
-        updateHeroSection,
-        divineFavorites,
-        updateDivineFavorites,
-        divineEssentials,
-        updateDivineEssential,
-        categories,
-        addCategory,
-        removeCategory
-    } = useContent();
-
-    const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories'
-    const [newCategory, setNewCategory] = useState('');
-
-    // Product Form State
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingId, setEditingId] = useState(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        price: '',
-        originalPrice: '',
-        category: 'Puja Thali',
-        image: '',
-        description: '',
-        features: ''
-    });
 
     const resetForm = () => {
         setFormData({
