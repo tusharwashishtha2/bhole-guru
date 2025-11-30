@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for Render cold start
+            const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout for Render cold start
 
             // Try actual API first
             const response = await fetch(`${API_URL}/login`, {
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     const signup = async (userData) => {
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+            const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout
 
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
