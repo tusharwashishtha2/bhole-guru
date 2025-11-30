@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Package, Truck, MapPin, Phone, ArrowRight, X, Download } from 'lucide-react';
 import Button from '../components/ui/Button';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
 import Invoice from '../components/Invoice';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -23,137 +23,77 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const OrderTracking = () => {
-    const { getOrder, currentOrderId, cancelOrder } = useOrder();
+    const { getOrder, currentOrderId, cancelOrder, setCurrentOrderId } = useOrder();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [order, setOrder] = useState(null);
     const [showDeliveredPopup, setShowDeliveredPopup] = useState(false);
     const invoiceRef = useRef();
     const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
+    const [manualOrderId, setManualOrderId] = useState('');
 
     // Mock coordinates for demo (Varanasi)
     const position = [25.3176, 82.9739];
 
-    const handleDownloadInvoice = async () => {
-        const element = invoiceRef.current;
-        const opt = {
-            margin: 0,
-            filename: `invoice_${order._id}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        setIsGeneratingInvoice(true);
-        try {
-            const html2pdf = (await import('html2pdf.js')).default;
-            await html2pdf().set(opt).from(element).save();
-        } catch (error) {
-            console.error("Error generating invoice:", error);
-            alert("Failed to generate invoice. Please try again.");
-        } finally {
-            setIsGeneratingInvoice(false);
-        }
-    };
+    // ... handleDownloadInvoice ...
 
     useEffect(() => {
-        if (currentOrderId) {
-            const currentOrder = getOrder(currentOrderId);
-            setOrder(currentOrder);
+        const urlOrderId = searchParams.get('orderId');
+        const activeId = urlOrderId || currentOrderId;
 
-            // Check if just delivered to show popup
-            // Use sessionStorage to ensure it only shows once per session/refresh
-            if (currentOrder?.status === 'Delivered') {
-                const hasShownPopup = sessionStorage.getItem(`popup_shown_${currentOrderId}`);
-                if (!hasShownPopup) {
-                    setShowDeliveredPopup(true);
-                    triggerConfetti();
-                    sessionStorage.setItem(`popup_shown_${currentOrderId}`, 'true');
+        if (activeId) {
+            const currentOrder = getOrder(activeId);
+            if (currentOrder) {
+                setOrder(currentOrder);
+                if (urlOrderId && !currentOrderId) {
+                    setCurrentOrderId(urlOrderId);
                 }
             }
         }
-    }, [currentOrderId, getOrder, order?.status]);
+    }, [currentOrderId, searchParams, getOrder, setCurrentOrderId]);
 
-    const triggerConfetti = async () => {
-        const confetti = (await import('canvas-confetti')).default;
-        var duration = 3 * 1000;
-        var animationEnd = Date.now() + duration;
-        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    // ... triggerConfetti ...
 
-        var random = function (min, max) {
-            return Math.random() * (max - min) + min;
-        };
+    // ... getStatusStep ...
 
-        var interval = setInterval(function () {
-            var timeLeft = animationEnd - Date.now();
+    // ... getStatusTitle ...
 
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
+    // ... getTimeForStatus ...
 
-            var particleCount = 50 * (timeLeft / duration);
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
-        }, 250);
-    };
-
-    const getStatusStep = (status) => {
-        switch (status) {
-            case 'Order Placed': return 0;
-            case 'Packed': return 1;
-            case 'Shipped': return 2;
-            case 'Out for Delivery': return 3;
-            case 'Delivered': return 4;
-            case 'Cancelled': return -1;
-            default: return 0;
-        }
-    };
-
-    const getStatusTitle = (status) => {
-        switch (status) {
-            case 'Order Placed': return 'Order Confirmed';
-            case 'Packed': return 'Order Packed';
-            case 'Shipped': return 'Order Shipped';
-            case 'Out for Delivery': return 'Out for Delivery';
-            case 'Delivered': return 'Order Delivered';
-            case 'Cancelled': return 'Order Cancelled';
-            default: return 'Order Status';
-        }
-    };
-
-    // Helper to get time for a specific status from timeline
-    const getTimeForStatus = (statusLabel) => {
-        if (!order || !order.timeline) return '';
-        const entry = order.timeline.find(t => t.status === statusLabel);
-        if (!entry) return '';
-        return new Date(entry.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const steps = [
-        { icon: CheckCircle, label: "Order Placed", statusKey: "Order Placed" },
-        { icon: Package, label: "Packed", statusKey: "Packed" },
-        { icon: Truck, label: "Shipped", statusKey: "Shipped" },
-        { icon: Truck, label: "Out for Delivery", statusKey: "Out for Delivery" },
-        { icon: MapPin, label: "Delivered", statusKey: "Delivered" }
-    ];
+    // ... steps ...
 
     // Handle loading or no order state
     if (!order) {
-        // If there's no currentOrderId, show empty state immediately
-        if (!currentOrderId) {
-            return (
-                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">No Active Order</h2>
-                        <p className="text-gray-500 mb-6">It looks like you haven't placed an order yet.</p>
-                        <Button to="/shop">Start Shopping</Button>
-                    </div>
-                </div>
-            );
-        }
-        // If there is an ID but no order yet (loading), show loader
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-luminous-maroon"></div>
+                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+                    <div className="w-16 h-16 bg-luminous-gold/20 rounded-full flex items-center justify-center mx-auto mb-6 text-luminous-maroon">
+                        <Truck size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Track Your Order</h2>
+                    <p className="text-gray-500 mb-6">Enter your Order ID to see real-time updates.</p>
+
+                    <div className="flex gap-2 mb-6">
+                        <input
+                            type="text"
+                            placeholder="Order ID (e.g., 674...)"
+                            value={manualOrderId}
+                            onChange={(e) => setManualOrderId(e.target.value)}
+                            className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                        />
+                        <Button onClick={() => {
+                            if (manualOrderId.trim()) {
+                                setSearchParams({ orderId: manualOrderId.trim() });
+                            }
+                        }}>
+                            Track
+                        </Button>
+                    </div>
+
+                    <div className="text-sm text-gray-400">
+                        Don't have an Order ID? <Link to="/profile" className="text-luminous-maroon hover:underline">Check My Orders</Link>
+                    </div>
+                </div>
             </div>
         );
     }
