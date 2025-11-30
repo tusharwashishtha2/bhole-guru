@@ -35,7 +35,7 @@ const Cart = () => {
                     {/* Cart Items */}
                     <div className="lg:col-span-2 space-y-6">
                         {cart.map((item) => (
-                            <div key={item.id} className="bg-white dark:bg-stone-900 p-6 rounded-xl shadow-sm flex gap-6 items-center border border-luminous-gold/10">
+                            <div key={item.id || item._id} className="bg-white dark:bg-stone-900 p-6 rounded-xl shadow-sm flex gap-6 items-center border border-luminous-gold/10">
                                 <div className="w-24 h-24 bg-gray-100 dark:bg-stone-800 rounded-lg overflow-hidden flex-shrink-0">
                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                 </div>
@@ -43,7 +43,7 @@ const Cart = () => {
                                     <div className="flex justify-between items-start mb-2">
                                         <h3 className="font-serif font-bold text-lg text-luminous-maroon dark:text-luminous-gold">{item.name}</h3>
                                         <button
-                                            onClick={() => removeFromCart(item.id)}
+                                            onClick={() => removeFromCart(item.id || item._id)}
                                             className="text-gray-400 hover:text-red-500 transition-colors"
                                         >
                                             <Trash2 size={18} />
@@ -53,14 +53,14 @@ const Cart = () => {
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center border border-gray-200 dark:border-stone-700 rounded-lg">
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                onClick={() => updateQuantity(item.id || item._id, item.quantity - 1)}
                                                 className="p-2 hover:bg-gray-50 dark:hover:bg-stone-800 text-gray-600 dark:text-gray-300"
                                             >
                                                 <Minus size={16} />
                                             </button>
                                             <span className="w-8 text-center font-medium dark:text-white">{item.quantity}</span>
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                onClick={() => updateQuantity(item.id || item._id, item.quantity + 1)}
                                                 className="p-2 hover:bg-gray-50 dark:hover:bg-stone-800 text-gray-600 dark:text-gray-300"
                                             >
                                                 <Plus size={16} />

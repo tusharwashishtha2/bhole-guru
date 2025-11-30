@@ -17,38 +17,37 @@ export const CartProvider = ({ children }) => {
     }, [cart]);
 
     const addToCart = (product, quantity = 1) => {
+        // Normalize product data to ensure consistent ID and Image
+        const cartItem = {
+            ...product,
+            id: product.id || product._id,
+            image: product.image || (product.images && product.images.length > 0 ? product.images[0] : ''),
+            quantity
+        };
+
         let message = '';
         let type = 'success';
 
         setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id);
+            const existingItem = prevCart.find(item => (item.id || item._id) === cartItem.id);
             if (existingItem) {
-                message = `Updated quantity for ${product.name}`;
+                message = `Updated quantity for ${cartItem.name}`;
                 type = 'info';
                 return prevCart.map(item =>
-                    item.id === product.id
+                    (item.id || item._id) === cartItem.id
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             }
-            message = `Added ${product.name} to cart`;
-            return [...prevCart, { ...product, quantity }];
+            message = `Added ${cartItem.name} to cart`;
+            return [...prevCart, cartItem];
         });
 
-        // We need to use a timeout or effect to show toast after render, 
-        // but since we can't easily get the result of the state update here synchronously to know if it was an add or update 
-        // without duplicating logic, we can just calculate the intention first.
-
-        // Actually, better approach:
-        // Check existence first using current state (which might be slightly stale in high freq updates but fine here)
-        // OR just duplicate the check logic outside.
-
-        // Let's do this:
-        const isExisting = cart.some(item => item.id === product.id);
+        const isExisting = cart.some(item => (item.id || item._id) === cartItem.id);
         if (isExisting) {
-            addToast(`Updated quantity for ${product.name}`, 'info');
+            addToast(`Updated quantity for ${cartItem.name}`, 'info');
         } else {
-            addToast(`Added ${product.name} to cart`, 'success');
+            addToast(`Added ${cartItem.name} to cart`, 'success');
         }
     };
 
