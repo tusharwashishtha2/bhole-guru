@@ -10,14 +10,14 @@ import Button from '../components/ui/Button';
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
-    const { user, logout, getAllUsers, updateUser, deleteUser } = useAuth();
+    const { user, logout, fetchAllUsers, updateUser, deleteUser } = useAuth();
     const { addToast } = useToast(); // Assuming useToast is available or imported
 
     const [usersList, setUsersList] = useState([]);
 
     React.useEffect(() => {
         if (activeTab === 'users') {
-            getAllUsers().then(setUsersList).catch(console.error);
+            fetchAllUsers().then(setUsersList).catch(console.error);
         }
     }, [activeTab]);
 
@@ -25,7 +25,7 @@ const Admin = () => {
         try {
             await updateUser(id, data);
             alert('User updated successfully');
-            getAllUsers().then(setUsersList);
+            fetchAllUsers().then(setUsersList);
         } catch (error) {
             alert('Failed to update user');
         }

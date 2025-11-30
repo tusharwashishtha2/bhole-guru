@@ -177,7 +177,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const getAllUsers = async () => {
+    const fetchAllUsers = async () => {
         try {
             const token = localStorage.getItem('bhole_guru_token');
             if (!token) throw new Error("Not authenticated");
@@ -242,7 +242,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile, refreshUser, getAllUsers, updateUser, deleteUser }}>
+        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile, refreshUser, fetchAllUsers, updateUser, deleteUser }}>
             {!loading && children}
         </AuthContext.Provider>
     );
