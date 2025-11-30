@@ -11,7 +11,6 @@ const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
     const { user, logout } = useAuth();
-    const { user, logout } = useAuth();
     // const { addToast } = useToast(); 
     const addToast = (msg, type) => alert(msg); // Temporary fallback
 
