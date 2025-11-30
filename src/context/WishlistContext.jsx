@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // Context for managing user wishlist
 import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext();
 
@@ -33,9 +34,11 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
+    const { user } = useAuth(); // Import user from AuthContext
+
     useEffect(() => {
         fetchWishlist();
-    }, []);
+    }, [user]); // Re-fetch when user changes (login/logout)
 
     const addToWishlist = async (product) => {
         const token = getToken();
