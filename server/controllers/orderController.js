@@ -36,7 +36,7 @@ exports.createOrder = async (req, res) => {
                     res.status(404);
                     throw new Error(`Product not found: ${item.name}`);
                 }
-                if (product.stock < item.quantity) {
+                if (product.stock < item.qty) {
                     res.status(400);
                     throw new Error(`Insufficient stock for ${item.name}`);
                 }
@@ -74,7 +74,7 @@ exports.createOrder = async (req, res) => {
             for (const item of orderItems) {
                 const product = await Product.findById(item.product);
                 if (product) {
-                    product.stock -= item.quantity;
+                    product.stock -= item.qty;
                     await product.save();
                 }
             }
@@ -94,7 +94,7 @@ exports.createOrder = async (req, res) => {
                             <br>
                             <h3>Items:</h3>
                             <ul>
-                                ${orderItems.map(item => `<li>${item.name} x ${item.quantity}</li>`).join('')}
+                                ${orderItems.map(item => `<li>${item.name} x ${item.qty}</li>`).join('')}
                             </ul>
                             <br>
                             <p>You can track your order status in your profile.</p>
