@@ -56,12 +56,20 @@ const Checkout = () => {
                 name: item.name,
                 image: item.image,
                 price: item.price,
-                quantity: item.quantity
+                qty: item.quantity // Map quantity to qty as expected by backend
             }));
+
+            const shippingAddressObject = {
+                address: address.addressLine1,
+                city: address.city,
+                postalCode: address.pincode,
+                country: 'India', // Default country
+                phone: address.phone
+            };
 
             const orderData = {
                 orderItems,
-                shippingAddress,
+                shippingAddress: shippingAddressObject,
                 paymentMethod,
                 itemsPrice: subtotal,
                 taxPrice: 0,
@@ -135,7 +143,7 @@ const Checkout = () => {
                         contact: address.phone
                     },
                     notes: {
-                        address: shippingAddress
+                        address: `${address.addressLine1}, ${address.city}, ${address.pincode}`
                     },
                     theme: {
                         color: "#800000" // Luminous Maroon
