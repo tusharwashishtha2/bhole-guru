@@ -70,7 +70,7 @@ const MyOrders = () => {
                                             </p>
                                         </div>
                                         <Link
-                                            to="/order-tracking"
+                                            to="/track-order"
                                             onClick={() => handleTrackOrder(order.id)}
                                             className="flex items-center text-royal-gold font-medium hover:text-white transition-colors text-sm uppercase tracking-wider"
                                         >

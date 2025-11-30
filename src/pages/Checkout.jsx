@@ -180,7 +180,7 @@ const Checkout = () => {
                             <p className="text-gray-500 mb-6">
                                 Your order has been successfully placed. You can track its status in the profile or tracking page.
                             </p>
-                            <Button onClick={() => navigate('/order-tracking')} className="w-full">
+                            <Button onClick={() => navigate('/track-order')} className="w-full">
                                 Track Order
                             </Button>
                         </motion.div>

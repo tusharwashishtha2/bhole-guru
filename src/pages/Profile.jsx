@@ -204,7 +204,7 @@ const Profile = () => {
                                     </div>
                                     <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                                         <span className="font-bold text-gray-900">Total: ₹{order.total}</span>
-                                        <Link to="/order-tracking" className="text-luminous-maroon font-bold text-sm hover:underline">
+                                        <Link to="/track-order" className="text-luminous-maroon font-bold text-sm hover:underline">
                                             Track Order
                                         </Link>
                                     </div>
