@@ -50,8 +50,17 @@ const Checkout = () => {
 
         try {
             // 1. Create Order on Backend
+            // 1. Create Order on Backend
+            const orderItems = cart.map(item => ({
+                product: item.id || item._id,
+                name: item.name,
+                image: item.image,
+                price: item.price,
+                quantity: item.quantity
+            }));
+
             const orderData = {
-                orderItems: cart,
+                orderItems,
                 shippingAddress,
                 paymentMethod,
                 itemsPrice: subtotal,

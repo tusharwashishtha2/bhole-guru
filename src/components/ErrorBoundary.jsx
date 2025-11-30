@@ -29,12 +29,20 @@ class ErrorBoundary extends React.Component {
                             {this.state.errorInfo && this.state.errorInfo.componentStack}
                         </pre>
                     </details>
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="mt-8 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        Refresh Page
-                    </button>
+                    <div className="flex gap-4 mt-8">
+                        <button
+                            onClick={() => window.history.back()}
+                            className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                            Go Back
+                        </button>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                            Refresh Page
+                        </button>
+                    </div>
                 </div>
             );
         }

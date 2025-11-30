@@ -73,7 +73,11 @@ const Admin = () => {
                 body: JSON.stringify(data)
             });
             if (response.ok) {
-                addToast('User updated successfully', 'success');
+                if (data.password) {
+                    addToast('Password updated successfully', 'success');
+                } else {
+                    addToast('User updated successfully', 'success');
+                }
                 fetchAllUsers();
             } else {
                 addToast('Failed to update user', 'error');

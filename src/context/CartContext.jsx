@@ -53,7 +53,11 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromCart = (productId) => {
-        setCart(prevCart => prevCart.filter(item => item.id.toString() !== productId.toString()));
+        setCart(prevCart => prevCart.filter(item => {
+            const itemId = item.id || item._id;
+            const targetId = productId;
+            return String(itemId) !== String(targetId);
+        }));
         addToast('Item removed from cart', 'info');
     };
 
@@ -63,9 +67,11 @@ export const CartProvider = ({ children }) => {
             return;
         }
         setCart(prevCart =>
-            prevCart.map(item =>
-                item.id.toString() === productId.toString() ? { ...item, quantity: newQuantity } : item
-            )
+            prevCart.map(item => {
+                const itemId = item.id || item._id;
+                const targetId = productId;
+                return String(itemId) === String(targetId) ? { ...item, quantity: newQuantity } : item;
+            })
         );
     };
 

@@ -34,7 +34,7 @@ const Login = () => {
             await login(formData.email, formData.password);
             navigate('/');
         } catch (err) {
-            setError(err);
+            setError(err.message || 'Login failed');
         } finally {
             setIsLoading(false);
         }
