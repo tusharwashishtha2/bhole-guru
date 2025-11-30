@@ -10,34 +10,78 @@ import Button from '../components/ui/Button';
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
-    const { user, logout, fetchAllUsers, updateUser, deleteUser } = useAuth();
-    const { addToast } = useToast(); // Assuming useToast is available or imported
+    const { user, logout } = useAuth();
+    const { addToast } = useToast();
 
     const [usersList, setUsersList] = useState([]);
+    const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/users';
 
-    React.useEffect(() => {
-        if (activeTab === 'users') {
-            fetchAllUsers().then(setUsersList).catch(console.error);
-        }
-    }, [activeTab]);
-
-    const handleUpdateUser = async (id, data) => {
+    const fetchAllUsers = async () => {
         try {
-            await updateUser(id, data);
-            alert('User updated successfully');
-            fetchAllUsers().then(setUsersList);
+            const token = localStorage.getItem('bhole_guru_token');
+            if (!token) return;
+            const response = await fetch(API_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) setUsersList(data);
         } catch (error) {
-            alert('Failed to update user');
+            console.error("Failed to fetch users", error);
         }
     };
 
-    const handleDeleteUser = async (id) => {
+    const updateUser = async (id, data) => {
         try {
-            await deleteUser(id);
-            setUsersList(prev => prev.filter(u => u._id !== id));
+            const token = localStorage.getItem('bhole_guru_token');
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                addToast('User updated successfully', 'success');
+                fetchAllUsers();
+            } else {
+                addToast('Failed to update user', 'error');
+            }
         } catch (error) {
-            alert('Failed to delete user');
+            addToast('Error updating user', 'error');
         }
+    };
+
+    const deleteUser = async (id) => {
+        try {
+            const token = localStorage.getItem('bhole_guru_token');
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                addToast('User deleted successfully', 'success');
+                setUsersList(prev => prev.filter(u => u._id !== id));
+            } else {
+                addToast('Failed to delete user', 'error');
+            }
+        } catch (error) {
+            addToast('Error deleting user', 'error');
+        }
+    };
+
+    React.useEffect(() => {
+        if (activeTab === 'users') {
+            fetchAllUsers();
+        }
+    }, [activeTab]);
+
+    const handleUpdateUser = (id, data) => {
+        updateUser(id, data);
+    };
+
+    const handleDeleteUser = (id) => {
+        deleteUser(id);
     };
 
     const {

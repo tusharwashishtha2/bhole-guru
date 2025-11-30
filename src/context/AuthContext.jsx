@@ -177,72 +177,8 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const fetchAllUsers = async () => {
-        try {
-            const token = localStorage.getItem('bhole_guru_token');
-            if (!token) throw new Error("Not authenticated");
-
-            const response = await fetch(`${API_URL.replace('/auth', '/users')}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Failed to fetch users');
-            return data;
-        } catch (error) {
-            console.error("Get users failed:", error);
-            throw error;
-        }
-    };
-
-    const updateUser = async (id, userData) => {
-        try {
-            const token = localStorage.getItem('bhole_guru_token');
-            if (!token) throw new Error("Not authenticated");
-
-            const response = await fetch(`${API_URL.replace('/auth', '/users')}/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(userData)
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Failed to update user');
-            return data;
-        } catch (error) {
-            console.error("Update user failed:", error);
-            throw error;
-        }
-    };
-
-    const deleteUser = async (id) => {
-        try {
-            const token = localStorage.getItem('bhole_guru_token');
-            if (!token) throw new Error("Not authenticated");
-
-            const response = await fetch(`${API_URL.replace('/auth', '/users')}/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Failed to delete user');
-            return data;
-        } catch (error) {
-            console.error("Delete user failed:", error);
-            throw error;
-        }
-    };
-
     return (
-        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile, refreshUser, fetchAllUsers, updateUser, deleteUser }}>
+        <AuthContext.Provider value={{ user, login, logout, signup, forgotPassword, loading, updateUserProfile, refreshUser }}>
             {!loading && children}
         </AuthContext.Provider>
     );
