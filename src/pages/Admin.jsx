@@ -9,8 +9,35 @@ import Button from '../components/ui/Button';
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
-    const { user, logout } = useAuth();
-    const { addToast } = useToast();
+    const { user, logout, getAllUsers, updateUser, deleteUser } = useAuth();
+    const { addToast } = useToast(); // Assuming useToast is available or imported
+
+    const [usersList, setUsersList] = useState([]);
+
+    React.useEffect(() => {
+        if (activeTab === 'users') {
+            getAllUsers().then(setUsersList).catch(console.error);
+        }
+    }, [activeTab]);
+
+    const handleUpdateUser = async (id, data) => {
+        try {
+            await updateUser(id, data);
+            alert('User updated successfully');
+            getAllUsers().then(setUsersList);
+        } catch (error) {
+            alert('Failed to update user');
+        }
+    };
+
+    const handleDeleteUser = async (id) => {
+        try {
+            await deleteUser(id);
+            setUsersList(prev => prev.filter(u => u._id !== id));
+        } catch (error) {
+            alert('Failed to delete user');
+        }
+    };
 
     const {
         sacredOfferings,
@@ -191,6 +218,13 @@ const Admin = () => {
                         >
                             Categories
                             {activeTab === 'categories' && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 w-full h-1 bg-luminous-maroon rounded-t-full" />}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('users')}
+                            className={`pb-4 px-4 font-bold text-lg transition-colors relative ${activeTab === 'users' ? 'text-luminous-maroon' : 'text-gray-400 hover:text-gray-600'}`}
+                        >
+                            Users
+                            {activeTab === 'users' && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 w-full h-1 bg-luminous-maroon rounded-t-full" />}
                         </button>
                     </div>
                 </div>
@@ -495,6 +529,54 @@ const Admin = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    ) : activeTab === 'users' ? (
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Manage Users</h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="border-b border-gray-100 text-gray-500 text-sm uppercase">
+                                            <th className="pb-3 font-bold">Name</th>
+                                            <th className="pb-3 font-bold">Email</th>
+                                            <th className="pb-3 font-bold">Role</th>
+                                            <th className="pb-3 font-bold text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {usersList.map((u) => (
+                                            <tr key={u._id} className="group hover:bg-gray-50 transition-colors">
+                                                <td className="py-4 font-medium text-gray-900">{u.name}</td>
+                                                <td className="py-4 text-gray-600">{u.email}</td>
+                                                <td className="py-4">
+                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+                                                        {u.role}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 text-right flex justify-end gap-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            const newPass = prompt(`Enter new password for ${u.name}:`);
+                                                            if (newPass) handleUpdateUser(u._id, { password: newPass });
+                                                        }}
+                                                        className="text-blue-600 hover:text-blue-800 text-sm font-bold px-3 py-1 rounded hover:bg-blue-50"
+                                                    >
+                                                        Reset Password
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (window.confirm(`Delete user ${u.name}?`)) handleDeleteUser(u._id);
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-full"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     ) : (
