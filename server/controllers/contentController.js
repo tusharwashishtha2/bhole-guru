@@ -44,6 +44,20 @@ exports.getContent = async (req, res) => {
         let content = await Content.findOne();
         if (!content) {
             content = await Content.create(defaultContent);
+        } else {
+            // Ensure categories exist
+            if (!content.categories || content.categories.length === 0) {
+                content.categories = defaultContent.categories;
+                await content.save();
+            }
+            // Ensure other sections exist (optional robustness)
+            if (!content.heroSection) content.heroSection = defaultContent.heroSection;
+            if (!content.sacredOfferings || content.sacredOfferings.length === 0) content.sacredOfferings = defaultContent.sacredOfferings;
+            if (!content.divineEssentials || content.divineEssentials.length === 0) content.divineEssentials = defaultContent.divineEssentials;
+
+            if (content.isModified()) {
+                await content.save();
+            }
         }
         res.json(content);
     } catch (error) {
