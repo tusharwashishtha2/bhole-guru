@@ -34,7 +34,7 @@ const Cart = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
                     {/* Cart Items */}
                     <div className="lg:col-span-2 space-y-6">
-                        {cart.map((item) => (
+                        {Array.isArray(cart) && cart.map((item) => (
                             <div key={item.id || item._id} className="bg-white dark:bg-stone-900 p-6 rounded-xl shadow-sm flex gap-6 items-center border border-luminous-gold/10">
                                 <div className="w-24 h-24 bg-gray-100 dark:bg-stone-800 rounded-lg overflow-hidden flex-shrink-0">
                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
