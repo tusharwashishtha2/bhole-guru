@@ -16,7 +16,7 @@ const MyOrders = () => {
 
     // Sort orders by date (newest first)
     // Ensure orders is an array before sorting
-    const sortedOrders = Array.isArray(orders) ? [...orders].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)) : [];
+    const sortedOrders = Array.isArray(orders) ? [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -56,25 +56,25 @@ const MyOrders = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                key={order.id}
+                                key={order._id}
                                 className="bg-royal-maroon/50 rounded-2xl overflow-hidden border border-royal-gold/10 hover:border-royal-gold/30 transition-all duration-300 shadow-lg"
                             >
                                 <div className="p-6">
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                                         <div>
                                             <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="font-bold text-lg text-royal-gold">Order #{order.id}</h3>
+                                                <h3 className="font-bold text-lg text-royal-gold">Order #{order._id}</h3>
                                                 <span className={`px-3 py-0.5 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}>
                                                     {order.status}
                                                 </span>
                                             </div>
                                             <p className="text-sm text-royal-ivory/60 flex items-center gap-1">
-                                                <Clock size={14} /> Placed on {new Date(order.date).toLocaleDateString()} at {new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                <Clock size={14} /> Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
                                         <Link
-                                            to={`/track-order?orderId=${order.id}`}
-                                            onClick={() => handleTrackOrder(order.id)}
+                                            to={`/track-order?orderId=${order._id}`}
+                                            onClick={() => handleTrackOrder(order._id)}
                                             className="flex items-center text-royal-gold font-medium hover:text-white transition-colors text-sm uppercase tracking-wider"
                                         >
                                             Track Order <ChevronRight size={18} />
@@ -83,7 +83,7 @@ const MyOrders = () => {
 
                                     <div className="border-t border-royal-gold/10 pt-4">
                                         <div className="flex flex-col gap-3">
-                                            {order.items.map((item, idx) => (
+                                            {order.orderItems && order.orderItems.map((item, idx) => (
                                                 <div key={idx} className="flex items-center gap-3">
                                                     <div className="w-12 h-12 bg-royal-maroon rounded-md overflow-hidden flex-shrink-0 border border-royal-gold/10">
                                                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -97,7 +97,7 @@ const MyOrders = () => {
                                         </div>
                                         <div className="flex justify-between items-center mt-4 pt-4 border-t border-royal-gold/10">
                                             <span className="text-sm text-royal-ivory/60">Total Amount</span>
-                                            <span className="font-bold text-royal-gold text-lg">₹{order.total}</span>
+                                            <span className="font-bold text-royal-gold text-lg">₹{order.totalPrice}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -107,7 +107,7 @@ const MyOrders = () => {
                                     {order.status === 'Delivered' ? (
                                         <>
                                             <CheckCircle size={14} className="text-green-400" />
-                                            <span>Delivered on {new Date(order.timeline[order.timeline.length - 1].time).toLocaleDateString()}</span>
+                                            <span>Delivered on {order.deliveredAt ? new Date(order.deliveredAt).toLocaleDateString() : 'Recently'}</span>
                                         </>
                                     ) : (
                                         <>
