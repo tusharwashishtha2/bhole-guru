@@ -2,8 +2,10 @@ import React from 'react';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { motion } from 'framer-motion';
+import { useToast } from '../context/ToastContext';
 
 const Contact = () => {
+    const { addToast } = useToast();
     return (
         <div className="bg-royal-maroon min-h-screen pb-20 pt-24">
             {/* Header */}
@@ -95,7 +97,7 @@ const Contact = () => {
                         <h3 className="text-2xl font-serif font-bold mb-6 text-royal-gold">Send Message</h3>
                         <form className="space-y-6" onSubmit={(e) => {
                             e.preventDefault();
-                            alert("Thank you for your message! We will get back to you soon.");
+                            addToast("Thank you for your message! We will get back to you soon.", "success");
                             e.target.reset();
                         }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

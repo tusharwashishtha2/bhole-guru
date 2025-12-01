@@ -35,6 +35,11 @@ const Admin = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
+
+    // Reset Password Modal State
+    const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+    const [selectedUserForReset, setSelectedUserForReset] = useState(null);
+    const [newPassword, setNewPassword] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         price: '',
@@ -346,7 +351,6 @@ const Admin = () => {
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 }}
                                         transition={{ delay: index * 0.1 }}
                                         key={order._id || order.id}
                                         className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
@@ -674,8 +678,9 @@ const Admin = () => {
                                                 <td className="py-4 text-right flex justify-end gap-2">
                                                     <button
                                                         onClick={() => {
-                                                            const newPass = prompt(`Enter new password for ${u.name}:`);
-                                                            if (newPass) handleUpdateUser(u._id, { password: newPass });
+                                                            setSelectedUserForReset(u);
+                                                            setNewPassword('');
+                                                            setShowResetPasswordModal(true);
                                                         }}
                                                         className="text-blue-600 hover:text-blue-800 text-sm font-bold px-3 py-1 rounded hover:bg-blue-50"
                                                     >
@@ -695,6 +700,39 @@ const Admin = () => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            <AnimatePresence>
+                                {showResetPasswordModal && (
+                                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+                                        <motion.div
+                                            initial={{ scale: 0.9, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            exit={{ scale: 0.9, opacity: 0 }}
+                                            className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl"
+                                        >
+                                            <h3 className="text-xl font-bold text-gray-900 mb-4">Reset Password</h3>
+                                            <p className="text-gray-500 mb-4">Enter new password for <strong>{selectedUserForReset?.name}</strong></p>
+                                            <input
+                                                type="text"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                className="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                placeholder="New Password"
+                                                autoFocus
+                                            />
+                                            <div className="flex justify-end gap-3">
+                                                <Button variant="outline" onClick={() => setShowResetPasswordModal(false)}>Cancel</Button>
+                                                <Button onClick={() => {
+                                                    if (newPassword) {
+                                                        handleUpdateUser(selectedUserForReset._id, { password: newPassword });
+                                                        setShowResetPasswordModal(false);
+                                                    }
+                                                }}>Save Password</Button>
+                                            </div>
+                                        </motion.div>
+                                    </div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     ) : (
                         <div className="space-y-12">

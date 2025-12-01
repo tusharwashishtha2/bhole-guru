@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile = () => {
     const { user, logout, updateUserProfile, refreshUser } = useAuth();
-    const { orders, fetchMyOrders } = useOrder();
+    const { orders, fetchMyOrders, loading } = useOrder();
     const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState('orders');
 
@@ -166,7 +166,11 @@ const Profile = () => {
                 return (
                     <div className="space-y-6">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Orders</h2>
-                        {(!Array.isArray(userOrders) || userOrders.length === 0) ? (
+                        {loading ? (
+                            <div className="flex justify-center items-center py-12">
+                                <div className="w-12 h-12 border-4 border-luminous-maroon border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                        ) : (!Array.isArray(userOrders) || userOrders.length === 0) ? (
                             <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
                                 <ShoppingBag className="mx-auto text-gray-300 mb-4" size={48} />
                                 <p className="text-gray-500 mb-4">No orders found</p>
