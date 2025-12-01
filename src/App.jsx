@@ -15,6 +15,8 @@ import { ProductProvider } from './context/ProductContext';
 import QuickViewModal from './components/ui/QuickViewModal';
 import ScrollToTop from './components/ScrollToTop';
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 function App() {
   return (
     <AuthProvider>
@@ -27,17 +29,19 @@ function App() {
                   <ReviewProvider>
                     <QuickViewProvider>
                       <ContentProvider>
-                        <Router>
-                          <ScrollToTop />
-                          <div className="flex flex-col min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 font-sans transition-colors duration-300">
-                            <Header />
-                            <main className="flex-grow">
-                              <AnimatedRoutes />
-                            </main>
-                            <Footer />
-                            <QuickViewModal />
-                          </div>
-                        </Router>
+                        <ErrorBoundary>
+                          <Router>
+                            <ScrollToTop />
+                            <div className="flex flex-col min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 font-sans transition-colors duration-300">
+                              <Header />
+                              <main className="flex-grow">
+                                <AnimatedRoutes />
+                              </main>
+                              <Footer />
+                              <QuickViewModal />
+                            </div>
+                          </Router>
+                        </ErrorBoundary>
                       </ContentProvider>
                     </QuickViewProvider>
                   </ReviewProvider>
