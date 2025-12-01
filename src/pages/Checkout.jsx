@@ -26,8 +26,47 @@ const Checkout = () => {
         addressLine1: '',
         city: '',
         pincode: '',
-        phone: user?.phone || '' // Pre-fill phone if available
+        phone: user?.phone || '',
+        location: null // { lat, lng }
     });
+
+    const detectLocation = () => {
+        if (!navigator.geolocation) {
+            addToast('Geolocation is not supported by your browser', 'error');
+            return;
+        }
+
+        setLoading(true);
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            setAddress(prev => ({ ...prev, location: { lat: latitude, lng: longitude } }));
+
+            try {
+                // Reverse Geocoding using OpenStreetMap (Nominatim)
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+
+                if (data && data.address) {
+                    setAddress(prev => ({
+                        ...prev,
+                        city: data.address.city || data.address.town || data.address.village || '',
+                        pincode: data.address.postcode || '',
+                        addressLine1: [data.address.road, data.address.suburb].filter(Boolean).join(', ')
+                    }));
+                    addToast('Location detected successfully!', 'success');
+                }
+            } catch (error) {
+                console.error("Reverse geocoding failed", error);
+                addToast('Location detected (Address auto-fill failed)', 'info');
+            } finally {
+                setLoading(false);
+            }
+        }, (error) => {
+            console.error("Geolocation error", error);
+            addToast('Unable to retrieve your location', 'error');
+            setLoading(false);
+        });
+    };
 
     const subtotal = getCartTotal();
     const shipping = subtotal > 500 ? 0 : 49;
@@ -64,7 +103,8 @@ const Checkout = () => {
                 city: address.city,
                 postalCode: address.pincode,
                 country: 'India', // Default country
-                phone: address.phone
+                phone: address.phone,
+                location: address.location
             };
 
             const orderData = {
@@ -223,9 +263,18 @@ const Checkout = () => {
 
                         {/* Address Section */}
                         <div className="bg-white p-6 rounded-2xl shadow-sm">
-                            <h3 className="text-xl font-bold font-serif mb-4 flex items-center gap-2">
-                                <MapPin className="text-luminous-maroon" /> Delivery Address
-                            </h3>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold font-serif flex items-center gap-2">
+                                    <MapPin className="text-luminous-maroon" /> Delivery Address
+                                </h3>
+                                <button
+                                    type="button"
+                                    onClick={detectLocation}
+                                    className="text-sm text-luminous-maroon hover:text-luminous-gold font-bold flex items-center gap-1 transition-colors"
+                                >
+                                    <MapPin size={16} /> Detect My Location
+                                </button>
+                            </div>
                             <form id="checkout-form" onSubmit={handlePayment} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>

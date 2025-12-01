@@ -156,6 +156,34 @@ const OrderTracking = () => {
     const statusStep = getStatusStep(order.status);
     const isCancelled = order.status === 'Cancelled';
 
+    // Live Tracking Logic
+    const [driverLocation, setDriverLocation] = useState(null);
+    const [eta, setEta] = useState('');
+    const warehouseLocation = [25.3176, 82.9739]; // Varanasi (Warehouse)
+    const userLocation = order.shippingAddress?.location ? [order.shippingAddress.location.lat, order.shippingAddress.location.lng] : warehouseLocation;
+
+    useEffect(() => {
+        if (statusStep >= 3 && statusStep < 4) { // Out for Delivery
+            // Simulate driver movement (halfway)
+            const lat = (warehouseLocation[0] + userLocation[0]) / 2;
+            const lng = (warehouseLocation[1] + userLocation[1]) / 2;
+            setDriverLocation([lat, lng]);
+            setEta('15 mins');
+        } else if (statusStep === 4) { // Delivered
+            setDriverLocation(userLocation);
+            setEta('Arrived');
+        } else {
+            setDriverLocation(warehouseLocation);
+            setEta(statusStep === 0 ? '2 days' : '1 day');
+        }
+    }, [statusStep, order]);
+
+    const TruckIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png', // Truck Icon
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+
     return (
         <div className="min-h-screen bg-gray-50 pb-20 relative">
             {/* Delivered Popup */}
@@ -191,16 +219,32 @@ const OrderTracking = () => {
 
             {/* Map Header */}
             <div className="h-[40vh] bg-gray-200 relative overflow-hidden w-full z-0">
-                <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <MapContainer center={userLocation} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <Marker position={position}>
+                    {/* User Location */}
+                    <Marker position={userLocation}>
                         <Popup>
-                            Order Location <br /> {order.shippingAddress?.city || 'Varanasi'}
+                            <div className="text-center">
+                                <p className="font-bold">Delivery Location</p>
+                                <p className="text-xs">{order.shippingAddress?.address}</p>
+                            </div>
                         </Popup>
                     </Marker>
+
+                    {/* Driver Location */}
+                    {driverLocation && (
+                        <Marker position={driverLocation} icon={TruckIcon}>
+                            <Popup>
+                                <div className="text-center">
+                                    <p className="font-bold">Your Order</p>
+                                    <p className="text-xs">{eta === 'Arrived' ? 'Arrived' : `Arriving in ${eta}`}</p>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    )}
                 </MapContainer>
             </div>
 
@@ -255,6 +299,29 @@ const OrderTracking = () => {
                         <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-center">
                             <h3 className="text-red-800 font-bold text-lg mb-2">This order has been cancelled</h3>
                             <p className="text-red-600">If you have any questions, please contact our support team.</p>
+                        </div>
+                    )}
+
+                    {/* Driver Details Card */}
+                    {order.driverDetails?.name && statusStep >= 3 && (
+                        <div className="bg-gradient-to-r from-luminous-gold/10 to-luminous-maroon/5 border border-luminous-gold/20 rounded-xl p-4 mb-8 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                                    <img
+                                        src={order.driverDetails.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+                                        alt={order.driverDetails.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-gray-900">{order.driverDetails.name}</h3>
+                                    <p className="text-xs text-gray-500">Delivery Partner • {order.driverDetails.phone}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">ETA</p>
+                                <p className="text-xl font-bold text-luminous-maroon">{eta}</p>
+                            </div>
                         </div>
                     )}
 

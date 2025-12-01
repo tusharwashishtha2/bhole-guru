@@ -8,7 +8,7 @@ import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 const Admin = () => {
-    const { orders, updateOrderStatus, deleteOrder } = useOrder();
+    const { orders, updateOrderStatus, deleteOrder, fetchAllOrders } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
     const { user, logout } = useAuth();
     const { addToast } = useToast();
@@ -108,6 +108,8 @@ const Admin = () => {
     React.useEffect(() => {
         if (activeTab === 'users') {
             fetchAllUsers();
+        } else if (activeTab === 'orders') {
+            fetchAllOrders();
         }
     }, [activeTab]);
 
@@ -395,14 +397,26 @@ const Admin = () => {
                                             </button>
 
                                             <button
-                                                onClick={() => updateOrderStatus(order.id, 'Out for Delivery')}
+                                                onClick={() => {
+                                                    const drivers = [
+                                                        { name: 'Ramesh Kumar', phone: '9876543210', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                                                        { name: 'Suresh Singh', phone: '9123456789', image: 'https://randomuser.me/api/portraits/men/45.jpg' }
+                                                    ];
+                                                    const choice = prompt(`Assign Driver (Enter 1 or 2):\n1. Ramesh Kumar\n2. Suresh Singh`);
+                                                    if (choice === '1' || choice === '2') {
+                                                        const driver = drivers[parseInt(choice) - 1];
+                                                        updateOrderStatus(order.id, 'Out for Delivery', {
+                                                            driverDetails: driver
+                                                        });
+                                                    }
+                                                }}
                                                 disabled={order.status !== 'Shipped'}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Shipped'
                                                     ? 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100'
                                                     : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
                                                     }`}
                                             >
-                                                <Truck size={18} /> Out for Delivery
+                                                <Truck size={18} /> Assign Driver
                                             </button>
 
                                             <button
