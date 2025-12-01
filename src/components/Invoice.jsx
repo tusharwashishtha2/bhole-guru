@@ -1,9 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import html2pdf from 'html2pdf.js';
-
 const Invoice = forwardRef(({ order }, ref) => {
     const contentRef = useRef();
 

@@ -170,6 +170,7 @@ const OrderTracking = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 relative overflow-hidden">
+            <div className="bg-red-600 text-white text-center font-bold p-2 z-50 relative">DEBUG MODE: v2.0 - IF YOU SEE THIS, UPDATES ARE WORKING</div>
             {/* Delivered Popup */}
             <AnimatePresence>
                 {showDeliveredPopup && (
@@ -375,8 +376,8 @@ const OrderTracking = () => {
                     </div>
                 </div>
 
-                {/* Hidden Invoice Component for PDF Generation */}
-                <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
+                {/* Hidden Invoice Component for PDF Generation - Fixed Width */}
+                <div style={{ position: 'fixed', top: '0', left: '-9999px', width: '794px' }}>
                     <Invoice ref={invoiceRef} order={order} />
                 </div>
 
