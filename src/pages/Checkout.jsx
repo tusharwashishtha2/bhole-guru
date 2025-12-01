@@ -18,6 +18,7 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('razorpay'); // Default to Online
     const [loading, setLoading] = useState(false);
     const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+    const [placedOrderId, setPlacedOrderId] = useState(null);
 
     // Address State
     const [address, setAddress] = useState({
@@ -49,7 +50,6 @@ const Checkout = () => {
         const shippingAddress = `${address.addressLine1}, ${address.city}, ${address.pincode}`;
 
         try {
-            // 1. Create Order on Backend
             // 1. Create Order on Backend
             const orderItems = cart.map(item => ({
                 product: item.id || item._id,
@@ -88,6 +88,7 @@ const Checkout = () => {
                 // COD Flow
                 clearCart();
                 setIsOrderPlaced(true);
+                setPlacedOrderId(data.order._id);
                 setLoading(false);
             } else {
                 // Razorpay Flow
@@ -129,6 +130,7 @@ const Checkout = () => {
                             if (verifyRes.ok) {
                                 clearCart();
                                 setIsOrderPlaced(true);
+                                setPlacedOrderId(data.order._id);
                             } else {
                                 addToast(verifyData.message || 'Payment verification failed', 'error');
                             }
@@ -197,7 +199,7 @@ const Checkout = () => {
                             <p className="text-gray-500 mb-6">
                                 Your order has been successfully placed. You can track its status in the profile or tracking page.
                             </p>
-                            <Button onClick={() => navigate(`/track-order?orderId=${orderId}`)} className="w-full">
+                            <Button onClick={() => navigate(`/track-order?orderId=${placedOrderId}`)} className="w-full">
                                 Track Order
                             </Button>
                         </motion.div>
