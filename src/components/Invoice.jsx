@@ -10,10 +10,10 @@ const Invoice = forwardRef(({ order }, ref) => {
 
             const element = contentRef.current;
             const opt = {
-                margin: [10, 10],
+                margin: [5, 5],
                 filename: `Invoice-${order._id}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 794 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
@@ -39,7 +39,7 @@ const Invoice = forwardRef(({ order }, ref) => {
                     <h2 className="text-2xl font-serif font-bold text-luminous-maroon mb-1">Bhole Guru</h2>
                     <p className="text-xs text-gray-500">Premium Rudraksha & Spiritual Items</p>
                     <p className="text-xs text-gray-500">support@bholeguru.com</p>
-                    <p className="text-xs text-gray-500">+91 98765 43210</p>
+                    <p className="text-xs text-gray-500">+91 70003 08463</p>
                 </div>
             </div>
 

@@ -89,7 +89,30 @@ const OrderTracking = () => {
         const fetchOrderDetails = async () => {
             let orderId = searchParams.get('orderId') || currentOrderId;
 
-            // Auto-select most recent order if no ID provided
+            // If no order ID and no orders loaded, try to fetch user's orders first
+            if (!orderId && (!orders || orders.length === 0)) {
+                // Assuming fetchMyOrders is available in context, if not we rely on the component mounting
+                // But usually OrderProvider handles initial fetch. 
+                // Let's try to find the most recent order from API directly if context is empty
+                try {
+                    const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/orders/myorders';
+                    const token = localStorage.getItem('bhole_guru_token');
+                    if (token) {
+                        const response = await fetch(API_URL, { headers: { 'Authorization': `Bearer ${token}` } });
+                        const data = await response.json();
+                        if (response.ok && data.length > 0) {
+                            orderId = data[0]._id || data[0].id;
+                            setSearchParams({ orderId });
+                            setOrder(data[0]);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to auto-fetch recent order", e);
+                }
+            }
+
+            // Auto-select most recent order if no ID provided but orders exist in context
             if (!orderId && orders && orders.length > 0) {
                 orderId = orders[0]._id || orders[0].id;
                 setSearchParams({ orderId });
@@ -170,7 +193,6 @@ const OrderTracking = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 relative overflow-hidden">
-            <div className="bg-red-600 text-white text-center font-bold p-2 z-50 relative">DEBUG MODE: v2.0 - IF YOU SEE THIS, UPDATES ARE WORKING</div>
             {/* Delivered Popup */}
             <AnimatePresence>
                 {showDeliveredPopup && (

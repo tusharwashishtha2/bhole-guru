@@ -99,6 +99,7 @@ export const OrderProvider = ({ children }) => {
     };
 
     const updateOrderStatus = async (orderId, newStatus, trackingData = {}) => {
+        console.log(`Attempting to update order ${orderId} to status: ${newStatus}`, trackingData);
         const token = getToken();
         try {
             const response = await fetch(`${API_URL}/${orderId}/status`, {
@@ -110,6 +111,7 @@ export const OrderProvider = ({ children }) => {
                 body: JSON.stringify({ status: newStatus, ...trackingData }),
             });
             const data = await response.json();
+            console.log("Update status response:", data);
 
             if (response.ok) {
                 setOrders(prev => prev.map(order =>
@@ -117,6 +119,7 @@ export const OrderProvider = ({ children }) => {
                 ));
                 addToast('Order status updated', 'success');
             } else {
+                console.error("Update status failed:", data);
                 addToast('Failed to update status', 'error');
             }
         } catch (error) {
