@@ -389,7 +389,7 @@ const Admin = () => {
                                                     <p className="text-gray-500 text-xs uppercase font-bold">Method</p>
                                                     <p className="font-medium text-gray-900">{order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod}</p>
                                                 </div>
-                                                {order.paymentResult && order.paymentResult.id && (
+                                                {order.paymentMethod !== 'cod' && order.paymentResult && order.paymentResult.id && (
                                                     <div>
                                                         <p className="text-gray-500 text-xs uppercase font-bold">Transaction ID / UTR</p>
                                                         <p className="font-mono font-bold text-luminous-maroon bg-white px-2 py-1 rounded border border-blue-200 inline-block mt-1">

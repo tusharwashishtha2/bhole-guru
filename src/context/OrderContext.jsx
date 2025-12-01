@@ -120,7 +120,7 @@ export const OrderProvider = ({ children }) => {
                 addToast('Order status updated', 'success');
             } else {
                 console.error("Update status failed:", data);
-                addToast('Failed to update status', 'error');
+                addToast(data.message || 'Failed to update status', 'error');
             }
         } catch (error) {
             console.error("Error updating order status:", error);
