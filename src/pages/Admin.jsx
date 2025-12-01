@@ -379,6 +379,27 @@ const Admin = () => {
                                             </div>
                                         </div>
 
+                                        {/* Payment Details Section */}
+                                        <div className="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                            <h4 className="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2">
+                                                <ShoppingBag size={16} /> Payment Details
+                                            </h4>
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <p className="text-gray-500 text-xs uppercase font-bold">Method</p>
+                                                    <p className="font-medium text-gray-900">{order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod}</p>
+                                                </div>
+                                                {order.paymentResult && order.paymentResult.id && (
+                                                    <div>
+                                                        <p className="text-gray-500 text-xs uppercase font-bold">Transaction ID / UTR</p>
+                                                        <p className="font-mono font-bold text-luminous-maroon bg-white px-2 py-1 rounded border border-blue-200 inline-block mt-1">
+                                                            {order.paymentResult.id}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
                                         {/* Shipping Address Section */}
                                         <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
                                             <div className="flex items-start gap-3">
