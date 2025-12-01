@@ -54,7 +54,7 @@ const Invoice = forwardRef(({ order }, ref) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {order.orderItems.map((item, index) => (
+                    {order.orderItems && order.orderItems.map((item, index) => (
                         <tr key={index} className="border-b border-gray-200">
                             <td className="py-4">
                                 <p className="font-bold text-gray-900">{item.name}</p>
