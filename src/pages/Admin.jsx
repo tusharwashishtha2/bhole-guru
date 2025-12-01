@@ -390,9 +390,12 @@ const Admin = () => {
                                                         {order.shippingAddress?.city}, {order.shippingAddress?.postalCode}<br />
                                                         {order.shippingAddress?.country}
                                                     </p>
-                                                    {order.shippingAddress?.location?.lat && (
+                                                    {order.shippingAddress && (
                                                         <a
-                                                            href={`https://www.google.com/maps/dir/?api=1&destination=${order.shippingAddress.location.lat},${order.shippingAddress.location.lng}`}
+                                                            href={order.shippingAddress.location?.lat
+                                                                ? `https://www.google.com/maps/dir/?api=1&destination=${order.shippingAddress.location.lat},${order.shippingAddress.location.lng}`
+                                                                : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.postalCode}`)}`
+                                                            }
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors"
