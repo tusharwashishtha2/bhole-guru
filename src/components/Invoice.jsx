@@ -1,10 +1,34 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import html2pdf from 'html2pdf.js';
 
 const Invoice = forwardRef(({ order }, ref) => {
+    const contentRef = useRef();
+
+    useImperativeHandle(ref, () => ({
+        generatePdf: async () => {
+            if (!contentRef.current) return;
+
+            const element = contentRef.current;
+            const opt = {
+                margin: 10,
+                filename: `Invoice-${order._id}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error("PDF Generation Error:", error);
+            }
+        }
+    }));
+
     if (!order) return null;
 
     return (
-        <div ref={ref} className="bg-white p-8 max-w-4xl mx-auto text-gray-900 font-sans" style={{ width: '210mm', minHeight: '297mm' }}>
+        <div ref={contentRef} className="bg-white p-8 max-w-4xl mx-auto text-gray-900 font-sans" style={{ width: '210mm', minHeight: '297mm' }}>
             {/* Header */}
             <div className="flex justify-between items-start mb-12 border-b pb-8">
                 <div>

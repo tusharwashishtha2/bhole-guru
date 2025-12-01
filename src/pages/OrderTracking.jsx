@@ -1,29 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Package, Truck, MapPin, Phone, ArrowRight, X, Download } from 'lucide-react';
+import { CheckCircle, Package, Truck, MapPin, Phone, ArrowRight, X, Download, Star } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
 import Invoice from '../components/Invoice';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix Leaflet default icon issue
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const OrderTracking = () => {
-    const { getOrder, currentOrderId, cancelOrder, setCurrentOrderId } = useOrder();
+    const { getOrder, currentOrderId, cancelOrder, setCurrentOrderId, orders } = useOrder();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [order, setOrder] = useState(null);
@@ -31,14 +16,6 @@ const OrderTracking = () => {
     const invoiceRef = useRef();
     const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
     const [manualOrderId, setManualOrderId] = useState('');
-
-    // Mock coordinates for demo (Varanasi)
-    const position = [25.3176, 82.9739];
-
-    // Live Tracking Logic
-    const [driverLocation, setDriverLocation] = useState(null);
-    const [eta, setEta] = useState('');
-    const warehouseLocation = [25.3176, 82.9739]; // Varanasi (Warehouse)
 
     // Derived state helpers
     const getStatusStep = (status) => {
@@ -69,8 +46,6 @@ const OrderTracking = () => {
     const statusStep = order ? getStatusStep(order.status) : 0;
     const isCancelled = order ? order.status === 'Cancelled' : false;
 
-    const isValidCoordinate = (coord) => typeof coord === 'number' && !isNaN(coord);
-
     const handleDownloadInvoice = async () => {
         if (invoiceRef.current) {
             setIsGeneratingInvoice(true);
@@ -96,8 +71,6 @@ const OrderTracking = () => {
 
     const getTimeForStatus = (statusKey) => {
         if (!order) return '';
-        // This is a simplified logic. Ideally, backend should provide timestamps for each status change.
-        // For now, we use createdAt for placed, and current time for others if active.
         if (statusKey === 'Order Placed') return new Date(order.createdAt || order.date).toLocaleDateString();
         if (order.status === statusKey) return 'In Progress';
         if (getStatusStep(order.status) > getStatusStep(statusKey)) return 'Completed';
@@ -114,7 +87,14 @@ const OrderTracking = () => {
 
     useEffect(() => {
         const fetchOrderDetails = async () => {
-            const orderId = searchParams.get('orderId') || currentOrderId;
+            let orderId = searchParams.get('orderId') || currentOrderId;
+
+            // Auto-select most recent order if no ID provided
+            if (!orderId && orders && orders.length > 0) {
+                orderId = orders[0]._id || orders[0].id;
+                setSearchParams({ orderId });
+            }
+
             if (!orderId) return;
 
             // First try to get from context
@@ -143,7 +123,7 @@ const OrderTracking = () => {
         };
 
         fetchOrderDetails();
-    }, [searchParams, currentOrderId, getOrder]);
+    }, [searchParams, currentOrderId, getOrder, orders, setSearchParams]);
 
     useEffect(() => {
         if (order?.status === 'Delivered') {
@@ -151,39 +131,6 @@ const OrderTracking = () => {
             triggerConfetti();
         }
     }, [order?.status]);
-
-    // Effect for Live Tracking
-    useEffect(() => {
-        if (!order) return;
-
-        const hasValidLocation = order.shippingAddress?.location &&
-            isValidCoordinate(order.shippingAddress.location.lat) &&
-            isValidCoordinate(order.shippingAddress.location.lng);
-
-        const userLocation = hasValidLocation
-            ? [order.shippingAddress.location.lat, order.shippingAddress.location.lng]
-            : warehouseLocation;
-
-        if (statusStep >= 3 && statusStep < 4) { // Out for Delivery
-            // Simulate driver movement (halfway)
-            const lat = (warehouseLocation[0] + userLocation[0]) / 2;
-            const lng = (warehouseLocation[1] + userLocation[1]) / 2;
-            setDriverLocation([lat, lng]);
-            setEta('15 mins');
-        } else if (statusStep === 4) { // Delivered
-            setDriverLocation(userLocation);
-            setEta('Arrived');
-        } else {
-            setDriverLocation(warehouseLocation);
-            setEta(statusStep === 0 ? '2 days' : '1 day');
-        }
-    }, [statusStep, order]);
-
-    const TruckIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png', // Truck Icon
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
-    });
 
     // Handle loading or no order state
     if (!order) {
@@ -221,16 +168,8 @@ const OrderTracking = () => {
         );
     }
 
-    const hasValidLocation = order.shippingAddress?.location &&
-        isValidCoordinate(order.shippingAddress.location.lat) &&
-        isValidCoordinate(order.shippingAddress.location.lng);
-
-    const userLocation = hasValidLocation
-        ? [order.shippingAddress.location.lat, order.shippingAddress.location.lng]
-        : warehouseLocation;
-
     return (
-        <div className="min-h-screen bg-gray-50 pb-20 relative">
+        <div className="min-h-screen bg-gray-50 pb-20 relative overflow-hidden">
             {/* Delivered Popup */}
             <AnimatePresence>
                 {showDeliveredPopup && (
@@ -262,39 +201,41 @@ const OrderTracking = () => {
                 )}
             </AnimatePresence>
 
-            {/* Map Header */}
-            <div className="h-[40vh] bg-gray-200 relative overflow-hidden w-full z-0">
-                <MapContainer center={userLocation} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {/* User Location */}
-                    <Marker position={userLocation}>
-                        <Popup>
-                            <div className="text-center">
-                                <p className="font-bold">Delivery Location</p>
-                                <p className="text-xs">{order.shippingAddress?.address}</p>
-                            </div>
-                        </Popup>
-                    </Marker>
-
-                    {/* Driver Location */}
-                    {driverLocation && (
-                        <Marker position={driverLocation} icon={TruckIcon}>
-                            <Popup>
-                                <div className="text-center">
-                                    <p className="font-bold">Your Order</p>
-                                    <p className="text-xs">{eta === 'Arrived' ? 'Arrived' : `Arriving in ${eta}`}</p>
-                                </div>
-                            </Popup>
-                        </Marker>
-                    )}
-                </MapContainer>
+            {/* Cosmic Background Animation */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-black overflow-hidden">
+                <div className="absolute inset-0 opacity-30">
+                    {[...Array(50)].map((_, i) => (
+                        <motion.div
+                            key={i}
+                            className="absolute bg-white rounded-full"
+                            initial={{
+                                x: Math.random() * window.innerWidth,
+                                y: Math.random() * window.innerHeight,
+                                scale: Math.random() * 0.5 + 0.5,
+                                opacity: Math.random() * 0.5 + 0.2
+                            }}
+                            animate={{
+                                y: [null, Math.random() * window.innerHeight],
+                                opacity: [null, Math.random() * 0.5 + 0.2, 0]
+                            }}
+                            transition={{
+                                duration: Math.random() * 10 + 10,
+                                repeat: Infinity,
+                                ease: "linear"
+                            }}
+                            style={{
+                                width: Math.random() * 3 + 1 + 'px',
+                                height: Math.random() * 3 + 1 + 'px',
+                            }}
+                        />
+                    ))}
+                </div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-luminous-gold/10 rounded-full blur-[100px] animate-pulse"></div>
             </div>
 
-            <div className="container mx-auto px-4 -mt-20 relative z-10">
-                <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 max-w-3xl mx-auto">
+            <div className="container mx-auto px-4 pt-32 relative z-10">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8 max-w-3xl mx-auto border border-white/20">
                     <div className="flex justify-between items-start mb-8">
                         <div>
                             <h1 className="text-2xl md:text-3xl font-serif font-bold text-gray-900">
@@ -364,8 +305,8 @@ const OrderTracking = () => {
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">ETA</p>
-                                <p className="text-xl font-bold text-luminous-maroon">{eta}</p>
+                                <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Status</p>
+                                <p className="text-xl font-bold text-luminous-maroon">{order.status}</p>
                             </div>
                         </div>
                     )}
@@ -387,9 +328,12 @@ const OrderTracking = () => {
                             </div>
                         </div>
                         <div className="flex gap-3 w-full sm:w-auto">
-                            <Button variant="outline" className="flex-1 sm:flex-none gap-2">
-                                <Phone size={18} /> Call
-                            </Button>
+                            <a
+                                href="tel:+919876543210"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
+                            >
+                                <Phone size={18} /> Call Support
+                            </a>
                             {order.status === 'Processing' && (
                                 <Button
                                     variant="outline"
@@ -428,8 +372,8 @@ const OrderTracking = () => {
                 </div>
 
                 {/* Continue Shopping Promo */}
-                <div className="mt-8 text-center">
-                    <Link to="/shop" className="inline-flex items-center text-luminous-maroon hover:text-luminous-saffron font-medium transition-colors">
+                <div className="mt-8 text-center relative z-10">
+                    <Link to="/shop" className="inline-flex items-center text-white hover:text-luminous-gold font-medium transition-colors">
                         Continue Shopping <ArrowRight size={18} className="ml-2" />
                     </Link>
                 </div>

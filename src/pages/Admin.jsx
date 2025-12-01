@@ -392,12 +392,12 @@ const Admin = () => {
                                                     </p>
                                                     {order.shippingAddress?.location?.lat && (
                                                         <a
-                                                            href={`https://www.google.com/maps/search/?api=1&query=${order.shippingAddress.location.lat},${order.shippingAddress.location.lng}`}
+                                                            href={`https://www.google.com/maps/dir/?api=1&destination=${order.shippingAddress.location.lat},${order.shippingAddress.location.lng}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-luminous-maroon text-xs font-bold hover:underline mt-2 inline-flex items-center gap-1"
+                                                            className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors"
                                                         >
-                                                            View on Google Maps <ArrowRight size={12} />
+                                                            <MapPin size={14} /> Get Directions
                                                         </a>
                                                     )}
                                                 </div>
