@@ -33,10 +33,10 @@ export const ContentProvider = ({ children }) => {
 
             if (data) {
                 if (data.heroSection) setHeroSection(data.heroSection);
-                if (data.sacredOfferings) setSacredOfferings(data.sacredOfferings);
+                if (Array.isArray(data.sacredOfferings)) setSacredOfferings(data.sacredOfferings);
                 if (data.divineFavorites) setDivineFavorites(data.divineFavorites);
-                if (data.divineEssentials) setDivineEssentials(data.divineEssentials);
-                if (data.categories) setCategories(data.categories);
+                if (Array.isArray(data.divineEssentials)) setDivineEssentials(data.divineEssentials);
+                if (Array.isArray(data.categories)) setCategories(data.categories);
             }
             setLoading(false);
         } catch (error) {
