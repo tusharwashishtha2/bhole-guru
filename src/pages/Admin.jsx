@@ -431,8 +431,8 @@ const Admin = () => {
                                         <div className="flex flex-wrap gap-3">
                                             <button
                                                 onClick={() => updateOrderStatus(order._id || order.id, 'Packed')}
-                                                disabled={order.status !== 'Order Placed' && order.status !== 'Processing'}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Order Placed' || order.status === 'Processing'
+                                                disabled={!['Order Placed', 'Processing', 'Pending', 'Paid'].includes(order.status?.trim())}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${['Order Placed', 'Processing', 'Pending', 'Paid'].includes(order.status?.trim())
                                                     ? 'bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100'
                                                     : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
                                                     }`}
