@@ -7,13 +7,16 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 
 const MyOrders = () => {
-    const { getUserOrders, setCurrentOrderId } = useOrder();
+    const { orders, fetchMyOrders, setCurrentOrderId } = useOrder();
     const { user } = useAuth();
 
-    const userOrders = getUserOrders(user?.email);
+    React.useEffect(() => {
+        fetchMyOrders();
+    }, []);
 
     // Sort orders by date (newest first)
-    const sortedOrders = [...userOrders].sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Ensure orders is an array before sorting
+    const sortedOrders = Array.isArray(orders) ? [...orders].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)) : [];
 
     const getStatusColor = (status) => {
         switch (status) {

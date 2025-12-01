@@ -35,32 +35,77 @@ const OrderTracking = () => {
     // Mock coordinates for demo (Varanasi)
     const position = [25.3176, 82.9739];
 
-    // ... handleDownloadInvoice ...
-
-    useEffect(() => {
-        const urlOrderId = searchParams.get('orderId');
-        const activeId = urlOrderId || currentOrderId;
-
-        if (activeId) {
-            const currentOrder = getOrder(activeId);
-            if (currentOrder) {
-                setOrder(currentOrder);
-                if (urlOrderId && !currentOrderId) {
-                    setCurrentOrderId(urlOrderId);
-                }
+    const handleDownloadInvoice = async () => {
+        if (invoiceRef.current) {
+            setIsGeneratingInvoice(true);
+            try {
+                await invoiceRef.current.generatePdf();
+            } catch (error) {
+                console.error("Failed to generate invoice:", error);
+            } finally {
+                setIsGeneratingInvoice(false);
             }
         }
-    }, [currentOrderId, searchParams, getOrder, setCurrentOrderId]);
+    };
 
-    // ... triggerConfetti ...
+    const triggerConfetti = () => {
+        import('canvas-confetti').then((confetti) => {
+            confetti.default({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        });
+    };
 
-    // ... getStatusStep ...
+    const getStatusStep = (status) => {
+        switch (status) {
+            case 'Order Placed': return 0;
+            case 'Processing': return 1;
+            case 'Packed': return 2;
+            case 'Out for Delivery': return 3;
+            case 'Delivered': return 4;
+            case 'Cancelled': return -1;
+            default: return 0;
+        }
+    };
 
-    // ... getStatusTitle ...
+    const getStatusTitle = (status) => {
+        switch (status) {
+            case 'Order Placed': return 'Order Placed';
+            case 'Processing': return 'Processing Order';
+            case 'Packed': return 'Packed & Ready';
+            case 'Out for Delivery': return 'Out for Delivery';
+            case 'Delivered': return 'Arrived Home';
+            case 'Cancelled': return 'Order Cancelled';
+            default: return 'Order Status';
+        }
+    };
 
-    // ... getTimeForStatus ...
+    const getTimeForStatus = (statusKey) => {
+        if (!order) return '';
+        // This is a simplified logic. Ideally, backend should provide timestamps for each status change.
+        // For now, we use createdAt for placed, and current time for others if active.
+        if (statusKey === 'Order Placed') return new Date(order.createdAt || order.date).toLocaleDateString();
+        if (order.status === statusKey) return 'In Progress';
+        if (getStatusStep(order.status) > getStatusStep(statusKey)) return 'Completed';
+        return '';
+    };
 
-    // ... steps ...
+    const steps = [
+        { statusKey: 'Order Placed', label: 'Order Placed', icon: Package },
+        { statusKey: 'Processing', label: 'Processing', icon: CheckCircle },
+        { statusKey: 'Packed', label: 'Packed', icon: Package },
+        { statusKey: 'Out for Delivery', label: 'Out for Delivery', icon: Truck },
+        { statusKey: 'Delivered', label: 'Delivered', icon: MapPin }
+    ];
+
+    useEffect(() => {
+        if (order?.status === 'Delivered') {
+            setShowDeliveredPopup(true);
+            triggerConfetti();
+        }
+    }, [order?.status]);
 
     // Handle loading or no order state
     if (!order) {
