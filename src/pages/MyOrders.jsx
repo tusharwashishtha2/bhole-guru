@@ -11,8 +11,12 @@ const MyOrders = () => {
     const { user } = useAuth();
 
     React.useEffect(() => {
+        console.log("MyOrders: Fetching orders...");
         fetchMyOrders();
     }, []);
+
+    console.log("MyOrders: orders state:", orders);
+    console.log("MyOrders: user state:", user);
 
     // Sort orders by date (newest first)
     // Ensure orders is an array before sorting

@@ -47,7 +47,7 @@ const QuickViewModal = () => {
                         {/* Image Section */}
                         <div className="relative h-64 md:h-full bg-gray-100 dark:bg-stone-800">
                             <img
-                                src={selectedProduct.images?.[0] || selectedProduct.image}
+                                src={(selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : selectedProduct.image}
                                 alt={selectedProduct.name}
                                 className="w-full h-full object-cover"
                             />
