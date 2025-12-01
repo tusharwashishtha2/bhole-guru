@@ -379,11 +379,36 @@ const Admin = () => {
                                             </div>
                                         </div>
 
+                                        {/* Shipping Address Section */}
+                                        <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                            <div className="flex items-start gap-3">
+                                                <MapPin className="text-gray-400 mt-1" size={18} />
+                                                <div>
+                                                    <h4 className="font-bold text-gray-700 text-sm">Shipping Address</h4>
+                                                    <p className="text-sm text-gray-600 mt-1">
+                                                        {order.shippingAddress?.address}<br />
+                                                        {order.shippingAddress?.city}, {order.shippingAddress?.postalCode}<br />
+                                                        {order.shippingAddress?.country}
+                                                    </p>
+                                                    {order.shippingAddress?.location?.lat && (
+                                                        <a
+                                                            href={`https://www.google.com/maps/search/?api=1&query=${order.shippingAddress.location.lat},${order.shippingAddress.location.lng}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-luminous-maroon text-xs font-bold hover:underline mt-2 inline-flex items-center gap-1"
+                                                        >
+                                                            View on Google Maps <ArrowRight size={12} />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div className="flex flex-wrap gap-3">
                                             <button
                                                 onClick={() => updateOrderStatus(order._id || order.id, 'Packed')}
-                                                disabled={order.status !== 'Order Placed'}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Order Placed'
+                                                disabled={order.status !== 'Order Placed' && order.status !== 'Processing'}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Order Placed' || order.status === 'Processing'
                                                     ? 'bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100'
                                                     : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
                                                     }`}
