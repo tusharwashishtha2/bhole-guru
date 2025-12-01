@@ -16,10 +16,10 @@ export const ProductProvider = ({ children }) => {
             const response = await fetch(API_URL);
             const data = await response.json();
             // Map _id to id for frontend compatibility
-            const mappedProducts = data.map(product => ({
+            const mappedProducts = Array.isArray(data) ? data.map(product => ({
                 ...product,
                 id: product._id
-            }));
+            })) : [];
             setProducts(mappedProducts);
             setLoading(false);
         } catch (error) {
