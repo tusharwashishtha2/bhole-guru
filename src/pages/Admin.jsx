@@ -352,9 +352,9 @@ const Admin = () => {
                                     >
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-100 pb-4">
                                             <div>
-                                                <h3 className="text-xl font-bold text-gray-900 font-serif">Order #{order.id}</h3>
+                                                <h3 className="text-xl font-bold text-gray-900 font-serif">Order #{order._id || order.id}</h3>
                                                 <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-                                                    <Clock size={14} /> {new Date(order.date).toLocaleString()}
+                                                    <Clock size={14} /> {new Date(order.createdAt || order.date).toLocaleString()}
                                                 </p>
                                             </div>
                                             <span className={`px-4 py-1 rounded-full text-sm font-bold mt-2 md:mt-0 border ${getStatusColor(order.status)}`}>
@@ -365,23 +365,23 @@ const Admin = () => {
                                         <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
                                             <p className="font-bold text-gray-700 mb-2">Items:</p>
                                             <ul className="space-y-2 text-gray-600 text-sm mb-3">
-                                                {order.items.map((item, idx) => (
+                                                {(order.orderItems || order.items || []).map((item, idx) => (
                                                     <li key={idx} className="flex items-center gap-3">
                                                         <span className="w-2 h-2 bg-luminous-maroon rounded-full"></span>
                                                         <span className="font-medium">{item.name}</span>
-                                                        <span className="text-gray-400">x{item.quantity}</span>
+                                                        <span className="text-gray-400">x{item.quantity || item.qty}</span>
                                                     </li>
                                                 ))}
                                             </ul>
                                             <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
                                                 <span className="text-gray-500 font-medium">Total Amount</span>
-                                                <span className="font-bold text-luminous-maroon text-lg">₹{order.total}</span>
+                                                <span className="font-bold text-luminous-maroon text-lg">₹{order.totalPrice || order.total}</span>
                                             </div>
                                         </div>
 
                                         <div className="flex flex-wrap gap-3">
                                             <button
-                                                onClick={() => updateOrderStatus(order.id, 'Packed')}
+                                                onClick={() => updateOrderStatus(order._id || order.id, 'Packed')}
                                                 disabled={order.status !== 'Order Placed'}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Order Placed'
                                                     ? 'bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100'
@@ -396,7 +396,7 @@ const Admin = () => {
                                                     const tracking = prompt('Enter Tracking Number:');
                                                     if (tracking) {
                                                         const courier = prompt('Enter Courier Name (e.g., DTDC, BlueDart):');
-                                                        updateOrderStatus(order.id, 'Shipped', { trackingNumber: tracking, courierName: courier });
+                                                        updateOrderStatus(order._id || order.id, 'Shipped', { trackingNumber: tracking, courierName: courier });
                                                     }
                                                 }}
                                                 disabled={order.status !== 'Packed'}
@@ -417,7 +417,7 @@ const Admin = () => {
                                                     const choice = prompt(`Assign Driver (Enter 1 or 2):\n1. Ramesh Kumar\n2. Suresh Singh`);
                                                     if (choice === '1' || choice === '2') {
                                                         const driver = drivers[parseInt(choice) - 1];
-                                                        updateOrderStatus(order.id, 'Out for Delivery', {
+                                                        updateOrderStatus(order._id || order.id, 'Out for Delivery', {
                                                             driverDetails: driver
                                                         });
                                                     }
@@ -432,7 +432,7 @@ const Admin = () => {
                                             </button>
 
                                             <button
-                                                onClick={() => updateOrderStatus(order.id, 'Delivered')}
+                                                onClick={() => updateOrderStatus(order._id || order.id, 'Delivered')}
                                                 disabled={order.status !== 'Out for Delivery'}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Out for Delivery'
                                                     ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
@@ -445,7 +445,7 @@ const Admin = () => {
                                             <button
                                                 onClick={() => {
                                                     if (window.confirm('Are you sure you want to delete this order?')) {
-                                                        deleteOrder(order.id);
+                                                        deleteOrder(order._id || order.id);
                                                     }
                                                 }}
                                                 className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all bg-white text-red-500 border border-red-200 hover:bg-red-50 ml-auto shadow-sm"
