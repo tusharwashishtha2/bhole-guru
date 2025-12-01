@@ -200,6 +200,18 @@ const Admin = () => {
         setShowAddForm(true);
     };
 
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Order Placed': return 'text-blue-600 bg-blue-100 border-blue-200';
+            case 'Packed': return 'text-yellow-600 bg-yellow-100 border-yellow-200';
+            case 'Shipped': return 'text-purple-600 bg-purple-100 border-purple-200';
+            case 'Out for Delivery': return 'text-orange-600 bg-orange-100 border-orange-200';
+            case 'Delivered': return 'text-green-600 bg-green-100 border-green-200';
+            case 'Cancelled': return 'text-red-600 bg-red-100 border-red-200';
+            default: return 'text-gray-600 bg-gray-100 border-gray-200';
+        }
+    };
+
     return (
         <div className="bg-gray-50 min-h-screen pb-20 pt-24">
             <div className="container mx-auto px-4">
