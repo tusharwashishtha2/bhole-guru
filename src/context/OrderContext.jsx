@@ -25,8 +25,11 @@ export const OrderProvider = ({ children }) => {
                 }
             });
             const data = await response.json();
-            if (response.ok) {
+            if (response.ok && Array.isArray(data)) {
                 setOrders(data);
+            } else {
+                setOrders([]);
+                console.error("Fetched orders data is not an array:", data);
             }
         } catch (error) {
             console.error("Failed to fetch orders", error);

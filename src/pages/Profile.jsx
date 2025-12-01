@@ -166,7 +166,7 @@ const Profile = () => {
                 return (
                     <div className="space-y-6">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Orders</h2>
-                        {userOrders.length === 0 ? (
+                        {(!Array.isArray(userOrders) || userOrders.length === 0) ? (
                             <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
                                 <ShoppingBag className="mx-auto text-gray-300 mb-4" size={48} />
                                 <p className="text-gray-500 mb-4">No orders found</p>
@@ -176,11 +176,11 @@ const Profile = () => {
                             </div>
                         ) : (
                             userOrders.map((order) => (
-                                <div key={order.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                <div key={order._id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 className="font-bold text-lg text-gray-900">Order #{order.id}</h3>
-                                            <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
+                                            <h3 className="font-bold text-lg text-gray-900">Order #{order._id}</h3>
+                                            <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
                                         </div>
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
                                             order.status === 'Order Placed' ? 'bg-blue-100 text-blue-700' :
@@ -195,7 +195,7 @@ const Profile = () => {
                                         </div>
                                     )}
                                     <div className="space-y-2 mb-4">
-                                        {order.items.map((item, idx) => (
+                                        {order.orderItems && order.orderItems.map((item, idx) => (
                                             <div key={idx} className="flex justify-between text-sm">
                                                 <span className="text-gray-600">{item.name} x {item.quantity}</span>
                                                 <span className="font-medium">₹{item.price * item.quantity}</span>
@@ -203,8 +203,8 @@ const Profile = () => {
                                         ))}
                                     </div>
                                     <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                                        <span className="font-bold text-gray-900">Total: ₹{order.total}</span>
-                                        <Link to={`/track-order?orderId=${order.id}`} className="text-luminous-maroon font-bold text-sm hover:underline">
+                                        <span className="font-bold text-gray-900">Total: ₹{order.totalPrice}</span>
+                                        <Link to={`/track-order?orderId=${order._id}`} className="text-luminous-maroon font-bold text-sm hover:underline">
                                             Track Order
                                         </Link>
                                     </div>

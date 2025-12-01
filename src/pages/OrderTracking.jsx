@@ -101,13 +101,36 @@ const OrderTracking = () => {
     ];
 
     useEffect(() => {
-        const orderId = searchParams.get('orderId') || currentOrderId;
-        if (orderId) {
+        const fetchOrderDetails = async () => {
+            const orderId = searchParams.get('orderId') || currentOrderId;
+            if (!orderId) return;
+
+            // First try to get from context
             const foundOrder = getOrder(orderId);
             if (foundOrder) {
                 setOrder(foundOrder);
+                return;
             }
-        }
+
+            // If not in context, fetch from API
+            try {
+                const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com')) + '/api/orders';
+                const token = localStorage.getItem('bhole_guru_token');
+                const response = await fetch(`${API_URL}/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setOrder(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch order details", error);
+            }
+        };
+
+        fetchOrderDetails();
     }, [searchParams, currentOrderId, getOrder]);
 
     useEffect(() => {
