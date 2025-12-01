@@ -101,6 +101,16 @@ const OrderTracking = () => {
     ];
 
     useEffect(() => {
+        const orderId = searchParams.get('orderId') || currentOrderId;
+        if (orderId) {
+            const foundOrder = getOrder(orderId);
+            if (foundOrder) {
+                setOrder(foundOrder);
+            }
+        }
+    }, [searchParams, currentOrderId, getOrder]);
+
+    useEffect(() => {
         if (order?.status === 'Delivered') {
             setShowDeliveredPopup(true);
             triggerConfetti();
@@ -222,7 +232,7 @@ const OrderTracking = () => {
                             ></div>
 
                             <div className="flex justify-between relative z-10">
-                                {steps.map((step, index) => {
+                                {Array.isArray(steps) && steps.map((step, index) => {
                                     const Icon = step.icon;
                                     const isActive = index <= statusStep;
                                     const time = getTimeForStatus(step.statusKey);
