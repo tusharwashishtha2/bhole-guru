@@ -4,11 +4,13 @@ import { CheckCircle, Package, Truck, MapPin, Phone, ArrowRight, X, Download, St
 import Button from '../components/ui/Button';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
+import { useAuth } from '../context/AuthContext';
 import Invoice from '../components/Invoice';
 import 'leaflet/dist/leaflet.css';
 
 const OrderTracking = () => {
-    const { getOrder, currentOrderId, cancelOrder, setCurrentOrderId, orders } = useOrder();
+    const { getOrder, currentOrderId, cancelOrder, setCurrentOrderId, orders, loading } = useOrder();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [order, setOrder] = useState(null);
@@ -149,13 +151,23 @@ const OrderTracking = () => {
     }, [searchParams, currentOrderId, getOrder, orders, setSearchParams]);
 
     useEffect(() => {
-        if (order?.status === 'Delivered') {
+        const hasSeen = localStorage.getItem(`seen_delivered_${order?._id}`);
+        if (order?.status === 'Delivered' && !hasSeen && user?.role !== 'admin') {
             setShowDeliveredPopup(true);
             triggerConfetti();
+            localStorage.setItem(`seen_delivered_${order?._id}`, 'true');
         }
-    }, [order?.status]);
+    }, [order?.status, order?._id, user?.role]);
 
     // Handle loading or no order state
+    if (loading && !order) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-luminous-maroon border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
     if (!order) {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -357,7 +369,7 @@ const OrderTracking = () => {
 
                         <div className="flex flex-wrap justify-center lg:justify-end gap-3 w-full lg:w-auto">
                             <a
-                                href="tel:+919876543210"
+                                href="tel:+917000308463"
                                 className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-semibold text-gray-700 shadow-sm"
                             >
                                 <Phone size={18} /> Call Support

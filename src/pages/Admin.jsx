@@ -252,8 +252,8 @@ const Admin = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex justify-center mb-8 border-b border-gray-200">
-                    <div className="flex gap-8">
+                <div className="flex justify-start md:justify-center mb-8 border-b border-gray-200 overflow-x-auto pb-2 scrollbar-hide">
+                    <div className="flex gap-8 px-4 min-w-max">
                         <button
                             onClick={() => setActiveTab('orders')}
                             className={`pb-4 px-4 font-bold text-lg transition-colors relative ${activeTab === 'orders' ? 'text-luminous-maroon' : 'text-gray-400 hover:text-gray-600'}`}
@@ -347,7 +347,8 @@ const Admin = () => {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.1 }}
-                                        key={order.id}
+                                        transition={{ delay: index * 0.1 }}
+                                        key={order._id || order.id}
                                         className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
                                     >
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-100 pb-4">
@@ -441,13 +442,7 @@ const Admin = () => {
                                             </button>
 
                                             <button
-                                                onClick={() => {
-                                                    const tracking = prompt('Enter Tracking Number:');
-                                                    if (tracking) {
-                                                        const courier = prompt('Enter Courier Name (e.g., DTDC, BlueDart):');
-                                                        updateOrderStatus(order._id || order.id, 'Shipped', { trackingNumber: tracking, courierName: courier });
-                                                    }
-                                                }}
+                                                onClick={() => updateOrderStatus(order._id || order.id, 'Shipped')}
                                                 disabled={order.status !== 'Packed'}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${order.status === 'Packed'
                                                     ? 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
@@ -459,16 +454,14 @@ const Admin = () => {
 
                                             <button
                                                 onClick={() => {
-                                                    const drivers = [
-                                                        { name: 'Ramesh Kumar', phone: '9876543210', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
-                                                        { name: 'Suresh Singh', phone: '9123456789', image: 'https://randomuser.me/api/portraits/men/45.jpg' }
-                                                    ];
-                                                    const choice = prompt(`Assign Driver (Enter 1 or 2):\n1. Ramesh Kumar\n2. Suresh Singh`);
-                                                    if (choice === '1' || choice === '2') {
-                                                        const driver = drivers[parseInt(choice) - 1];
-                                                        updateOrderStatus(order._id || order.id, 'Out for Delivery', {
-                                                            driverDetails: driver
-                                                        });
+                                                    const driverName = prompt("Enter Driver Name:");
+                                                    if (driverName) {
+                                                        const driverPhone = prompt("Enter Driver Phone Number:");
+                                                        if (driverPhone) {
+                                                            updateOrderStatus(order._id || order.id, 'Out for Delivery', {
+                                                                driverDetails: { name: driverName, phone: driverPhone }
+                                                            });
+                                                        }
                                                     }
                                                 }}
                                                 disabled={order.status !== 'Shipped'}
