@@ -35,29 +35,12 @@ const OrderTracking = () => {
     // Mock coordinates for demo (Varanasi)
     const position = [25.3176, 82.9739];
 
-    const handleDownloadInvoice = async () => {
-        if (invoiceRef.current) {
-            setIsGeneratingInvoice(true);
-            try {
-                await invoiceRef.current.generatePdf();
-            } catch (error) {
-                console.error("Failed to generate invoice:", error);
-            } finally {
-                setIsGeneratingInvoice(false);
-            }
-        }
-    };
+    // Live Tracking Logic
+    const [driverLocation, setDriverLocation] = useState(null);
+    const [eta, setEta] = useState('');
+    const warehouseLocation = [25.3176, 82.9739]; // Varanasi (Warehouse)
 
-    const triggerConfetti = () => {
-        import('canvas-confetti').then((confetti) => {
-            confetti.default({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-        });
-    };
-
+    // Derived state helpers
     const getStatusStep = (status) => {
         switch (status) {
             case 'Order Placed': return 0;
@@ -80,6 +63,35 @@ const OrderTracking = () => {
             case 'Cancelled': return 'Order Cancelled';
             default: return 'Order Status';
         }
+    };
+
+    // Derived state
+    const statusStep = order ? getStatusStep(order.status) : 0;
+    const isCancelled = order ? order.status === 'Cancelled' : false;
+
+    const isValidCoordinate = (coord) => typeof coord === 'number' && !isNaN(coord);
+
+    const handleDownloadInvoice = async () => {
+        if (invoiceRef.current) {
+            setIsGeneratingInvoice(true);
+            try {
+                await invoiceRef.current.generatePdf();
+            } catch (error) {
+                console.error("Failed to generate invoice:", error);
+            } finally {
+                setIsGeneratingInvoice(false);
+            }
+        }
+    };
+
+    const triggerConfetti = () => {
+        import('canvas-confetti').then((confetti) => {
+            confetti.default({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        });
     };
 
     const getTimeForStatus = (statusKey) => {
@@ -140,6 +152,39 @@ const OrderTracking = () => {
         }
     }, [order?.status]);
 
+    // Effect for Live Tracking
+    useEffect(() => {
+        if (!order) return;
+
+        const hasValidLocation = order.shippingAddress?.location &&
+            isValidCoordinate(order.shippingAddress.location.lat) &&
+            isValidCoordinate(order.shippingAddress.location.lng);
+
+        const userLocation = hasValidLocation
+            ? [order.shippingAddress.location.lat, order.shippingAddress.location.lng]
+            : warehouseLocation;
+
+        if (statusStep >= 3 && statusStep < 4) { // Out for Delivery
+            // Simulate driver movement (halfway)
+            const lat = (warehouseLocation[0] + userLocation[0]) / 2;
+            const lng = (warehouseLocation[1] + userLocation[1]) / 2;
+            setDriverLocation([lat, lng]);
+            setEta('15 mins');
+        } else if (statusStep === 4) { // Delivered
+            setDriverLocation(userLocation);
+            setEta('Arrived');
+        } else {
+            setDriverLocation(warehouseLocation);
+            setEta(statusStep === 0 ? '2 days' : '1 day');
+        }
+    }, [statusStep, order]);
+
+    const TruckIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png', // Truck Icon
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+
     // Handle loading or no order state
     if (!order) {
         return (
@@ -176,36 +221,13 @@ const OrderTracking = () => {
         );
     }
 
-    const statusStep = getStatusStep(order.status);
-    const isCancelled = order.status === 'Cancelled';
+    const hasValidLocation = order.shippingAddress?.location &&
+        isValidCoordinate(order.shippingAddress.location.lat) &&
+        isValidCoordinate(order.shippingAddress.location.lng);
 
-    // Live Tracking Logic
-    const [driverLocation, setDriverLocation] = useState(null);
-    const [eta, setEta] = useState('');
-    const warehouseLocation = [25.3176, 82.9739]; // Varanasi (Warehouse)
-    const userLocation = order.shippingAddress?.location ? [order.shippingAddress.location.lat, order.shippingAddress.location.lng] : warehouseLocation;
-
-    useEffect(() => {
-        if (statusStep >= 3 && statusStep < 4) { // Out for Delivery
-            // Simulate driver movement (halfway)
-            const lat = (warehouseLocation[0] + userLocation[0]) / 2;
-            const lng = (warehouseLocation[1] + userLocation[1]) / 2;
-            setDriverLocation([lat, lng]);
-            setEta('15 mins');
-        } else if (statusStep === 4) { // Delivered
-            setDriverLocation(userLocation);
-            setEta('Arrived');
-        } else {
-            setDriverLocation(warehouseLocation);
-            setEta(statusStep === 0 ? '2 days' : '1 day');
-        }
-    }, [statusStep, order]);
-
-    const TruckIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png', // Truck Icon
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
-    });
+    const userLocation = hasValidLocation
+        ? [order.shippingAddress.location.lat, order.shippingAddress.location.lng]
+        : warehouseLocation;
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 relative">

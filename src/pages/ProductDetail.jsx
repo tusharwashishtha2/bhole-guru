@@ -29,7 +29,7 @@ const ProductDetail = () => {
             setLoading(true);
             try {
                 // Try to fetch from API first
-                const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
+                const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com'));
                 const response = await fetch(`${API_URL}/api/products/${id}`);
 
                 if (response.ok) {
@@ -93,7 +93,7 @@ const ProductDetail = () => {
             return;
         }
         try {
-            const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
+            const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com'));
             const token = localStorage.getItem('bhole_guru_token');
             const response = await fetch(`${API_URL}/api/products/${product._id}/reviews`, {
                 method: 'POST',

@@ -17,12 +17,21 @@ export const ContentProvider = ({ children }) => {
         bgImage: "https://images.unsplash.com/photo-1609818698346-8cb3be6e0826?q=80&w=2000&auto=format&fit=crop"
     });
 
-    const [sacredOfferings, setSacredOfferings] = useState([]);
+    const [sacredOfferings, setSacredOfferings] = useState([
+        { title: 'Puja Thali', category: 'Puja Thali', img: 'https://images.unsplash.com/photo-1604663395726-027582522789?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Incense', category: 'Incense', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Idols', category: 'Idols', img: 'https://images.unsplash.com/photo-1567591414240-e1363061199d?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Lamps', category: 'Lamps', img: 'https://images.unsplash.com/photo-1513628253939-010e64ac66cd?q=80&w=600&auto=format&fit=crop' }
+    ]);
     const [divineFavorites, setDivineFavorites] = useState({
         title: "Divine Favorites",
         subtitle: "Most loved by our devotees"
     });
-    const [divineEssentials, setDivineEssentials] = useState([]);
+    const [divineEssentials, setDivineEssentials] = useState([
+        { id: 1, title: 'Rudraksha Beads', desc: 'Sacred Energy', img: 'https://images.unsplash.com/photo-1610450949247-91f862a9b34f?q=80&w=600&auto=format&fit=crop', link: '/shop' },
+        { id: 2, title: 'Copper Kalash', desc: 'Pure Water', img: 'https://images.unsplash.com/photo-1628842095268-33340052e540?q=80&w=600&auto=format&fit=crop', link: '/shop' },
+        { id: 3, title: 'Conch Shell', desc: 'Divine Sound', img: 'https://images.unsplash.com/photo-1596558284897-6a42a0438128?q=80&w=600&auto=format&fit=crop', link: '/shop' }
+    ]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 

@@ -198,7 +198,7 @@ const Profile = () => {
                                         {order.orderItems && order.orderItems.map((item, idx) => (
                                             <div key={idx} className="flex justify-between text-sm">
                                                 <span className="text-gray-600">{item.name} x {item.quantity}</span>
-                                                <span className="font-medium">₹{item.price * item.quantity}</span>
+                                                <span className="font-medium">₹{(parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 1)}</span>
                                             </div>
                                         ))}
                                     </div>

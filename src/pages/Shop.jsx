@@ -25,7 +25,7 @@ const Shop = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const API_URL = (import.meta.env.VITE_API_URL || 'https://bhole-guru.onrender.com');
+                const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com'));
                 let url = `${API_URL}/api/products?`;
 
                 if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
@@ -353,7 +353,11 @@ const Shop = () => {
                     </div>
 
                     {/* Product Grid */}
-                    {filteredProducts.length > 0 ? (
+                    {loading ? (
+                        <div className="flex justify-center items-center py-32">
+                            <div className="w-16 h-16 border-4 border-luminous-gold border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    ) : filteredProducts.length > 0 ? (
                         <motion.div
                             layout
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8"
