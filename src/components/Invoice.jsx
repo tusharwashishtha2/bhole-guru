@@ -37,8 +37,7 @@ const Invoice = forwardRef(({ order }, ref) => {
                 </div>
                 <div className="text-right">
                     <h2 className="text-2xl font-serif font-bold text-luminous-maroon mb-1">Bhole Guru</h2>
-                    <p className="text-xs text-gray-500">Premium Rudraksha & Spiritual Items</p>
-                    <p className="text-xs text-gray-500">support@bholeguru.com</p>
+                    <p className="text-xs text-gray-500">Pooja Essentials and Spiritual Items</p>
                     <p className="text-xs text-gray-500">+91 70003 08463</p>
                 </div>
             </div>

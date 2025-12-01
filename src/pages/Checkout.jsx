@@ -72,15 +72,9 @@ const Checkout = () => {
     const shipping = subtotal > 500 ? 0 : 49;
     const total = subtotal + shipping;
 
-    const loadRazorpayScript = () => {
-        return new Promise((resolve) => {
-            const script = document.createElement('script');
-            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-            script.onload = () => resolve(true);
-            script.onerror = () => resolve(false);
-            document.body.appendChild(script);
-        });
-    };
+    const [showQrModal, setShowQrModal] = useState(false);
+    const [transactionId, setTransactionId] = useState('');
+    const [verifyingPayment, setVerifyingPayment] = useState(false);
 
     const handlePayment = async (e) => {
         e.preventDefault();
@@ -89,116 +83,49 @@ const Checkout = () => {
         const shippingAddress = `${address.addressLine1}, ${address.city}, ${address.pincode}`;
 
         try {
-            // 1. Create Order on Backend
-            const orderItems = cart.map(item => ({
-                product: item.id || item._id,
-                name: item.name,
-                image: item.image,
-                price: item.price,
-                qty: item.quantity // Map quantity to qty as expected by backend
-            }));
-
-            const shippingAddressObject = {
-                address: address.addressLine1,
-                city: address.city,
-                postalCode: address.pincode,
-                country: 'India', // Default country
-                phone: address.phone,
-                location: address.location
-            };
-
-            const orderData = {
-                orderItems,
-                shippingAddress: shippingAddressObject,
-                paymentMethod,
-                itemsPrice: subtotal,
-                taxPrice: 0,
-                shippingPrice: shipping,
-                totalPrice: total
-            };
-
-            const data = await addOrder(orderData);
-
-            if (!data) {
-                setLoading(false);
-                return;
-            }
-
             if (paymentMethod === 'cod') {
                 // COD Flow
-                clearCart();
-                setIsOrderPlaced(true);
-                setPlacedOrderId(data.order._id);
-                setLoading(false);
-            } else {
-                // Razorpay Flow
-                const res = await loadRazorpayScript();
+                const orderItems = cart.map(item => ({
+                    product: item.id || item._id,
+                    name: item.name,
+                    image: item.image,
+                    price: item.price,
+                    qty: item.quantity
+                }));
 
-                if (!res) {
-                    addToast('Razorpay SDK failed to load. Are you online?', 'error');
-                    setLoading(false);
-                    return;
-                }
-
-                const options = {
-                    key: data.key,
-                    amount: data.amount,
-                    currency: data.currency,
-                    name: "Bhole Guru",
-                    description: "Divine Artifacts Purchase",
-                    image: "https://res.cloudinary.com/dnhb4llf9/image/upload/v1732163668/bhole-guru-logo_v2_small.png", // Use your logo URL
-                    order_id: data.razorpayOrderId,
-                    handler: async function (response) {
-                        try {
-                            const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com'));
-                            const verifyUrl = `${API_URL}/api/orders/verify`;
-                            const verifyRes = await fetch(verifyUrl, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${localStorage.getItem('bhole_guru_token')}`
-                                },
-                                body: JSON.stringify({
-                                    razorpay_order_id: response.razorpay_order_id,
-                                    razorpay_payment_id: response.razorpay_payment_id,
-                                    razorpay_signature: response.razorpay_signature,
-                                    orderId: data.order._id
-                                })
-                            });
-
-                            const verifyData = await verifyRes.json();
-
-                            if (verifyRes.ok) {
-                                clearCart();
-                                setIsOrderPlaced(true);
-                                setPlacedOrderId(data.order._id);
-                            } else {
-                                addToast(verifyData.message || 'Payment verification failed', 'error');
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            addToast('Payment verification failed', 'error');
-                        }
-                    },
-                    prefill: {
-                        name: address.fullName,
-                        email: user?.email,
-                        contact: address.phone
-                    },
-                    notes: {
-                        address: `${address.addressLine1}, ${address.city}, ${address.pincode}`
-                    },
-                    theme: {
-                        color: "#800000" // Luminous Maroon
-                    }
+                const shippingAddressObject = {
+                    address: address.addressLine1,
+                    city: address.city,
+                    postalCode: address.pincode,
+                    country: 'India',
+                    phone: address.phone,
+                    location: address.location
                 };
 
-                const paymentObject = new window.Razorpay(options);
-                paymentObject.open();
+                const orderData = {
+                    orderItems,
+                    shippingAddress: shippingAddressObject,
+                    paymentMethod,
+                    itemsPrice: subtotal,
+                    taxPrice: 0,
+                    shippingPrice: shipping,
+                    totalPrice: total
+                };
+
+                const data = await addOrder(orderData);
+                if (data) {
+                    clearCart();
+                    setIsOrderPlaced(true);
+                    setPlacedOrderId(data.order._id);
+                }
+                setLoading(false);
+            } else {
+                // Online Payment (QR Code) Flow
+                setShowQrModal(true);
                 setLoading(false);
             }
 
-            // Auto-save address to profile if empty
+            // Auto-save address
             if (user && (!user.address || !user.phone)) {
                 updateUserProfile({
                     phone: address.phone,
@@ -215,6 +142,69 @@ const Checkout = () => {
         }
     };
 
+    const confirmOnlinePayment = async () => {
+        if (!transactionId.trim()) {
+            addToast('Please enter Transaction ID / UTR', 'error');
+            return;
+        }
+
+        setVerifyingPayment(true);
+
+        // Simulate verification delay
+        setTimeout(async () => {
+            try {
+                const orderItems = cart.map(item => ({
+                    product: item.id || item._id,
+                    name: item.name,
+                    image: item.image,
+                    price: item.price,
+                    qty: item.quantity
+                }));
+
+                const shippingAddressObject = {
+                    address: address.addressLine1,
+                    city: address.city,
+                    postalCode: address.pincode,
+                    country: 'India',
+                    phone: address.phone,
+                    location: address.location
+                };
+
+                const orderData = {
+                    orderItems,
+                    shippingAddress: shippingAddressObject,
+                    paymentMethod: 'UPI/Online',
+                    itemsPrice: subtotal,
+                    taxPrice: 0,
+                    shippingPrice: shipping,
+                    totalPrice: total,
+                    paymentResult: {
+                        id: transactionId,
+                        status: 'Pending Verification',
+                        update_time: new Date().toISOString(),
+                        email_address: user?.email
+                    }
+                };
+
+                const data = await addOrder(orderData);
+
+                if (data) {
+                    clearCart();
+                    setShowQrModal(false);
+                    setIsOrderPlaced(true);
+                    setPlacedOrderId(data.order._id);
+                } else {
+                    addToast('Failed to place order', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                addToast('Order placement failed', 'error');
+            } finally {
+                setVerifyingPayment(false);
+            }
+        }, 2000);
+    };
+
     if (cart.length === 0 && !isOrderPlaced) {
         setTimeout(() => {
             if (!isOrderPlaced) navigate('/cart');
@@ -224,6 +214,70 @@ const Checkout = () => {
 
     return (
         <div className="bg-gray-50 min-h-screen pb-20 pt-24 relative">
+            {/* QR Code Payment Modal */}
+            <AnimatePresence>
+                {showQrModal && (
+                    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative"
+                        >
+                            <button
+                                onClick={() => setShowQrModal(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                            >
+                                <ArrowLeft size={24} />
+                            </button>
+
+                            <h3 className="text-xl font-bold text-center mb-4">Scan & Pay</h3>
+
+                            <div className="bg-gray-100 p-4 rounded-xl mb-6 flex flex-col items-center">
+                                <div className="bg-white p-2 rounded-lg shadow-sm mb-3">
+                                    <img
+                                        src="/assets/payment-qr.jpg"
+                                        alt="Payment QR Code"
+                                        className="w-48 h-auto object-contain"
+                                    />
+                                </div>
+                                <p className="text-sm font-bold text-gray-700">Bhole Guru</p>
+                                <p className="text-xs text-gray-500">UPI ID: 7000308463@kotak811</p>
+                                <p className="text-lg font-bold text-luminous-maroon mt-2">Amount: ₹{total}</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Enter Transaction ID / UTR</label>
+                                    <input
+                                        type="text"
+                                        value={transactionId}
+                                        onChange={(e) => setTransactionId(e.target.value)}
+                                        placeholder="e.g., 123456789012"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-luminous-maroon outline-none font-mono text-sm"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Please enter the 12-digit UTR number from your payment app.</p>
+                                </div>
+
+                                <Button
+                                    onClick={confirmOnlinePayment}
+                                    className="w-full py-3"
+                                    disabled={verifyingPayment}
+                                >
+                                    {verifyingPayment ? (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Loader className="animate-spin" size={18} /> Verifying Payment...
+                                        </div>
+                                    ) : (
+                                        "I Have Paid"
+                                    )}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             {/* Order Placed Success Modal */}
             <AnimatePresence>
                 {isOrderPlaced && (
@@ -353,8 +407,8 @@ const Checkout = () => {
                                         className="w-5 h-5 text-luminous-maroon focus:ring-luminous-maroon"
                                     />
                                     <div className="ml-4 flex-grow">
-                                        <span className="block font-bold text-gray-900">Online Payment</span>
-                                        <span className="text-sm text-gray-500">Credit/Debit Card, UPI, Netbanking (Razorpay)</span>
+                                        <span className="block font-bold text-gray-900">Scan QR & Pay</span>
+                                        <span className="text-sm text-gray-500">UPI, GPay, PhonePe, Paytm</span>
                                     </div>
                                     <ShieldCheck className="text-blue-600" size={24} />
                                 </label>
@@ -437,7 +491,7 @@ const Checkout = () => {
                             </Button>
 
                             <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-                                <ShieldCheck size={12} /> Secure Payment by Razorpay
+                                <ShieldCheck size={12} /> Secure Payment
                             </p>
                         </div>
                     </div>
