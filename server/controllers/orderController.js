@@ -254,6 +254,9 @@ exports.updateOrderStatus = async (req, res) => {
             if (req.body.courierName) {
                 order.courierName = req.body.courierName;
             }
+            if (req.body.driverDetails) {
+                order.driverDetails = req.body.driverDetails;
+            }
             const updatedOrder = await order.save();
 
             // Send Status Update Email

@@ -128,6 +128,7 @@ const OrderTracking = () => {
             const foundOrder = getOrder(orderId);
             if (foundOrder) {
                 setOrder(foundOrder);
+                setSearchParams({ orderId });
                 setIsInitializing(false);
                 return;
             }

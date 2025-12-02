@@ -115,7 +115,7 @@ export const OrderProvider = ({ children }) => {
 
             if (response.ok) {
                 setOrders(prev => prev.map(order =>
-                    order._id === orderId ? data : order
+                    (order._id === orderId || order.id === orderId) ? data : order
                 ));
                 addToast('Order status updated', 'success');
             } else {
