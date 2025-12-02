@@ -25,7 +25,15 @@ const Admin = () => {
         updateDivineEssentialsSection,
         categories,
         addCategory,
-        removeCategory
+        removeCategory,
+        shubhAarambh,
+        updateShubhAarambh,
+        aromaticBliss,
+        updateAromaticBliss,
+        templeCorridor,
+        updateTempleCorridor,
+        royalTreasury,
+        updateRoyalTreasury
     } = useContent();
 
     const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories', 'users'
@@ -972,6 +980,339 @@ const Admin = () => {
                                             >
                                                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                                             </select>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Shubh Aarambh Section */}
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <div className="flex justify-between items-center mb-6 border-b pb-2">
+                                    <h2 className="text-2xl font-bold text-gray-800 font-serif">Shubh Aarambh (New Beginnings)</h2>
+                                    <Button onClick={() => {
+                                        const newItem = { title: 'New Item', img: '', link: '' };
+                                        updateShubhAarambh([...(shubhAarambh || []), newItem]);
+                                    }}>
+                                        <Plus size={16} className="mr-2" /> Add Item
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {shubhAarambh && shubhAarambh.map((item, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-3 relative group">
+                                            <button
+                                                onClick={() => {
+                                                    if (window.confirm('Delete this item?')) {
+                                                        const newList = shubhAarambh.filter((_, i) => i !== index);
+                                                        updateShubhAarambh(newList);
+                                                    }
+                                                }}
+                                                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-600 shadow-sm"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                            <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                    <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                        Change
+                                                        <input
+                                                            type="file"
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files[0];
+                                                                if (file) {
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => {
+                                                                        const newList = [...shubhAarambh];
+                                                                        newList[index] = { ...item, img: reader.result };
+                                                                        updateShubhAarambh(newList);
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <input
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const newList = [...shubhAarambh];
+                                                    newList[index] = { ...item, title: e.target.value };
+                                                    updateShubhAarambh(newList);
+                                                }}
+                                                className="w-full p-2 border rounded text-sm font-bold focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                placeholder="Title"
+                                            />
+                                            <input
+                                                value={item.link}
+                                                onChange={(e) => {
+                                                    const newList = [...shubhAarambh];
+                                                    newList[index] = { ...item, link: e.target.value };
+                                                    updateShubhAarambh(newList);
+                                                }}
+                                                className="w-full p-2 border rounded text-xs text-blue-500 focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                placeholder="Link (e.g. /shop)"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Aromatic Bliss Section */}
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Aromatic Bliss (Incense)</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                        <input
+                                            value={aromaticBliss?.title || ''}
+                                            onChange={(e) => updateAromaticBliss({ title: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                        <input
+                                            value={aromaticBliss?.subtitle || ''}
+                                            onChange={(e) => updateAromaticBliss({ subtitle: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                        <input
+                                            value={aromaticBliss?.bgImage || ''}
+                                            onChange={(e) => updateAromaticBliss({ bgImage: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="https://example.com/image.jpg"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-gray-700">Items</h3>
+                                    <Button onClick={() => {
+                                        const newItem = { title: 'New Scent', img: '', link: '' };
+                                        updateAromaticBliss({ items: [...(aromaticBliss?.items || []), newItem] });
+                                    }} size="sm">
+                                        <Plus size={16} className="mr-2" /> Add Scent
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {aromaticBliss?.items && aromaticBliss.items.map((item, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
+                                            <button
+                                                onClick={() => {
+                                                    if (window.confirm('Delete this item?')) {
+                                                        const newItems = aromaticBliss.items.filter((_, i) => i !== index);
+                                                        updateAromaticBliss({ items: newItems });
+                                                    }
+                                                }}
+                                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                            <input
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const newItems = [...aromaticBliss.items];
+                                                    newItems[index] = { ...item, title: e.target.value };
+                                                    updateAromaticBliss({ items: newItems });
+                                                }}
+                                                className="w-full p-1 border rounded text-sm font-bold"
+                                                placeholder="Scent Name"
+                                            />
+                                            {/* Color Picker or Icon could be added here, keeping it simple for now */}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Temple Corridor Section */}
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">The Temple Corridor (Dhoop)</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                        <input
+                                            value={templeCorridor?.title || ''}
+                                            onChange={(e) => updateTempleCorridor({ title: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                        <input
+                                            value={templeCorridor?.subtitle || ''}
+                                            onChange={(e) => updateTempleCorridor({ subtitle: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                        <input
+                                            value={templeCorridor?.bgImage || ''}
+                                            onChange={(e) => updateTempleCorridor({ bgImage: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="https://example.com/image.jpg"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-gray-700">Items</h3>
+                                    <Button onClick={() => {
+                                        const newItem = { title: 'New Dhoop', img: '', link: '' };
+                                        updateTempleCorridor({ items: [...(templeCorridor?.items || []), newItem] });
+                                    }} size="sm">
+                                        <Plus size={16} className="mr-2" /> Add Dhoop
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {templeCorridor?.items && templeCorridor.items.map((item, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
+                                            <button
+                                                onClick={() => {
+                                                    if (window.confirm('Delete this item?')) {
+                                                        const newItems = templeCorridor.items.filter((_, i) => i !== index);
+                                                        updateTempleCorridor({ items: newItems });
+                                                    }
+                                                }}
+                                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                            <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                    <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                        Change
+                                                        <input
+                                                            type="file"
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files[0];
+                                                                if (file) {
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => {
+                                                                        const newItems = [...templeCorridor.items];
+                                                                        newItems[index] = { ...item, img: reader.result };
+                                                                        updateTempleCorridor({ items: newItems });
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <input
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const newItems = [...templeCorridor.items];
+                                                    newItems[index] = { ...item, title: e.target.value };
+                                                    updateTempleCorridor({ items: newItems });
+                                                }}
+                                                className="w-full p-1 border rounded text-sm font-bold"
+                                                placeholder="Title"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Royal Treasury Section */}
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Royal Treasury (Lamps)</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                        <input
+                                            value={royalTreasury?.title || ''}
+                                            onChange={(e) => updateRoyalTreasury({ title: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                        <input
+                                            value={royalTreasury?.subtitle || ''}
+                                            onChange={(e) => updateRoyalTreasury({ subtitle: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                        <input
+                                            value={royalTreasury?.bgImage || ''}
+                                            onChange={(e) => updateRoyalTreasury({ bgImage: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="https://example.com/image.jpg"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-gray-700">Items</h3>
+                                    <Button onClick={() => {
+                                        const newItem = { title: 'New Lamp', img: '', link: '' };
+                                        updateRoyalTreasury({ items: [...(royalTreasury?.items || []), newItem] });
+                                    }} size="sm">
+                                        <Plus size={16} className="mr-2" /> Add Lamp
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {royalTreasury?.items && royalTreasury.items.map((item, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
+                                            <button
+                                                onClick={() => {
+                                                    if (window.confirm('Delete this item?')) {
+                                                        const newItems = royalTreasury.items.filter((_, i) => i !== index);
+                                                        updateRoyalTreasury({ items: newItems });
+                                                    }
+                                                }}
+                                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                            <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                    <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                        Change
+                                                        <input
+                                                            type="file"
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files[0];
+                                                                if (file) {
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => {
+                                                                        const newItems = [...royalTreasury.items];
+                                                                        newItems[index] = { ...item, img: reader.result };
+                                                                        updateRoyalTreasury({ items: newItems });
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <input
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const newItems = [...royalTreasury.items];
+                                                    newItems[index] = { ...item, title: e.target.value };
+                                                    updateRoyalTreasury({ items: newItems });
+                                                }}
+                                                className="w-full p-1 border rounded text-sm font-bold"
+                                                placeholder="Title"
+                                            />
                                         </div>
                                     ))}
                                 </div>

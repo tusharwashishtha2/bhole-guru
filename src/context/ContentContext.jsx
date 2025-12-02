@@ -27,21 +27,20 @@ export const ContentProvider = ({ children }) => {
         title: "Divine Favorites",
         subtitle: "Most loved by our devotees",
         bgImage: "",
-        bgColor: "bg-gradient-to-b from-white to-luminous-bg"
     });
     const [divineEssentials, setDivineEssentials] = useState({
         title: "Divine Essentials",
         subtitle: "",
         bgImage: "",
         bgColor: "bg-stone-900",
-        items: [
-            { id: 1, title: 'Rudraksha Beads', desc: 'Sacred Energy', img: 'https://images.unsplash.com/photo-1610450949247-91f862a9b34f?q=80&w=600&auto=format&fit=crop', link: '/shop' },
-            { id: 2, title: 'Copper Kalash', desc: 'Pure Water', img: 'https://images.unsplash.com/photo-1628842095268-33340052e540?q=80&w=600&auto=format&fit=crop', link: '/shop' },
-            { id: 3, title: 'Conch Shell', desc: 'Divine Sound', img: 'https://images.unsplash.com/photo-1596558284897-6a42a0438128?q=80&w=600&auto=format&fit=crop', link: '/shop' }
-        ]
+        items: []
     });
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [shubhAarambh, setShubhAarambh] = useState([]);
+    const [aromaticBliss, setAromaticBliss] = useState({});
+    const [templeCorridor, setTempleCorridor] = useState({});
+    const [royalTreasury, setRoyalTreasury] = useState({});
 
     const fetchContent = async () => {
         try {
@@ -53,7 +52,6 @@ export const ContentProvider = ({ children }) => {
                 if (Array.isArray(data.sacredOfferings)) setSacredOfferings(data.sacredOfferings);
                 if (data.divineFavorites) setDivineFavorites(data.divineFavorites);
                 if (data.divineEssentials) {
-                    // Handle migration from array to object if needed
                     if (Array.isArray(data.divineEssentials)) {
                         setDivineEssentials(prev => ({ ...prev, items: data.divineEssentials }));
                     } else {
@@ -61,6 +59,10 @@ export const ContentProvider = ({ children }) => {
                     }
                 }
                 if (Array.isArray(data.categories)) setCategories(data.categories);
+                if (data.shubhAarambh) setShubhAarambh(data.shubhAarambh);
+                if (data.aromaticBliss) setAromaticBliss(data.aromaticBliss);
+                if (data.templeCorridor) setTempleCorridor(data.templeCorridor);
+                if (data.royalTreasury) setRoyalTreasury(data.royalTreasury);
             }
             setLoading(false);
         } catch (error) {
@@ -90,7 +92,6 @@ export const ContentProvider = ({ children }) => {
                 if (data.heroSection) setHeroSection(data.heroSection);
                 if (data.sacredOfferings) setSacredOfferings(data.sacredOfferings);
                 if (data.divineFavorites) setDivineFavorites(data.divineFavorites);
-
                 if (data.divineEssentials) {
                     if (Array.isArray(data.divineEssentials)) {
                         setDivineEssentials(prev => ({ ...prev, items: data.divineEssentials }));
@@ -99,6 +100,10 @@ export const ContentProvider = ({ children }) => {
                     }
                 }
                 if (data.categories) setCategories(data.categories);
+                if (data.shubhAarambh) setShubhAarambh(data.shubhAarambh);
+                if (data.aromaticBliss) setAromaticBliss(data.aromaticBliss);
+                if (data.templeCorridor) setTempleCorridor(data.templeCorridor);
+                if (data.royalTreasury) setRoyalTreasury(data.royalTreasury);
 
                 addToast('Content updated successfully', 'success');
             } else {
@@ -159,6 +164,26 @@ export const ContentProvider = ({ children }) => {
         updateContent({ categories: updatedList });
     };
 
+    const updateShubhAarambh = async (newData) => {
+        setShubhAarambh(newData);
+        await updateContent({ shubhAarambh: newData });
+    };
+
+    const updateAromaticBliss = async (newData) => {
+        setAromaticBliss(prev => ({ ...prev, ...newData }));
+        await updateContent({ aromaticBliss: newData });
+    };
+
+    const updateTempleCorridor = async (newData) => {
+        setTempleCorridor(prev => ({ ...prev, ...newData }));
+        await updateContent({ templeCorridor: newData });
+    };
+
+    const updateRoyalTreasury = async (newData) => {
+        setRoyalTreasury(prev => ({ ...prev, ...newData }));
+        await updateContent({ royalTreasury: newData });
+    };
+
     return (
         <ContentContext.Provider value={{
             sacredOfferings, updateSacredOffering,
@@ -166,6 +191,10 @@ export const ContentProvider = ({ children }) => {
             divineFavorites, updateDivineFavorites,
             divineEssentials, updateDivineEssential, updateDivineEssentialsSection,
             categories, addCategory, removeCategory,
+            shubhAarambh, updateShubhAarambh,
+            aromaticBliss, updateAromaticBliss,
+            templeCorridor, updateTempleCorridor,
+            royalTreasury, updateRoyalTreasury,
             loading
         }}>
             {children}

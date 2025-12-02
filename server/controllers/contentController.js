@@ -37,6 +37,47 @@ const defaultContent = {
             { id: 15, title: 'Pure Ghee', link: '/shop?category=Havan', img: 'https://plus.unsplash.com/premium_photo-1664302152996-347e3667ef95?q=80&w=600', desc: 'Cow Ghee' },
             { id: 16, title: 'Loban & Guggal', link: '/shop?category=Incense', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600', desc: 'Energy Cleansing' },
         ]
+    },
+    shubhAarambh: [
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' },
+        { text: 'SHUBH AARAMBH • PURE & DIVINE • BHOLE GURU' }
+    ],
+    aromaticBliss: {
+        title: "Aromatic Bliss",
+        subtitle: "Immerse yourself in a symphony of divine fragrances.",
+        items: [
+            { name: 'Rose', color: '#FFB7B2', img: '' },
+            { name: 'Jasmine', color: '#FFFFFF', img: '' },
+            { name: 'Lavender', color: '#E6E6FA', img: '' },
+            { name: 'Mogra', color: '#F0FFF0', img: '' },
+            { name: 'Lotus', color: '#FFC0CB', img: '' },
+            { name: 'Marigold', color: '#FFA500', img: '' },
+            { name: 'Hibiscus', color: '#FF69B4', img: '' },
+            { name: 'Champa', color: '#FFFACD', img: '' }
+        ]
+    },
+    templeCorridor: {
+        title: "The Temple Corridor",
+        subtitle: "Walk through the path of purity. Ancient dhoop recipes for your sacred space.",
+        items: [
+            { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
+            { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
+            { title: 'Cow Dung', img: 'https://images.unsplash.com/photo-1618422386284-262225343735?q=80&w=600&auto=format&fit=crop' },
+            { title: 'Loban', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600&auto=format&fit=crop' },
+            { title: 'Chandan', img: 'https://images.unsplash.com/photo-1602526430780-782d6b17d382?q=80&w=600&auto=format&fit=crop' }
+        ]
+    },
+    royalTreasury: {
+        title: "Royal Treasury",
+        subtitle: "Premium selections for your home temple."
     }
 };
 
@@ -85,6 +126,10 @@ exports.updateContent = async (req, res) => {
             if (req.body.divineEssentials) content.divineEssentials = req.body.divineEssentials;
             if (req.body.categories) content.categories = req.body.categories;
             if (req.body.aboutSection) content.aboutSection = { ...content.aboutSection, ...req.body.aboutSection };
+            if (req.body.shubhAarambh) content.shubhAarambh = req.body.shubhAarambh;
+            if (req.body.aromaticBliss) content.aromaticBliss = req.body.aromaticBliss;
+            if (req.body.templeCorridor) content.templeCorridor = req.body.templeCorridor;
+            if (req.body.royalTreasury) content.royalTreasury = { ...content.royalTreasury, ...req.body.royalTreasury };
 
             await content.save();
         }

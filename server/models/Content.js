@@ -39,6 +39,30 @@ const contentSchema = mongoose.Schema({
         title: { type: String, default: "About Bhole Guru" },
         description: { type: String, default: "Your trusted source for authentic spiritual essentials." },
         image: { type: String, default: "" }
+    },
+    shubhAarambh: [{
+        text: { type: String }
+    }],
+    aromaticBliss: {
+        title: { type: String, default: "Aromatic Bliss" },
+        subtitle: { type: String, default: "Immerse yourself in a symphony of divine fragrances." },
+        items: [{
+            name: { type: String },
+            color: { type: String },
+            img: { type: String } // Replaces Icon
+        }]
+    },
+    templeCorridor: {
+        title: { type: String, default: "The Temple Corridor" },
+        subtitle: { type: String, default: "Walk through the path of purity. Ancient dhoop recipes for your sacred space." },
+        items: [{
+            title: { type: String },
+            img: { type: String }
+        }]
+    },
+    royalTreasury: {
+        title: { type: String, default: "Royal Treasury" },
+        subtitle: { type: String, default: "Premium selections for your home temple." }
     }
 }, {
     timestamps: true
