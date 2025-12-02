@@ -437,7 +437,7 @@ const Home = () => {
 
                     {/* Row 1: Floral Scents (Left to Right) */}
                     <div className="flex gap-6 animate-marquee whitespace-nowrap px-4 min-w-full shrink-0">
-                        {aromaticBlissRow1.map((scent, idx) => (
+                        {[...aromaticBlissRow1, ...aromaticBlissRow1, ...aromaticBlissRow1].map((scent, idx) => (
                             <Link to="/shop?category=Incense" key={`s1-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
                                 <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
                                     <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
@@ -454,7 +454,7 @@ const Home = () => {
 
                     {/* Row 2: Woody & Earthy Scents (Right to Left) */}
                     <div className="flex gap-6 animate-marquee-reverse whitespace-nowrap px-4 min-w-full shrink-0">
-                        {aromaticBlissRow2.map((scent, idx) => (
+                        {[...aromaticBlissRow2, ...aromaticBlissRow2, ...aromaticBlissRow2].map((scent, idx) => (
                             <Link to="/shop?category=Incense" key={`s2-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
                                 <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
                                     <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
