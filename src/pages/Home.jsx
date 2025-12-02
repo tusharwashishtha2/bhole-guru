@@ -62,6 +62,20 @@ const Home = () => {
     ];
     const templeCorridorItems = (templeCorridor?.items && templeCorridor.items.length > 0) ? templeCorridor.items : templeCorridorDefaults;
 
+    // Helper for Divine Essentials
+    const divineEssentialsDefaults = [
+        { id: 1, title: 'God Statues', link: '/shop?category=Idols', img: 'https://images.unsplash.com/photo-1567591414240-e136599d7f33?q=80&w=600', desc: 'Murti Sthapana' },
+        { id: 2, title: 'Hawan Kund', link: '/shop?category=Havan', img: 'https://images.unsplash.com/photo-1602524206684-fdf6393c7d89?q=80&w=600', desc: 'Sacred Fire' },
+        { id: 3, title: 'Jap Mala', link: '/shop?category=Pooja Essentials', img: 'https://images.unsplash.com/photo-1623935813721-f3f5d0131f35?q=80&w=600', desc: 'Mantra Chanting' },
+        { id: 4, title: 'Kalawa', link: '/shop?category=Sacred Threads', img: 'https://images.unsplash.com/photo-1633809616843-0803153a7d27?q=80&w=600', desc: 'Raksha Sutra' },
+        { id: 5, title: 'Janeu', link: '/shop?category=Sacred Threads', img: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?q=80&w=600', desc: 'Yagnopavit' },
+        { id: 6, title: 'Gomti Chakra', link: '/shop?category=Pooja Essentials', img: 'https://images.unsplash.com/photo-1606293926075-69a00febf280?q=80&w=600', desc: 'Wealth & Prosperity' },
+        { id: 7, title: 'Kodi', link: '/shop?category=Pooja Essentials', img: 'https://images.unsplash.com/photo-1596305589440-2e180399a760?q=80&w=600', desc: 'Laxmi Kripa' },
+        { id: 8, title: 'Hawan Samagri', link: '/shop?category=Havan', img: 'https://images.unsplash.com/photo-1602524206684-fdf6393c7d89?q=80&w=600', desc: 'Pure Herbs' },
+        { id: 9, title: 'Pooja Cloth', link: '/shop?category=Vastras', img: 'https://images.unsplash.com/photo-1616628188550-808d82f5a32c?q=80&w=600', desc: 'Red, White, Yellow' },
+    ];
+    const divineEssentialsItems = (divineEssentials?.items && divineEssentials.items.length > 0) ? divineEssentials.items : divineEssentialsDefaults;
+
     const royalTreasuryItems = (royalTreasury?.items && royalTreasury.items.length > 0)
         ? royalTreasury.items.map(item => ({
             id: item.title,
@@ -589,7 +603,7 @@ const Home = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
                         {
-                            divineEssentials.items && divineEssentials.items.map((item, index) => (
+                            divineEssentialsItems.map((item, index) => (
                                 <motion.div
                                     key={index}
                                     initial={{ opacity: 0, y: 50 }}
