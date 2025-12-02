@@ -47,7 +47,7 @@ const contentSchema = mongoose.Schema({
         title: { type: String, default: "Aromatic Bliss" },
         subtitle: { type: String, default: "Immerse yourself in a symphony of divine fragrances." },
         items: [{
-            name: { type: String },
+            title: { type: String },
             color: { type: String },
             img: { type: String } // Replaces Icon
         }]

@@ -19,6 +19,49 @@ const Home = () => {
     // Get top rated products for Royal Treasury
     const royalTreasuryProducts = products.filter(p => p.rating >= 4.8).slice(0, 5);
 
+    // Helper for Aromatic Bliss Split
+    const aromaticBlissDefaultsRow1 = [
+        { title: 'Rose', color: '#FFB7B2', icon: Flower },
+        { title: 'Jasmine', color: '#FFFFFF', icon: Star },
+        { title: 'Lavender', color: '#E6E6FA', icon: Wind },
+        { title: 'Mogra', color: '#F0FFF0', icon: Sun },
+        { title: 'Lotus', color: '#FFC0CB', icon: Flower },
+        { title: 'Marigold', color: '#FFA500', icon: Sun },
+        { title: 'Hibiscus', color: '#FF69B4', icon: Flower },
+        { title: 'Champa', color: '#FFFACD', icon: Star },
+    ];
+    const aromaticBlissDefaultsRow2 = [
+        { title: 'Sandalwood', color: '#D2B48C', icon: Wind },
+        { title: 'Musk', color: '#8B4513', icon: Star },
+        { title: 'Patchouli', color: '#DEB887', icon: Flower },
+        { title: 'Amber', color: '#FFBF00', icon: Sun },
+        { title: 'Frankincense', color: '#F5DEB3', icon: Wind },
+        { title: 'Myrrh', color: '#CD853F', icon: Star },
+        { title: 'Cedar', color: '#A0522D', icon: Flower },
+        { title: 'Oudh', color: '#5D4037', icon: Sun },
+    ];
+
+    let aromaticBlissRow1 = aromaticBlissDefaultsRow1;
+    let aromaticBlissRow2 = aromaticBlissDefaultsRow2;
+
+    if (aromaticBliss?.items && aromaticBliss.items.length > 0) {
+        const mid = Math.ceil(aromaticBliss.items.length / 2);
+        aromaticBlissRow1 = aromaticBliss.items.slice(0, mid);
+        aromaticBlissRow2 = aromaticBliss.items.slice(mid);
+        // If row 2 is empty (e.g. only 1 item), duplicate row 1 to keep animation balanced
+        if (aromaticBlissRow2.length === 0) aromaticBlissRow2 = aromaticBlissRow1;
+    }
+
+    // Helper for Temple Corridor
+    const templeCorridorDefaults = [
+        { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Cow Dung', img: 'https://images.unsplash.com/photo-1618422386284-262225343735?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Loban', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600&auto=format&fit=crop' },
+        { title: 'Chandan', img: 'https://images.unsplash.com/photo-1602526430780-782d6b17d382?q=80&w=600&auto=format&fit=crop' },
+    ];
+    const templeCorridorItems = (templeCorridor?.items && templeCorridor.items.length > 0) ? templeCorridor.items : templeCorridorDefaults;
+
     const royalTreasuryItems = (royalTreasury?.items && royalTreasury.items.length > 0)
         ? royalTreasury.items.map(item => ({
             id: item.title,
@@ -394,16 +437,7 @@ const Home = () => {
 
                     {/* Row 1: Floral Scents (Left to Right) */}
                     <div className="flex gap-6 animate-marquee whitespace-nowrap px-4 min-w-full shrink-0">
-                        {(aromaticBliss?.items && aromaticBliss.items.length > 0 ? aromaticBliss.items : [
-                            { title: 'Rose', color: '#FFB7B2', icon: Flower },
-                            { title: 'Jasmine', color: '#FFFFFF', icon: Star },
-                            { title: 'Lavender', color: '#E6E6FA', icon: Wind },
-                            { title: 'Mogra', color: '#F0FFF0', icon: Sun },
-                            { title: 'Lotus', color: '#FFC0CB', icon: Flower },
-                            { title: 'Marigold', color: '#FFA500', icon: Sun },
-                            { title: 'Hibiscus', color: '#FF69B4', icon: Flower },
-                            { title: 'Champa', color: '#FFFACD', icon: Star },
-                        ]).map((scent, idx) => (
+                        {aromaticBlissRow1.map((scent, idx) => (
                             <Link to="/shop?category=Incense" key={`s1-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
                                 <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
                                     <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
@@ -413,6 +447,21 @@ const Home = () => {
                                     </div>
                                     {/* Smoke Effect on Hover */}
                                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-gray-200 blur-2xl opacity-0 group-hover/scent:opacity-40 transition-opacity duration-700 animate-pulse"></div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Row 2: Woody & Earthy Scents (Right to Left) */}
+                    <div className="flex gap-6 animate-marquee-reverse whitespace-nowrap px-4 min-w-full shrink-0">
+                        {aromaticBlissRow2.map((scent, idx) => (
+                            <Link to="/shop?category=Incense" key={`s2-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
+                                <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
+                                    <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
+                                    <div className="relative z-10 flex items-center gap-3">
+                                        {scent.icon ? <scent.icon className="text-luminous-maroon" size={24} /> : <Flower className="text-luminous-maroon" size={24} />}
+                                        <span className="text-xl font-display font-bold text-luminous-maroon">{scent.title}</span>
+                                    </div>
                                 </div>
                             </Link>
                         ))}
@@ -444,14 +493,45 @@ const Home = () => {
                 <div className="relative w-full flex overflow-hidden z-20 py-12">
                     {/* Track 1 */}
                     <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] will-change-transform">
-                        {(templeCorridor?.items && templeCorridor.items.length > 0 ? templeCorridor.items : [
-                            { title: 'Sambrani', img: 'https://images.unsplash.com/photo-1615486368197-081e578ee90c?q=80&w=600&auto=format&fit=crop' },
-                            { title: 'Guggal', img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop' },
-                            { title: 'Cow Dung', img: 'https://images.unsplash.com/photo-1618422386284-262225343735?q=80&w=600&auto=format&fit=crop' },
-                            { title: 'Loban', img: 'https://images.unsplash.com/photo-1602607202643-92236a53285a?q=80&w=600&auto=format&fit=crop' },
-                            { title: 'Chandan', img: 'https://images.unsplash.com/photo-1602526430780-782d6b17d382?q=80&w=600&auto=format&fit=crop' },
-                        ]).map((item, idx) => (
+                        {templeCorridorItems.map((item, idx) => (
                             <Link to="/shop?category=Incense" key={`c1-${idx}`} className="flex items-end mx-4">
+                                {/* The Pillar */}
+                                <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
+                                    <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">
+                                        <Sun className="text-luminous-gold animate-spin-slow" size={20} />
+                                    </div>
+                                    <div className="w-[1px] h-full bg-luminous-gold/20"></div>
+                                </div>
+
+                                {/* The Pedestal & Product */}
+                                <div className="w-64 md:w-80 mx-4 relative group/item cursor-pointer">
+                                    {/* Product Image on Pedestal */}
+                                    <div className="relative h-72 w-full rounded-t-full overflow-hidden border-4 border-luminous-gold/20 group-hover/item:border-luminous-gold transition-all duration-500 shadow-[0_0_30px_rgba(212,175,55,0.1)] group-hover/item:shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-black">
+                                        <img
+                                            src={item.img}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity duration-500 group-hover/item:scale-110"
+                                            loading="eager"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+
+                                        {/* Title Overlay */}
+                                        <div className="absolute bottom-4 left-0 w-full text-center">
+                                            <h3 className="text-2xl font-display font-bold text-luminous-gold tracking-wider">{item.title}</h3>
+                                        </div>
+                                    </div>
+
+                                    {/* The Stone Pedestal Base */}
+                                    <div className="h-12 w-full bg-gradient-to-b from-luminous-gold to-luminous-maroon border-t-4 border-luminous-gold/40 transform perspective-[500px] rotateX(10deg) shadow-lg"></div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Track 2 (Duplicate for Seamless Loop) */}
+                    <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] will-change-transform" aria-hidden="true">
+                        {templeCorridorItems.map((item, idx) => (
+                            <Link to="/shop?category=Incense" key={`c2-${idx}`} className="flex items-end mx-4">
                                 {/* The Pillar */}
                                 <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
                                     <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">
