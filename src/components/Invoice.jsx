@@ -119,7 +119,7 @@ const Invoice = forwardRef(({ order }, ref) => {
                 <p className="text-luminous-maroon font-serif font-bold text-lg mb-2">Thank you for your business!</p>
                 <p className="text-gray-500 text-xs">
                     If you have any questions about this invoice, please contact<br />
-                    support@bholeguru.com
+                    +91 70003 08463
                 </p>
             </div>
         </div>

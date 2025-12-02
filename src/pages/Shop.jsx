@@ -3,10 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, ChevronDown, Search, SlidersHorizontal, X, Sparkles, ArrowUpDown } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
 import { useContent } from '../context/ContentContext';
+import { useProduct } from '../context/ProductContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
-    const [products, setProducts] = useState([]);
+    const { products: allProducts, loading: contextLoading } = useProduct();
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const { categories: dynamicCategories } = useContent();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -22,53 +24,64 @@ const Shop = () => {
     const categories = ['All', ...dynamicCategories];
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : 'https://bhole-guru.onrender.com'));
-                let url = `${API_URL}/api/products?`;
+        if (contextLoading) return;
+        setLoading(true);
 
-                if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
-                    url += `category=${selectedCategories[0]}&`;
-                }
-                if (searchQuery) {
-                    url += `search=${searchQuery}&`;
-                }
-                if (sortBy) {
-                    url += `sort=${sortBy}&`;
-                }
+        let result = [...allProducts];
 
-                const response = await fetch(url);
-                const data = await response.json();
+        // 1. Filter by Category
+        if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
+            result = result.filter(p => selectedCategories.includes(p.category));
+        }
 
-                let filtered = data;
-                if (selectedPriceRanges.length > 0) {
-                    filtered = data.filter(product => {
-                        const price = product.price;
-                        return selectedPriceRanges.some(range => {
-                            if (range === 'under-200') return price < 200;
-                            if (range === '200-500') return price >= 200 && price <= 500;
-                            if (range === '500-1000') return price > 500 && price <= 1000;
-                            if (range === 'above-1000') return price > 1000;
-                            return false;
-                        });
-                    });
-                }
-                setProducts(filtered);
-            } catch (error) {
-                console.error("Failed to fetch products", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        // 2. Filter by Search Query
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            result = result.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.description?.toLowerCase().includes(query) ||
+                p.category?.toLowerCase().includes(query)
+            );
+        }
 
-        // Debounce only for search query
-        const timeoutId = setTimeout(() => {
-            fetchProducts();
-        }, searchQuery ? 500 : 0);
+        // 3. Filter by Price Range
+        if (selectedPriceRanges.length > 0) {
+            result = result.filter(product => {
+                const price = product.price;
+                return selectedPriceRanges.some(range => {
+                    if (range === 'under-200') return price < 200;
+                    if (range === '200-500') return price >= 200 && price <= 500;
+                    if (range === '500-1000') return price > 500 && price <= 1000;
+                    if (range === 'above-1000') return price > 1000;
+                    return false;
+                });
+            });
+        }
 
-        return () => clearTimeout(timeoutId);
-    }, [selectedCategories, searchQuery, sortBy, selectedPriceRanges]);
+        // 4. Sort
+        switch (sortBy) {
+            case 'price-low-high':
+                result.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-high-low':
+                result.sort((a, b) => b.price - a.price);
+                break;
+            case 'rating':
+                result.sort((a, b) => b.rating - a.rating);
+                break;
+            case 'newest':
+                result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'featured':
+            default:
+                // Keep original order or specific logic
+                break;
+        }
+
+        setFilteredProducts(result);
+        setLoading(false);
+
+    }, [allProducts, contextLoading, selectedCategories, searchQuery, sortBy, selectedPriceRanges]);
 
     useEffect(() => {
         const categoryParam = searchParams.get('category');
@@ -103,7 +116,7 @@ const Shop = () => {
         setSearchParams({});
     };
 
-    const filteredProducts = products; // Already filtered by effect
+
 
     return (
         <div className="bg-luminous-bg dark:bg-stone-950 min-h-screen pt-20 font-sans text-luminous-text dark:text-stone-100 relative overflow-hidden transition-colors duration-300">

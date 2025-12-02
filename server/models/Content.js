@@ -15,15 +15,23 @@ const contentSchema = mongoose.Schema({
     }],
     divineFavorites: {
         title: { type: String, default: "Divine Favorites" },
-        subtitle: { type: String, default: "Most loved by our devotees" }
+        subtitle: { type: String, default: "Most loved by our devotees" },
+        bgImage: { type: String, default: "" },
+        bgColor: { type: String, default: "" }
     },
-    divineEssentials: [{
-        id: { type: Number },
-        title: { type: String },
-        link: { type: String },
-        img: { type: String },
-        desc: { type: String }
-    }],
+    divineEssentials: {
+        title: { type: String, default: "Divine Essentials" },
+        subtitle: { type: String, default: "Curated for your daily worship" },
+        bgImage: { type: String, default: "" },
+        bgColor: { type: String, default: "" },
+        items: [{
+            id: { type: Number },
+            title: { type: String },
+            link: { type: String },
+            img: { type: String },
+            desc: { type: String }
+        }]
+    },
     categories: [{
         type: String
     }],

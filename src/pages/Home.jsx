@@ -32,7 +32,7 @@ const Home = () => {
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.6 }}
                         className="relative z-20 mt-4 md:mt-0"
                     >
                         {/* Badge */}
@@ -52,7 +52,7 @@ const Home = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
                         className="relative z-20 mb-8 md:mb-0"
                     >
                         {/* Description */}
@@ -104,7 +104,11 @@ const Home = () => {
 
 
             {/* --- DIVINE FAVORITES (BESTSELLERS) --- */}
-            <section className="py-20 relative overflow-hidden bg-gradient-to-b from-white to-luminous-bg">
+            <section
+                className={`py-20 relative overflow-hidden ${divineFavorites.bgColor || 'bg-gradient-to-b from-white to-luminous-bg'}`}
+                style={divineFavorites.bgImage ? { backgroundImage: `url(${divineFavorites.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+            >
+                {divineFavorites.bgImage && <div className="absolute inset-0 bg-white/80 z-0"></div>}
                 {/* Decorative Background Elements */}
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-luminous-gold/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -545,23 +549,28 @@ const Home = () => {
             </section>
 
             {/* --- DIVINE ESSENTIALS --- */}
-            <section className="py-20 relative bg-stone-900 text-white overflow-hidden">
+            <section
+                className={`py-20 relative overflow-hidden ${divineEssentials.bgColor || 'bg-stone-900'} text-white`}
+                style={divineEssentials.bgImage ? { backgroundImage: `url(${divineEssentials.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+            >
+                {divineEssentials.bgImage && <div className="absolute inset-0 bg-black/60 z-0"></div>}
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-gold mb-4">Divine Essentials</h2>
+                        <h2 className="text-4xl md:text-6xl font-display font-bold text-luminous-gold mb-4">{divineEssentials.title || "Divine Essentials"}</h2>
                         <div className="w-24 h-1 bg-luminous-gold mx-auto"></div>
+                        {divineEssentials.subtitle && <p className="text-gray-300 mt-4 text-lg">{divineEssentials.subtitle}</p>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
                         {
-                            divineEssentials.map((item, index) => (
+                            divineEssentials.items && divineEssentials.items.map((item, index) => (
                                 <motion.div
                                     key={index}
                                     initial={{ opacity: 0, y: 50 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    transition={{ duration: 0.6, delay: index * 0.05 }}
+                                    viewport={{ once: true, margin: "-20px" }}
+                                    transition={{ duration: 0.4, delay: index * 0.05 }}
                                 >
                                     <div className="h-full">
                                         <Link to={item.link} className="group block relative h-80 rounded-[2rem] overflow-hidden border border-luminous-gold/30 bg-black/40 backdrop-blur-sm shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:border-luminous-gold transition-all duration-500">

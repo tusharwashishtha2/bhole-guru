@@ -22,6 +22,7 @@ const Admin = () => {
         updateDivineFavorites,
         divineEssentials,
         updateDivineEssential,
+        updateDivineEssentialsSection,
         categories,
         addCategory,
         removeCategory
@@ -802,7 +803,7 @@ const Admin = () => {
                             {/* Divine Favorites */}
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                                 <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Divine Favorites Section</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
                                         <input
@@ -820,13 +821,72 @@ const Admin = () => {
                                         />
                                     </div>
                                 </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                        <input
+                                            value={divineFavorites.bgImage || ''}
+                                            onChange={(e) => updateDivineFavorites({ bgImage: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="https://example.com/image.jpg"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Color Class</label>
+                                        <input
+                                            value={divineFavorites.bgColor || ''}
+                                            onChange={(e) => updateDivineFavorites({ bgColor: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="e.g. bg-stone-900"
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Divine Essentials */}
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                                 <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Divine Essentials</h2>
+
+                                {/* Section Settings */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                        <input
+                                            value={divineEssentials.title || ''}
+                                            onChange={(e) => updateDivineEssentialsSection({ title: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                        <input
+                                            value={divineEssentials.subtitle || ''}
+                                            onChange={(e) => updateDivineEssentialsSection({ subtitle: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                        <input
+                                            value={divineEssentials.bgImage || ''}
+                                            onChange={(e) => updateDivineEssentialsSection({ bgImage: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="https://example.com/image.jpg"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Color Class</label>
+                                        <input
+                                            value={divineEssentials.bgColor || ''}
+                                            onChange={(e) => updateDivineEssentialsSection({ bgColor: e.target.value })}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                            placeholder="e.g. bg-stone-900"
+                                        />
+                                    </div>
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {divineEssentials.map((item) => (
+                                    {divineEssentials.items && divineEssentials.items.map((item) => (
                                         <div key={item.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
                                             <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group">
                                                 <img src={item.img} alt={item.title} className="w-full h-full object-cover" />

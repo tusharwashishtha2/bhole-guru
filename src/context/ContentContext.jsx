@@ -25,13 +25,21 @@ export const ContentProvider = ({ children }) => {
     ]);
     const [divineFavorites, setDivineFavorites] = useState({
         title: "Divine Favorites",
-        subtitle: "Most loved by our devotees"
+        subtitle: "Most loved by our devotees",
+        bgImage: "",
+        bgColor: "bg-gradient-to-b from-white to-luminous-bg"
     });
-    const [divineEssentials, setDivineEssentials] = useState([
-        { id: 1, title: 'Rudraksha Beads', desc: 'Sacred Energy', img: 'https://images.unsplash.com/photo-1610450949247-91f862a9b34f?q=80&w=600&auto=format&fit=crop', link: '/shop' },
-        { id: 2, title: 'Copper Kalash', desc: 'Pure Water', img: 'https://images.unsplash.com/photo-1628842095268-33340052e540?q=80&w=600&auto=format&fit=crop', link: '/shop' },
-        { id: 3, title: 'Conch Shell', desc: 'Divine Sound', img: 'https://images.unsplash.com/photo-1596558284897-6a42a0438128?q=80&w=600&auto=format&fit=crop', link: '/shop' }
-    ]);
+    const [divineEssentials, setDivineEssentials] = useState({
+        title: "Divine Essentials",
+        subtitle: "",
+        bgImage: "",
+        bgColor: "bg-stone-900",
+        items: [
+            { id: 1, title: 'Rudraksha Beads', desc: 'Sacred Energy', img: 'https://images.unsplash.com/photo-1610450949247-91f862a9b34f?q=80&w=600&auto=format&fit=crop', link: '/shop' },
+            { id: 2, title: 'Copper Kalash', desc: 'Pure Water', img: 'https://images.unsplash.com/photo-1628842095268-33340052e540?q=80&w=600&auto=format&fit=crop', link: '/shop' },
+            { id: 3, title: 'Conch Shell', desc: 'Divine Sound', img: 'https://images.unsplash.com/photo-1596558284897-6a42a0438128?q=80&w=600&auto=format&fit=crop', link: '/shop' }
+        ]
+    });
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -44,7 +52,14 @@ export const ContentProvider = ({ children }) => {
                 if (data.heroSection) setHeroSection(data.heroSection);
                 if (Array.isArray(data.sacredOfferings)) setSacredOfferings(data.sacredOfferings);
                 if (data.divineFavorites) setDivineFavorites(data.divineFavorites);
-                if (Array.isArray(data.divineEssentials)) setDivineEssentials(data.divineEssentials);
+                if (data.divineEssentials) {
+                    // Handle migration from array to object if needed
+                    if (Array.isArray(data.divineEssentials)) {
+                        setDivineEssentials(prev => ({ ...prev, items: data.divineEssentials }));
+                    } else {
+                        setDivineEssentials(data.divineEssentials);
+                    }
+                }
                 if (Array.isArray(data.categories)) setCategories(data.categories);
             }
             setLoading(false);
@@ -75,7 +90,14 @@ export const ContentProvider = ({ children }) => {
                 if (data.heroSection) setHeroSection(data.heroSection);
                 if (data.sacredOfferings) setSacredOfferings(data.sacredOfferings);
                 if (data.divineFavorites) setDivineFavorites(data.divineFavorites);
-                if (data.divineEssentials) setDivineEssentials(data.divineEssentials);
+
+                if (data.divineEssentials) {
+                    if (Array.isArray(data.divineEssentials)) {
+                        setDivineEssentials(prev => ({ ...prev, items: data.divineEssentials }));
+                    } else {
+                        setDivineEssentials(data.divineEssentials);
+                    }
+                }
                 if (data.categories) setCategories(data.categories);
 
                 addToast('Content updated successfully', 'success');
@@ -109,11 +131,18 @@ export const ContentProvider = ({ children }) => {
     };
 
     const updateDivineEssential = (id, updatedFields) => {
-        const updatedList = divineEssentials.map(item =>
+        const updatedItems = divineEssentials.items.map(item =>
             item.id === id ? { ...item, ...updatedFields } : item
         );
-        setDivineEssentials(updatedList); // Optimistic update
-        updateContent({ divineEssentials: updatedList });
+        const updatedSection = { ...divineEssentials, items: updatedItems };
+        setDivineEssentials(updatedSection); // Optimistic update
+        updateContent({ divineEssentials: updatedSection });
+    };
+
+    const updateDivineEssentialsSection = (updatedFields) => {
+        const updatedSection = { ...divineEssentials, ...updatedFields };
+        setDivineEssentials(updatedSection);
+        updateContent({ divineEssentials: updatedSection });
     };
 
     const addCategory = (newCategory) => {
@@ -135,7 +164,7 @@ export const ContentProvider = ({ children }) => {
             sacredOfferings, updateSacredOffering,
             heroSection, updateHeroSection,
             divineFavorites, updateDivineFavorites,
-            divineEssentials, updateDivineEssential,
+            divineEssentials, updateDivineEssential, updateDivineEssentialsSection,
             categories, addCategory, removeCategory,
             loading
         }}>

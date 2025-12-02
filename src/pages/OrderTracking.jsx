@@ -150,14 +150,26 @@ const OrderTracking = () => {
         fetchOrderDetails();
     }, [searchParams, currentOrderId, getOrder, orders, setSearchParams]);
 
+    const [showDeliveredPopup, setShowDeliveredPopup] = useState(false);
+    const [isDeliveredView, setIsDeliveredView] = useState(false);
+
     useEffect(() => {
         const hasSeen = localStorage.getItem(`seen_delivered_${order?._id}`);
-        if (order?.status === 'Delivered' && !hasSeen && user?.role !== 'admin') {
-            setShowDeliveredPopup(true);
-            triggerConfetti();
-            localStorage.setItem(`seen_delivered_${order?._id}`, 'true');
+        if (order?.status === 'Delivered') {
+            if (!hasSeen && user?.role !== 'admin') {
+                setShowDeliveredPopup(true);
+                triggerConfetti();
+            } else {
+                setIsDeliveredView(true);
+            }
         }
     }, [order?.status, order?._id, user?.role]);
+
+    const handleClosePopup = () => {
+        setShowDeliveredPopup(false);
+        localStorage.setItem(`seen_delivered_${order?._id}`, 'true');
+        setIsDeliveredView(true);
+    };
 
     // Handle loading or no order state
     if (loading && !order) {
@@ -205,6 +217,9 @@ const OrderTracking = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 relative overflow-hidden">
+            {/* Delivered View - No Live Tracking */}
+
+
             {/* Delivered Popup */}
             <AnimatePresence>
                 {showDeliveredPopup && (
@@ -216,7 +231,7 @@ const OrderTracking = () => {
                             className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center relative"
                         >
                             <button
-                                onClick={() => setShowDeliveredPopup(false)}
+                                onClick={handleClosePopup}
                                 className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
                             >
                                 <X size={24} />
@@ -228,7 +243,7 @@ const OrderTracking = () => {
                             <p className="text-gray-500 mb-6">
                                 Your package has been successfully delivered. Thank you for shopping with Bhole Guru!
                             </p>
-                            <Button onClick={() => setShowDeliveredPopup(false)} className="w-full">
+                            <Button onClick={handleClosePopup} className="w-full">
                                 Awesome!
                             </Button>
                         </motion.div>
@@ -274,153 +289,171 @@ const OrderTracking = () => {
             </div>
 
             <div className="container mx-auto px-4 pt-32 relative z-10">
-                <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 max-w-3xl mx-auto border border-white/20 ring-1 ring-white/50">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-serif font-bold text-gray-900">
-                                {getStatusTitle(order.status)}
-                            </h1>
-                            <p className="text-gray-500">Order #{order.id || order._id}</p>
-                            {order.trackingNumber && (
-                                <p className="text-luminous-maroon font-bold mt-1">Tracking ID: {order.trackingNumber}</p>
-                            )}
+                {isDeliveredView ? (
+                    <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-12 max-w-2xl mx-auto border border-white/20 ring-1 ring-white/50 text-center">
+                        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-slow">
+                            <CheckCircle size={48} className="text-green-600" />
                         </div>
-                        <div className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 self-start md:self-auto ${statusStep === 4 ? 'bg-green-100 text-green-700' : isCancelled ? 'bg-red-100 text-red-700' : 'bg-luminous-gold/10 text-luminous-maroon'}`}>
-                            <span className={`w-2 h-2 rounded-full ${statusStep === 4 ? 'bg-green-500' : isCancelled ? 'bg-red-500' : 'bg-luminous-maroon animate-pulse'}`}></span>
-                            {order.status}
+                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Order Delivered</h1>
+                        <p className="text-gray-500 text-lg mb-8 max-w-md mx-auto">
+                            Your package has been successfully delivered. We hope it brings peace and prosperity to your home.
+                        </p>
+                        <div className="flex flex-col sm:flex-row justify-center gap-4">
+                            <Button to="/shop" variant="primary" className="px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all">
+                                Shop Again
+                            </Button>
+                            <Button to="/contact" variant="outline" className="px-8 py-3 rounded-full border-2">
+                                Need Support?
+                            </Button>
                         </div>
                     </div>
-
-                    {/* Progress Bar */}
-                    {!isCancelled ? (
-                        <div className="relative mb-12 px-2">
-                            <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full"></div>
-                            <div
-                                className="absolute top-1/2 left-0 h-1 bg-green-500 -translate-y-1/2 rounded-full transition-all duration-1000"
-                                style={{ width: `${(statusStep / (steps.length - 1)) * 100}%` }}
-                            ></div>
-
-                            <div className="flex justify-between relative z-10">
-                                {Array.isArray(steps) && steps.map((step, index) => {
-                                    const Icon = step.icon;
-                                    const isActive = index <= statusStep;
-                                    const time = getTimeForStatus(step.statusKey);
-
-                                    return (
-                                        <div key={index} className="flex flex-col items-center gap-2">
-                                            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-green-500 text-white scale-110 shadow-lg' : 'bg-gray-100 text-gray-400'}`}>
-                                                <Icon size={16} className="md:w-5 md:h-5" />
-                                            </div>
-                                            <div className="text-center hidden sm:block">
-                                                <p className={`text-xs font-bold ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>{step.label}</p>
-                                                <p className="text-[10px] text-gray-400 min-h-[15px]">{time || (isActive ? 'Processing...' : '')}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-center">
-                            <h3 className="text-red-800 font-bold text-lg mb-2">This order has been cancelled</h3>
-                            <p className="text-red-600">If you have any questions, please contact our support team.</p>
-                        </div>
-                    )}
-
-                    {/* Driver Details Card */}
-                    {order.driverDetails?.name && statusStep >= 3 && (
-                        <div className="bg-gradient-to-r from-luminous-gold/10 to-luminous-maroon/5 border border-luminous-gold/20 rounded-xl p-4 mb-8 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                                    <img
-                                        src={order.driverDetails.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
-                                        alt={order.driverDetails.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-900">{order.driverDetails.name}</h3>
-                                    <p className="text-xs text-gray-500">Delivery Partner • {order.driverDetails.phone}</p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Status</p>
-                                <p className="text-xl font-bold text-luminous-maroon">{order.status}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Delivery Partner Info & Actions */}
-                    <div className="border-t border-gray-100 pt-8 flex flex-col lg:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-4 w-full lg:w-auto">
-                            <div className="w-16 h-16 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400 shadow-sm">
-                                {order.courierName ? <Truck size={32} /> : <Package size={32} />}
-                            </div>
+                ) : (
+                    <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 max-w-3xl mx-auto border border-white/20 ring-1 ring-white/50">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                             <div>
-                                <h3 className="font-bold text-lg text-gray-900">{order.courierName || 'Pending Assignment'}</h3>
-                                <p className="text-gray-500 text-sm">Courier Partner</p>
+                                <h1 className="text-2xl md:text-3xl font-serif font-bold text-gray-900">
+                                    {getStatusTitle(order.status)}
+                                </h1>
+                                <p className="text-gray-500">Order #{order.id || order._id}</p>
                                 {order.trackingNumber && (
-                                    <div className="flex items-center text-luminous-maroon text-sm mt-1 bg-luminous-gold/10 px-2 py-1 rounded-md inline-block">
-                                        <span className="font-bold">{order.trackingNumber}</span>
-                                    </div>
+                                    <p className="text-luminous-maroon font-bold mt-1">Tracking ID: {order.trackingNumber}</p>
                                 )}
                             </div>
+                            <div className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 self-start md:self-auto ${statusStep === 4 ? 'bg-green-100 text-green-700' : isCancelled ? 'bg-red-100 text-red-700' : 'bg-luminous-gold/10 text-luminous-maroon'}`}>
+                                <span className={`w-2 h-2 rounded-full ${statusStep === 4 ? 'bg-green-500' : isCancelled ? 'bg-red-500' : 'bg-luminous-maroon animate-pulse'}`}></span>
+                                {order.status}
+                            </div>
                         </div>
 
-                        <div className="flex flex-wrap justify-center lg:justify-end gap-3 w-full lg:w-auto">
-                            <a
-                                href="tel:+917000308463"
-                                className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-semibold text-gray-700 shadow-sm"
-                            >
-                                <Phone size={18} /> Call Support
-                            </a>
+                        {/* Progress Bar */}
+                        {!isCancelled ? (
+                            <div className="relative mb-12 px-2">
+                                <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full"></div>
+                                <div
+                                    className="absolute top-1/2 left-0 h-1 bg-green-500 -translate-y-1/2 rounded-full transition-all duration-1000"
+                                    style={{ width: `${(statusStep / (steps.length - 1)) * 100}%` }}
+                                ></div>
 
-                            {order.status === 'Processing' && (
-                                <button
-                                    className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 transition-all font-semibold shadow-sm"
-                                    onClick={async () => {
-                                        if (window.confirm('Are you sure you want to cancel this order?')) {
-                                            await cancelOrder(order._id || order.id);
-                                        }
-                                    }}
+                                <div className="flex justify-between relative z-10">
+                                    {Array.isArray(steps) && steps.map((step, index) => {
+                                        const Icon = step.icon;
+                                        const isActive = index <= statusStep;
+                                        const time = getTimeForStatus(step.statusKey);
+
+                                        return (
+                                            <div key={index} className="flex flex-col items-center gap-2">
+                                                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-green-500 text-white scale-110 shadow-lg' : 'bg-gray-100 text-gray-400'}`}>
+                                                    <Icon size={16} className="md:w-5 md:h-5" />
+                                                </div>
+                                                <div className="text-center hidden sm:block">
+                                                    <p className={`text-xs font-bold ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>{step.label}</p>
+                                                    <p className="text-[10px] text-gray-400 min-h-[15px]">{time || (isActive ? 'Processing...' : '')}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-center">
+                                <h3 className="text-red-800 font-bold text-lg mb-2">This order has been cancelled</h3>
+                                <p className="text-red-600">If you have any questions, please contact our support team.</p>
+                            </div>
+                        )}
+
+                        {/* Driver Details Card */}
+                        {order.driverDetails?.name && statusStep >= 3 && (
+                            <div className="bg-gradient-to-r from-luminous-gold/10 to-luminous-maroon/5 border border-luminous-gold/20 rounded-xl p-4 mb-8 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                                        <img
+                                            src={order.driverDetails.image || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+                                            alt={order.driverDetails.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900">{order.driverDetails.name}</h3>
+                                        <p className="text-xs text-gray-500">Delivery Partner • {order.driverDetails.phone}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Status</p>
+                                    <p className="text-xl font-bold text-luminous-maroon">{order.status}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Delivery Partner Info & Actions */}
+                        <div className="border-t border-gray-100 pt-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4 w-full lg:w-auto">
+                                <div className="w-16 h-16 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400 shadow-sm">
+                                    {order.courierName ? <Truck size={32} /> : <Package size={32} />}
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg text-gray-900">{order.courierName || 'Pending Assignment'}</h3>
+                                    <p className="text-gray-500 text-sm">Courier Partner</p>
+                                    {order.trackingNumber && (
+                                        <div className="flex items-center text-luminous-maroon text-sm mt-1 bg-luminous-gold/10 px-2 py-1 rounded-md inline-block">
+                                            <span className="font-bold">{order.trackingNumber}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap justify-center lg:justify-end gap-3 w-full lg:w-auto">
+                                <a
+                                    href="tel:+917000308463"
+                                    className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-semibold text-gray-700 shadow-sm"
                                 >
-                                    <X size={18} /> Cancel Order
-                                </button>
-                            )}
+                                    <Phone size={18} /> Call Support
+                                </a>
 
-                            <Link
-                                to="/"
-                                className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 bg-luminous-maroon text-white rounded-xl hover:bg-luminous-maroon/90 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                {order.status === 'Processing' && (
+                                    <button
+                                        className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 transition-all font-semibold shadow-sm"
+                                        onClick={async () => {
+                                            if (window.confirm('Are you sure you want to cancel this order?')) {
+                                                await cancelOrder(order._id || order.id);
+                                            }
+                                        }}
+                                    >
+                                        <X size={18} /> Cancel Order
+                                    </button>
+                                )}
+
+                                <Link
+                                    to="/"
+                                    className="flex-1 sm:flex-none min-w-[140px] flex items-center justify-center gap-2 px-4 py-2.5 bg-luminous-maroon text-white rounded-xl hover:bg-luminous-maroon/90 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                >
+                                    Back to Home
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Invoice Download Button */}
+                        <div className="mt-8 flex justify-center border-t border-gray-100 pt-6">
+                            <button
+                                onClick={handleDownloadInvoice}
+                                disabled={isGeneratingInvoice}
+                                className="group flex items-center gap-2 text-gray-500 hover:text-luminous-maroon transition-colors text-sm font-medium px-4 py-2 rounded-lg hover:bg-luminous-gold/5"
                             >
-                                Back to Home
-                            </Link>
+                                <Download size={16} className="group-hover:scale-110 transition-transform" />
+                                {isGeneratingInvoice ? 'Generating Invoice...' : 'Download Invoice'}
+                            </button>
                         </div>
                     </div>
+                )}
+            </div>      {/* Hidden Invoice Component for PDF Generation - Fixed Width */}
+            <div style={{ position: 'fixed', top: '0', left: '-9999px', width: '794px' }}>
+                <Invoice ref={invoiceRef} order={order} />
+            </div>
 
-                    {/* Invoice Download Button */}
-                    <div className="mt-8 flex justify-center border-t border-gray-100 pt-6">
-                        <button
-                            onClick={handleDownloadInvoice}
-                            disabled={isGeneratingInvoice}
-                            className="group flex items-center gap-2 text-gray-500 hover:text-luminous-maroon transition-colors text-sm font-medium px-4 py-2 rounded-lg hover:bg-luminous-gold/5"
-                        >
-                            <Download size={16} className="group-hover:scale-110 transition-transform" />
-                            {isGeneratingInvoice ? 'Generating Invoice...' : 'Download Invoice'}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Hidden Invoice Component for PDF Generation - Fixed Width */}
-                <div style={{ position: 'fixed', top: '0', left: '-9999px', width: '794px' }}>
-                    <Invoice ref={invoiceRef} order={order} />
-                </div>
-
-                {/* Continue Shopping Promo */}
-                <div className="mt-8 text-center relative z-10">
-                    <Link to="/shop" className="inline-flex items-center text-white hover:text-luminous-gold font-medium transition-colors">
-                        Continue Shopping <ArrowRight size={18} className="ml-2" />
-                    </Link>
-                </div>
+            {/* Continue Shopping Promo */}
+            <div className="mt-8 text-center relative z-10">
+                <Link to="/shop" className="inline-flex items-center text-white hover:text-luminous-gold font-medium transition-colors">
+                    Continue Shopping <ArrowRight size={18} className="ml-2" />
+                </Link>
             </div>
         </div>
     );
