@@ -114,9 +114,14 @@ export const OrderProvider = ({ children }) => {
             console.log("Update status response:", data);
 
             if (response.ok) {
-                setOrders(prev => prev.map(order =>
-                    (order._id === orderId || order.id === orderId) ? data : order
-                ));
+                setOrders(prev => prev.map(order => {
+                    const currentId = order._id || order.id;
+                    // Compare as strings to avoid type mismatches
+                    if (String(currentId) === String(orderId)) {
+                        return { ...order, ...data }; // Merge to preserve populated fields if any
+                    }
+                    return order;
+                }));
                 addToast('Order status updated', 'success');
             } else {
                 console.error("Update status failed:", data);
