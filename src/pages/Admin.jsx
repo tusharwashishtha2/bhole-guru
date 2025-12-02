@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProduct } from '../context/ProductContext';
 import { useContent } from '../context/ContentContext';
 import { useToast } from '../context/ToastContext';
-import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X, Save, Image as ImageIcon, MapPin, ArrowRight } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X, Save, Image as ImageIcon, MapPin, ArrowRight, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 const Admin = () => {
@@ -225,6 +225,34 @@ const Admin = () => {
             default: return 'text-gray-600 bg-gray-100 border-gray-200';
         }
     };
+
+    const [expandedSection, setExpandedSection] = useState(null);
+
+    const CollapsibleSection = ({ title, id, children }) => (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+            <button
+                onClick={() => setExpandedSection(expandedSection === id ? null : id)}
+                className="w-full flex items-center justify-between p-6 bg-white hover:bg-gray-50 transition-colors"
+            >
+                <h2 className="text-2xl font-bold text-gray-800 font-serif">{title}</h2>
+                {expandedSection === id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+            </button>
+            <AnimatePresence>
+                {expandedSection === id && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="p-6 border-t border-gray-100">
+                            {children}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 
     return (
         <div className="bg-gray-50 min-h-screen pb-20 pt-24">
@@ -746,8 +774,7 @@ const Admin = () => {
                     ) : (
                         <div className="space-y-12">
                             {/* Hero Section */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Hero Section</h2>
+                            <CollapsibleSection title="Hero Section" id="hero">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
                                         <div>
@@ -806,11 +833,10 @@ const Admin = () => {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Divine Favorites */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Divine Favorites Section</h2>
+                            <CollapsibleSection title="Divine Favorites Section" id="divineFavorites">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
@@ -849,12 +875,10 @@ const Admin = () => {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Divine Essentials */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Divine Essentials</h2>
-
+                            <CollapsibleSection title="Divine Essentials" id="divineEssentials">
                                 {/* Section Settings */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
                                     <div>
@@ -938,11 +962,11 @@ const Admin = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Sacred Offerings */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Sacred Offerings (Carousel)</h2>
+                            {/* Sacred Offerings */}
+                            <CollapsibleSection title="Sacred Offerings (Carousel)" id="sacredOfferings">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {sacredOfferings.map((item) => (
                                         <div key={item.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
@@ -983,12 +1007,12 @@ const Admin = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Shubh Aarambh Section */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <CollapsibleSection title="Shubh Aarambh (New Beginnings)" id="shubhAarambh">
                                 <div className="flex justify-between items-center mb-6 border-b pb-2">
-                                    <h2 className="text-2xl font-bold text-gray-800 font-serif">Shubh Aarambh (New Beginnings)</h2>
+                                    <h3 className="text-lg font-bold text-gray-700">Items</h3>
                                     <Button onClick={() => {
                                         const newItem = { title: 'New Item', img: '', link: '' };
                                         updateShubhAarambh([...(shubhAarambh || []), newItem]);
@@ -1058,11 +1082,10 @@ const Admin = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Aromatic Bliss Section */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Aromatic Bliss (Incense)</h2>
+                            <CollapsibleSection title="Aromatic Bliss (Incense)" id="aromaticBliss">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
@@ -1128,11 +1151,10 @@ const Admin = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Temple Corridor Section */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">The Temple Corridor (Dhoop)</h2>
+                            <CollapsibleSection title="The Temple Corridor (Dhoop)" id="templeCorridor">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
@@ -1222,11 +1244,10 @@ const Admin = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CollapsibleSection>
 
                             {/* Royal Treasury Section */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                <h2 className="text-2xl font-bold text-gray-800 font-serif mb-6 border-b pb-2">Royal Treasury (Lamps)</h2>
+                            <CollapsibleSection title="Royal Treasury (Lamps)" id="royalTreasury">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
@@ -1316,7 +1337,7 @@ const Admin = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CollapsibleSection>
                         </div>
                     )}
                 </div>

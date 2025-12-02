@@ -182,10 +182,10 @@ const Home = () => {
 
             {/* --- DIVINE FAVORITES (BESTSELLERS) --- */}
             <section
-                className={`py-20 relative overflow-hidden ${divineFavorites.bgColor || 'bg-gradient-to-b from-white to-luminous-bg'}`}
-                style={divineFavorites.bgImage ? { backgroundImage: `url(${divineFavorites.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                className={`py-20 relative overflow-hidden ${divineFavorites?.bgColor || 'bg-gradient-to-b from-white to-luminous-bg'}`}
+                style={divineFavorites?.bgImage ? { backgroundImage: `url(${divineFavorites.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
             >
-                {divineFavorites.bgImage && <div className="absolute inset-0 bg-white/80 z-0"></div>}
+                {divineFavorites?.bgImage && <div className="absolute inset-0 bg-white/80 z-0"></div>}
                 {/* Decorative Background Elements */}
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-luminous-gold/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -215,7 +215,7 @@ const Home = () => {
 
                         {/* Track 1 */}
                         <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0">
-                            {sacredOfferings.map((cat, idx) => (
+                            {(sacredOfferings || []).map((cat, idx) => (
                                 <Link to={`/shop?category=${cat.category}`} key={`t1-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4 pointer-events-auto">
                                     <div className="flex flex-col items-center">
                                         {/* The Divine Arch Card */}
@@ -255,7 +255,7 @@ const Home = () => {
 
                         {/* Track 2 (Duplicate) */}
                         <div className="flex gap-8 animate-marquee whitespace-nowrap px-4 group-hover:[animation-play-state:paused] min-w-full shrink-0" aria-hidden="true">
-                            {sacredOfferings.map((cat, idx) => (
+                            {(sacredOfferings || []).map((cat, idx) => (
                                 <Link to={`/shop?category=${cat.category}`} key={`t2-${idx}`} className="inline-block w-64 md:w-80 flex-shrink-0 group/card mx-4 pointer-events-auto">
                                     <div className="flex flex-col items-center">
                                         {/* The Divine Arch Card */}
@@ -589,8 +589,8 @@ const Home = () => {
 
             {/* --- DIVINE ESSENTIALS --- */}
             <section
-                className={`py-20 relative overflow-hidden ${divineEssentials.bgColor || 'bg-stone-900'} text-white`}
-                style={divineEssentials.bgImage ? { backgroundImage: `url(${divineEssentials.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                className={`py-20 relative overflow-hidden ${divineEssentials?.bgColor || 'bg-stone-900'} text-white`}
+                style={divineEssentials?.bgImage ? { backgroundImage: `url(${divineEssentials.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
             >
                 {divineEssentials.bgImage && <div className="absolute inset-0 bg-black/60 z-0"></div>}
                 <div className="container mx-auto px-6 relative z-10">
