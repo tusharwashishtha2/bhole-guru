@@ -452,12 +452,16 @@ const Home = () => {
                     {/* Row 1: Floral Scents (Left to Right) */}
                     <div className="flex gap-6 animate-marquee whitespace-nowrap px-4 min-w-full shrink-0">
                         {[...aromaticBlissRow1, ...aromaticBlissRow1, ...aromaticBlissRow1].map((scent, idx) => (
-                            <Link to="/shop?category=Incense" key={`s1-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
+                            <Link to={scent.link || "/shop?category=Incense"} key={`s1-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
                                 <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
-                                    <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
+                                    {scent.img ? (
+                                        <img src={scent.img} alt={scent.title} className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover/scent:opacity-100 transition-opacity" />
+                                    ) : (
+                                        <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
+                                    )}
                                     <div className="relative z-10 flex items-center gap-3">
-                                        {scent.icon ? <scent.icon className="text-luminous-maroon" size={24} /> : <Flower className="text-luminous-maroon" size={24} />}
-                                        <span className="text-xl font-display font-bold text-luminous-maroon">{scent.title}</span>
+                                        {!scent.img && (scent.icon ? <scent.icon className="text-luminous-maroon" size={24} /> : <Flower className="text-luminous-maroon" size={24} />)}
+                                        <span className={`text-xl font-display font-bold ${scent.img ? 'text-white drop-shadow-md' : 'text-luminous-maroon'}`}>{scent.title}</span>
                                     </div>
                                     {/* Smoke Effect on Hover */}
                                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-gray-200 blur-2xl opacity-0 group-hover/scent:opacity-40 transition-opacity duration-700 animate-pulse"></div>
@@ -469,12 +473,16 @@ const Home = () => {
                     {/* Row 2: Woody & Earthy Scents (Right to Left) */}
                     <div className="flex gap-6 animate-marquee-reverse whitespace-nowrap px-4 min-w-full shrink-0">
                         {[...aromaticBlissRow2, ...aromaticBlissRow2, ...aromaticBlissRow2].map((scent, idx) => (
-                            <Link to="/shop?category=Incense" key={`s2-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
+                            <Link to={scent.link || "/shop?category=Incense"} key={`s2-${idx}`} className="inline-block w-64 flex-shrink-0 group/scent">
                                 <div className="relative h-32 rounded-full flex items-center justify-center border-2 border-luminous-gold/20 bg-white shadow-sm group-hover/scent:scale-105 transition-transform duration-300 overflow-hidden">
-                                    <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
+                                    {scent.img ? (
+                                        <img src={scent.img} alt={scent.title} className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover/scent:opacity-100 transition-opacity" />
+                                    ) : (
+                                        <div className="absolute inset-0 opacity-20" style={{ backgroundColor: scent.color || '#fff' }}></div>
+                                    )}
                                     <div className="relative z-10 flex items-center gap-3">
-                                        {scent.icon ? <scent.icon className="text-luminous-maroon" size={24} /> : <Flower className="text-luminous-maroon" size={24} />}
-                                        <span className="text-xl font-display font-bold text-luminous-maroon">{scent.title}</span>
+                                        {!scent.img && (scent.icon ? <scent.icon className="text-luminous-maroon" size={24} /> : <Flower className="text-luminous-maroon" size={24} />)}
+                                        <span className={`text-xl font-display font-bold ${scent.img ? 'text-white drop-shadow-md' : 'text-luminous-maroon'}`}>{scent.title}</span>
                                     </div>
                                 </div>
                             </Link>
@@ -508,7 +516,7 @@ const Home = () => {
                     {/* Track 1 */}
                     <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] will-change-transform">
                         {templeCorridorItems.map((item, idx) => (
-                            <Link to="/shop?category=Incense" key={`c1-${idx}`} className="flex items-end mx-4">
+                            <Link to={item.link || "/shop?category=Incense"} key={`c1-${idx}`} className="flex items-end mx-4">
                                 {/* The Pillar */}
                                 <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
                                     <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">
@@ -545,7 +553,7 @@ const Home = () => {
                     {/* Track 2 (Duplicate for Seamless Loop) */}
                     <div className="flex items-end animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] will-change-transform" aria-hidden="true">
                         {templeCorridorItems.map((item, idx) => (
-                            <Link to="/shop?category=Incense" key={`c2-${idx}`} className="flex items-end mx-4">
+                            <Link to={item.link || "/shop?category=Incense"} key={`c2-${idx}`} className="flex items-end mx-4">
                                 {/* The Pillar */}
                                 <div className="w-16 md:w-24 h-96 bg-gradient-to-b from-[#4A0404] via-[#2D1810] to-black border-x-2 border-luminous-gold/30 relative flex flex-col items-center justify-start pt-4 shadow-2xl">
                                     <div className="w-12 h-12 border-2 border-luminous-gold/50 rounded-full flex items-center justify-center mb-4">

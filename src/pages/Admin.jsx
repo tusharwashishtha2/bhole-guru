@@ -20,20 +20,11 @@ const CollapsibleSection = ({ title, children }) => {
                 <h2 className="text-2xl font-bold text-gray-800 font-serif">{title}</h2>
                 {isOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
             </button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <div className="p-6 border-t border-gray-100">
-                            {children}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {isOpen && (
+                <div className="p-6 border-t border-gray-100">
+                    {children}
+                </div>
+            )}
         </div>
     );
 };
@@ -1144,6 +1135,34 @@ const Admin = () => {
                                                         >
                                                             <X size={12} />
                                                         </button>
+
+                                                        {/* Image Upload for Aromatic Bliss */}
+                                                        <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                            <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                    Change
+                                                                    <input
+                                                                        type="file"
+                                                                        className="hidden"
+                                                                        accept="image/*"
+                                                                        onChange={(e) => {
+                                                                            const file = e.target.files[0];
+                                                                            if (file) {
+                                                                                const reader = new FileReader();
+                                                                                reader.onloadend = () => {
+                                                                                    const newItems = [...aromaticBliss.items];
+                                                                                    newItems[index] = { ...item, img: reader.result };
+                                                                                    updateAromaticBliss({ items: newItems });
+                                                                                };
+                                                                                reader.readAsDataURL(file);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
                                                         <input
                                                             value={item.title}
                                                             onChange={(e) => {
@@ -1154,7 +1173,16 @@ const Admin = () => {
                                                             className="w-full p-1 border rounded text-sm font-bold"
                                                             placeholder="Scent Name"
                                                         />
-                                                        {/* Color Picker or Icon could be added here, keeping it simple for now */}
+                                                        <input
+                                                            value={item.link || ''}
+                                                            onChange={(e) => {
+                                                                const newItems = [...aromaticBliss.items];
+                                                                newItems[index] = { ...item, link: e.target.value };
+                                                                updateAromaticBliss({ items: newItems });
+                                                            }}
+                                                            className="w-full p-1 border rounded text-xs text-blue-500"
+                                                            placeholder="Link (e.g. /shop)"
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>
@@ -1247,6 +1275,16 @@ const Admin = () => {
                                                             }}
                                                             className="w-full p-1 border rounded text-sm font-bold"
                                                             placeholder="Title"
+                                                        />
+                                                        <input
+                                                            value={item.link || ''}
+                                                            onChange={(e) => {
+                                                                const newItems = [...templeCorridor.items];
+                                                                newItems[index] = { ...item, link: e.target.value };
+                                                                updateTempleCorridor({ items: newItems });
+                                                            }}
+                                                            className="w-full p-1 border rounded text-xs text-blue-500"
+                                                            placeholder="Link (e.g. /shop)"
                                                         />
                                                     </div>
                                                 ))}
