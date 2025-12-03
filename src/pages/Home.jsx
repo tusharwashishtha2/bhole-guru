@@ -41,13 +41,26 @@ const Home = () => {
         { title: 'Oudh', color: '#5D4037', icon: Sun },
     ];
 
+    const allDefaults = [...aromaticBlissDefaultsRow1, ...aromaticBlissDefaultsRow2];
+
     let aromaticBlissRow1 = aromaticBlissDefaultsRow1;
     let aromaticBlissRow2 = aromaticBlissDefaultsRow2;
 
     if (aromaticBliss?.items && aromaticBliss.items.length > 0) {
-        const mid = Math.ceil(aromaticBliss.items.length / 2);
-        aromaticBlissRow1 = aromaticBliss.items.slice(0, mid);
-        aromaticBlissRow2 = aromaticBliss.items.slice(mid);
+        // Merge CMS items with default styles (color/icon) based on index to preserve design
+        const mergedItems = aromaticBliss.items.map((item, index) => {
+            const defaultStyle = allDefaults[index % allDefaults.length];
+            return {
+                ...item,
+                color: item.color || defaultStyle.color,
+                icon: item.icon || defaultStyle.icon
+            };
+        });
+
+        const mid = Math.ceil(mergedItems.length / 2);
+        aromaticBlissRow1 = mergedItems.slice(0, mid);
+        aromaticBlissRow2 = mergedItems.slice(mid);
+
         // If row 2 is empty (e.g. only 1 item), duplicate row 1 to keep animation balanced
         if (aromaticBlissRow2.length === 0) aromaticBlissRow2 = aromaticBlissRow1;
     }

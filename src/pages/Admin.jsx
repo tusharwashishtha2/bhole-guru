@@ -7,6 +7,37 @@ import { useToast } from '../context/ToastContext';
 import { Package, Truck, CheckCircle, Clock, Trash2, ShoppingBag, Plus, Edit2, X, Save, Image as ImageIcon, MapPin, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
+
+const DebouncedInput = ({ value, onChange, onBlur, className, placeholder, ...props }) => {
+    const [localValue, setLocalValue] = React.useState(value);
+
+    React.useEffect(() => {
+        setLocalValue(value);
+    }, [value]);
+
+    const handleChange = (e) => {
+        setLocalValue(e.target.value);
+        if (onChange) onChange(e);
+    };
+
+    const handleBlur = (e) => {
+        if (onBlur && localValue !== value) {
+            onBlur(localValue);
+        }
+    };
+
+    return (
+        <input
+            {...props}
+            value={localValue}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={className}
+            placeholder={placeholder}
+        />
+    );
+};
+
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder, fetchAllOrders } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
@@ -1114,11 +1145,11 @@ const Admin = () => {
                                             >
                                                 <X size={12} />
                                             </button>
-                                            <input
+                                            <DebouncedInput
                                                 value={item.title}
-                                                onChange={(e) => {
+                                                onBlur={(val) => {
                                                     const newItems = [...aromaticBliss.items];
-                                                    newItems[index] = { ...item, title: e.target.value };
+                                                    newItems[index] = { ...item, title: val };
                                                     updateAromaticBliss({ items: newItems });
                                                 }}
                                                 className="w-full p-1 border rounded text-sm font-bold"
@@ -1209,11 +1240,11 @@ const Admin = () => {
                                                     </label>
                                                 </div>
                                             </div>
-                                            <input
+                                            <DebouncedInput
                                                 value={item.title}
-                                                onChange={(e) => {
+                                                onBlur={(val) => {
                                                     const newItems = [...templeCorridor.items];
-                                                    newItems[index] = { ...item, title: e.target.value };
+                                                    newItems[index] = { ...item, title: val };
                                                     updateTempleCorridor({ items: newItems });
                                                 }}
                                                 className="w-full p-1 border rounded text-sm font-bold"
