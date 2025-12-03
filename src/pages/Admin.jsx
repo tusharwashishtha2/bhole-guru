@@ -29,6 +29,71 @@ const CollapsibleSection = ({ title, children }) => {
     );
 };
 
+const SectionContainer = ({ title, data, onSave, children }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [localData, setLocalData] = useState(data);
+    const [hasChanges, setHasChanges] = useState(false);
+
+    // Update local state when prop data changes, but only if we haven't modified it locally
+    // or if the changes were saved
+    React.useEffect(() => {
+        if (!hasChanges) {
+            setLocalData(data);
+        }
+    }, [data, hasChanges]);
+
+    const handleChange = (newData) => {
+        setLocalData(newData);
+        setHasChanges(true);
+    };
+
+    const handleSave = () => {
+        onSave(localData);
+        setHasChanges(false);
+    };
+
+    const handleCancel = () => {
+        setLocalData(data);
+        setHasChanges(false);
+    };
+
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between p-6 bg-white hover:bg-gray-50 transition-colors"
+            >
+                <h2 className="text-2xl font-bold text-gray-800 font-serif">{title}</h2>
+                <div className="flex items-center gap-4">
+                    {hasChanges && (
+                        <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                            Unsaved Changes
+                        </span>
+                    )}
+                    {isOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                </div>
+            </button>
+            {isOpen && (
+                <div className="p-6 border-t border-gray-100">
+                    {children({ data: localData || {}, handleChange })}
+
+                    {hasChanges && (
+                        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+                            <Button variant="outline" onClick={handleCancel}>
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSave}>
+                                <Save size={16} className="mr-2" />
+                                Save Changes
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const Admin = () => {
     const { orders, updateOrderStatus, deleteOrder, fetchAllOrders } = useOrder();
     const { products, addProduct, updateProduct, deleteProduct } = useProduct();
@@ -38,6 +103,7 @@ const Admin = () => {
     const {
         sacredOfferings,
         updateSacredOffering,
+        updateSacredOfferingsList,
         heroSection,
         updateHeroSection,
         divineFavorites,
@@ -55,7 +121,8 @@ const Admin = () => {
         templeCorridor,
         updateTempleCorridor,
         royalTreasury,
-        updateRoyalTreasury
+        updateRoyalTreasury,
+        loading
     } = useContent();
 
     const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'products', 'content', 'categories', 'users'
@@ -538,6 +605,7 @@ const Admin = () => {
                                             ))
                                         )}
                                     </div>
+
                                 ) : activeTab === 'products' ? (
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-center mb-6">
@@ -772,617 +840,676 @@ const Admin = () => {
                                 ) : (
                                     <div className="space-y-12">
                                         {/* Hero Section */}
-                                        <CollapsibleSection title="Hero Section" id="hero">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div className="space-y-4">
-                                                    <div>
-                                                        <label className="block text-sm font-bold text-gray-700 mb-1">Main Title</label>
-                                                        <input
-                                                            value={heroSection.title}
-                                                            onChange={(e) => updateHeroSection({ title: e.target.value })}
-                                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-sm font-bold text-gray-700 mb-1">Subtitle</label>
-                                                        <textarea
-                                                            value={heroSection.subtitle}
-                                                            onChange={(e) => updateHeroSection({ subtitle: e.target.value })}
-                                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none h-24"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-sm font-bold text-gray-700 mb-1">Button Text</label>
-                                                        <input
-                                                            value={heroSection.ctaText}
-                                                            onChange={(e) => updateHeroSection({ ctaText: e.target.value })}
-                                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-4">
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Image</label>
-                                                    <div className="relative h-64 bg-gray-100 rounded-lg overflow-hidden group">
-                                                        <img src={heroSection.bgImage} alt="Hero" className="w-full h-full object-cover" />
-                                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <label className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-full font-bold hover:bg-gray-100">
-                                                                Change Image
-                                                                <input
-                                                                    type="file"
-                                                                    className="hidden"
-                                                                    accept="image/*"
-                                                                    onChange={(e) => {
-                                                                        const file = e.target.files[0];
-                                                                        if (file) {
-                                                                            const reader = new FileReader();
-                                                                            reader.onloadend = () => updateHeroSection({ bgImage: reader.result });
-                                                                            reader.readAsDataURL(file);
-                                                                        }
-                                                                    }}
-                                                                />
-                                                            </label>
+                                        <SectionContainer title="Hero Section" data={heroSection} onSave={updateHeroSection}>
+                                            {({ data, handleChange }) => (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Main Title</label>
+                                                            <input
+                                                                value={data.title || ''}
+                                                                onChange={(e) => handleChange({ ...data, title: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Subtitle</label>
+                                                            <textarea
+                                                                value={data.subtitle || ''}
+                                                                onChange={(e) => handleChange({ ...data, subtitle: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none h-24"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Button Text</label>
+                                                            <input
+                                                                value={data.ctaText || ''}
+                                                                onChange={(e) => handleChange({ ...data, ctaText: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
                                                         </div>
                                                     </div>
-                                                    <input
-                                                        value={heroSection.bgImage}
-                                                        onChange={(e) => updateHeroSection({ bgImage: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="Or paste image URL"
-                                                    />
+                                                    <div className="space-y-4">
+                                                        <label className="block text-sm font-bold text-gray-700 mb-1">Background Image</label>
+                                                        <div className="relative h-64 bg-gray-100 rounded-lg overflow-hidden group">
+                                                            <img src={data.bgImage} alt="Hero" className="w-full h-full object-cover" />
+                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <label className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-full font-bold hover:bg-gray-100">
+                                                                    Change Image
+                                                                    <input
+                                                                        type="file"
+                                                                        className="hidden"
+                                                                        accept="image/*"
+                                                                        onChange={(e) => {
+                                                                            const file = e.target.files[0];
+                                                                            if (file) {
+                                                                                const reader = new FileReader();
+                                                                                reader.onloadend = () => handleChange({ ...data, bgImage: reader.result });
+                                                                                reader.readAsDataURL(file);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <input
+                                                            value={data.bgImage || ''}
+                                                            onChange={(e) => handleChange({ ...data, bgImage: e.target.value })}
+                                                            className="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            placeholder="Or paste image URL"
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </CollapsibleSection>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Divine Favorites */}
-                                        <CollapsibleSection title="Divine Favorites Section" id="divineFavorites">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
-                                                    <input
-                                                        value={divineFavorites.title}
-                                                        onChange={(e) => updateDivineFavorites({ title: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
-                                                    <input
-                                                        value={divineFavorites.subtitle}
-                                                        onChange={(e) => updateDivineFavorites({ subtitle: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
-                                                    <input
-                                                        value={divineFavorites.bgImage || ''}
-                                                        onChange={(e) => updateDivineFavorites({ bgImage: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="https://example.com/image.jpg"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Color Class</label>
-                                                    <input
-                                                        value={divineFavorites.bgColor || ''}
-                                                        onChange={(e) => updateDivineFavorites({ bgColor: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="e.g. bg-stone-900"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </CollapsibleSection>
+                                        <SectionContainer title="Divine Favorites Section" data={divineFavorites} onSave={updateDivineFavorites}>
+                                            {({ data, handleChange }) => (
+                                                <>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                                            <input
+                                                                value={data.title || ''}
+                                                                onChange={(e) => handleChange({ ...data, title: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                                            <input
+                                                                value={data.subtitle || ''}
+                                                                onChange={(e) => handleChange({ ...data, subtitle: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                                            <input
+                                                                value={data.bgImage || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgImage: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="https://example.com/image.jpg"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Color Class</label>
+                                                            <input
+                                                                value={data.bgColor || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgColor: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="e.g. bg-stone-900"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Divine Essentials */}
-                                        <CollapsibleSection title="Divine Essentials" id="divineEssentials">
-                                            {/* Section Settings */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
-                                                    <input
-                                                        value={divineEssentials.title || ''}
-                                                        onChange={(e) => updateDivineEssentialsSection({ title: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
-                                                    <input
-                                                        value={divineEssentials.subtitle || ''}
-                                                        onChange={(e) => updateDivineEssentialsSection({ subtitle: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
-                                                    <input
-                                                        value={divineEssentials.bgImage || ''}
-                                                        onChange={(e) => updateDivineEssentialsSection({ bgImage: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="https://example.com/image.jpg"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Color Class</label>
-                                                    <input
-                                                        value={divineEssentials.bgColor || ''}
-                                                        onChange={(e) => updateDivineEssentialsSection({ bgColor: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="e.g. bg-stone-900"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                {divineEssentials.items && divineEssentials.items.map((item) => (
-                                                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
-                                                        <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group">
-                                                            <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
-                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
-                                                                    Change
-                                                                    <input
-                                                                        type="file"
-                                                                        className="hidden"
-                                                                        accept="image/*"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files[0];
-                                                                            if (file) {
-                                                                                const reader = new FileReader();
-                                                                                reader.onloadend = () => updateDivineEssential(item.id, { img: reader.result });
-                                                                                reader.readAsDataURL(file);
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </label>
-                                                            </div>
+                                        <SectionContainer title="Divine Essentials" data={divineEssentials} onSave={updateDivineEssentialsSection}>
+                                            {({ data, handleChange }) => (
+                                                <>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                                            <input
+                                                                value={data.title || ''}
+                                                                onChange={(e) => handleChange({ ...data, title: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
                                                         </div>
-                                                        <input
-                                                            value={item.title}
-                                                            onChange={(e) => updateDivineEssential(item.id, { title: e.target.value })}
-                                                            className="w-full p-1 border rounded text-sm font-bold"
-                                                            placeholder="Title"
-                                                        />
-                                                        <input
-                                                            value={item.desc}
-                                                            onChange={(e) => updateDivineEssential(item.id, { desc: e.target.value })}
-                                                            className="w-full p-1 border rounded text-sm text-gray-500"
-                                                            placeholder="Description"
-                                                        />
-                                                        <input
-                                                            value={item.link}
-                                                            onChange={(e) => updateDivineEssential(item.id, { link: e.target.value })}
-                                                            className="w-full p-1 border rounded text-xs text-blue-500"
-                                                            placeholder="Link"
-                                                        />
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                                            <input
+                                                                value={data.subtitle || ''}
+                                                                onChange={(e) => handleChange({ ...data, subtitle: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                                            <input
+                                                                value={data.bgImage || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgImage: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="https://example.com/image.jpg"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Color Class</label>
+                                                            <input
+                                                                value={data.bgColor || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgColor: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="e.g. bg-stone-900"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </CollapsibleSection>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                        {data.items && data.items.map((item, index) => (
+                                                            <div key={item.id || index} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                                                                <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group">
+                                                                    <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                            Change
+                                                                            <input
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                accept="image/*"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files[0];
+                                                                                    if (file) {
+                                                                                        const reader = new FileReader();
+                                                                                        reader.onloadend = () => {
+                                                                                            const newItems = [...data.items];
+                                                                                            newItems[index] = { ...item, img: reader.result };
+                                                                                            handleChange({ ...data, items: newItems });
+                                                                                        };
+                                                                                        reader.readAsDataURL(file);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <input
+                                                                    value={item.title || ''}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, title: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-sm font-bold"
+                                                                    placeholder="Title"
+                                                                />
+                                                                <input
+                                                                    value={item.desc || ''}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, desc: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-sm text-gray-500"
+                                                                    placeholder="Description"
+                                                                />
+                                                                <input
+                                                                    value={item.link || ''}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, link: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-xs text-blue-500"
+                                                                    placeholder="Link"
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Sacred Offerings */}
-                                        {/* Sacred Offerings */}
-                                        <CollapsibleSection title="Sacred Offerings (Carousel)" id="sacredOfferings">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                                {sacredOfferings.map((item) => (
-                                                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
-                                                        <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group">
-                                                            <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
-                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
-                                                                    Change
-                                                                    <input
-                                                                        type="file"
-                                                                        className="hidden"
-                                                                        accept="image/*"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files[0];
-                                                                            if (file) {
-                                                                                const reader = new FileReader();
-                                                                                reader.onloadend = () => updateSacredOffering(item.id, { img: reader.result });
-                                                                                reader.readAsDataURL(file);
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </label>
+                                        <SectionContainer title="Sacred Offerings (Carousel)" data={sacredOfferings} onSave={updateSacredOfferingsList}>
+                                            {({ data, handleChange }) => (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                                    {data && data.map((item, index) => (
+                                                        <div key={item.id || index} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                                                            <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group">
+                                                                <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                        Change
+                                                                        <input
+                                                                            type="file"
+                                                                            className="hidden"
+                                                                            accept="image/*"
+                                                                            onChange={(e) => {
+                                                                                const file = e.target.files[0];
+                                                                                if (file) {
+                                                                                    const reader = new FileReader();
+                                                                                    reader.onloadend = () => {
+                                                                                        const newData = [...data];
+                                                                                        newData[index] = { ...item, img: reader.result };
+                                                                                        handleChange(newData);
+                                                                                    };
+                                                                                    reader.readAsDataURL(file);
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                    </label>
+                                                                </div>
                                                             </div>
+                                                            <input
+                                                                value={item.title || ''}
+                                                                onChange={(e) => {
+                                                                    const newData = [...data];
+                                                                    newData[index] = { ...item, title: e.target.value };
+                                                                    handleChange(newData);
+                                                                }}
+                                                                className="w-full p-1 border rounded text-sm font-bold"
+                                                                placeholder="Title"
+                                                            />
+                                                            <select
+                                                                value={item.category || ''}
+                                                                onChange={(e) => {
+                                                                    const newData = [...data];
+                                                                    newData[index] = { ...item, category: e.target.value };
+                                                                    handleChange(newData);
+                                                                }}
+                                                                className="w-full p-1 border rounded text-xs"
+                                                            >
+                                                                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                                            </select>
                                                         </div>
-                                                        <input
-                                                            value={item.title}
-                                                            onChange={(e) => updateSacredOffering(item.id, { title: e.target.value })}
-                                                            className="w-full p-1 border rounded text-sm font-bold"
-                                                            placeholder="Title"
-                                                        />
-                                                        <select
-                                                            value={item.category}
-                                                            onChange={(e) => updateSacredOffering(item.id, { category: e.target.value })}
-                                                            className="w-full p-1 border rounded text-xs"
-                                                        >
-                                                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                                        </select>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </CollapsibleSection>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Shubh Aarambh Section */}
-                                        <CollapsibleSection title="Shubh Aarambh (New Beginnings)" id="shubhAarambh">
-                                            <div className="flex justify-between items-center mb-6 border-b pb-2">
-                                                <h3 className="text-lg font-bold text-gray-700">Items</h3>
-                                                <Button onClick={() => {
-                                                    const newItem = { title: 'New Item', img: '', link: '' };
-                                                    updateShubhAarambh([...(shubhAarambh || []), newItem]);
-                                                }}>
-                                                    <Plus size={16} className="mr-2" /> Add Item
-                                                </Button>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                                {shubhAarambh && shubhAarambh.map((item, index) => (
-                                                    <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-3 relative group">
-                                                        <button
-                                                            onClick={() => {
-                                                                if (window.confirm('Delete this item?')) {
-                                                                    const newList = shubhAarambh.filter((_, i) => i !== index);
-                                                                    updateShubhAarambh(newList);
-                                                                }
-                                                            }}
-                                                            className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-600 shadow-sm"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
-                                                        <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group/img">
-                                                            <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
-                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
-                                                                <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
-                                                                    Change
-                                                                    <input
-                                                                        type="file"
-                                                                        className="hidden"
-                                                                        accept="image/*"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files[0];
-                                                                            if (file) {
-                                                                                const reader = new FileReader();
-                                                                                reader.onloadend = () => {
-                                                                                    const newList = [...shubhAarambh];
-                                                                                    newList[index] = { ...item, img: reader.result };
-                                                                                    updateShubhAarambh(newList);
-                                                                                };
-                                                                                reader.readAsDataURL(file);
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <input
-                                                            value={item.title}
-                                                            onChange={(e) => {
-                                                                const newList = [...shubhAarambh];
-                                                                newList[index] = { ...item, title: e.target.value };
-                                                                updateShubhAarambh(newList);
-                                                            }}
-                                                            className="w-full p-2 border rounded text-sm font-bold focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                            placeholder="Title"
-                                                        />
-                                                        <input
-                                                            value={item.link}
-                                                            onChange={(e) => {
-                                                                const newList = [...shubhAarambh];
-                                                                newList[index] = { ...item, link: e.target.value };
-                                                                updateShubhAarambh(newList);
-                                                            }}
-                                                            className="w-full p-2 border rounded text-xs text-blue-500 focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                            placeholder="Link (e.g. /shop)"
-                                                        />
+                                        <SectionContainer title="Shubh Aarambh (New Beginnings)" data={shubhAarambh} onSave={updateShubhAarambh}>
+                                            {({ data, handleChange }) => (
+                                                <>
+                                                    <div className="flex justify-between items-center mb-6 border-b pb-2">
+                                                        <h3 className="text-lg font-bold text-gray-700">Items</h3>
+                                                        <Button onClick={() => {
+                                                            const newItem = { title: 'New Item', img: '', link: '' };
+                                                            handleChange([...(data || []), newItem]);
+                                                        }}>
+                                                            <Plus size={16} className="mr-2" /> Add Item
+                                                        </Button>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </CollapsibleSection>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                                        {data && data.map((item, index) => (
+                                                            <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-3 relative group">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (window.confirm('Delete this item?')) {
+                                                                            const newData = data.filter((_, i) => i !== index);
+                                                                            handleChange(newData);
+                                                                        }
+                                                                    }}
+                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-600 shadow-sm"
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                                <div className="relative h-32 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                                    <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                                        <label className="cursor-pointer bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                            Change
+                                                                            <input
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                accept="image/*"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files[0];
+                                                                                    if (file) {
+                                                                                        const reader = new FileReader();
+                                                                                        reader.onloadend = () => {
+                                                                                            const newData = [...data];
+                                                                                            newData[index] = { ...item, img: reader.result };
+                                                                                            handleChange(newData);
+                                                                                        };
+                                                                                        reader.readAsDataURL(file);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <input
+                                                                    value={item.title || ''}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data];
+                                                                        newData[index] = { ...item, title: e.target.value };
+                                                                        handleChange(newData);
+                                                                    }}
+                                                                    className="w-full p-2 border rounded text-sm font-bold focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                    placeholder="Title"
+                                                                />
+                                                                <input
+                                                                    value={item.link || ''}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data];
+                                                                        newData[index] = { ...item, link: e.target.value };
+                                                                        handleChange(newData);
+                                                                    }}
+                                                                    className="w-full p-2 border rounded text-xs text-blue-500 focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                    placeholder="Link (e.g. /shop)"
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Aromatic Bliss Section */}
-                                        <CollapsibleSection title="Aromatic Bliss (Incense)" id="aromaticBliss">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
-                                                    <input
-                                                        value={aromaticBliss?.title || ''}
-                                                        onChange={(e) => updateAromaticBliss({ title: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
-                                                    <input
-                                                        value={aromaticBliss?.subtitle || ''}
-                                                        onChange={(e) => updateAromaticBliss({ subtitle: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
-                                                    <input
-                                                        value={aromaticBliss?.bgImage || ''}
-                                                        onChange={(e) => updateAromaticBliss({ bgImage: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="https://example.com/image.jpg"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h3 className="font-bold text-gray-700">Items</h3>
-                                                <Button onClick={() => {
-                                                    const newItem = { title: 'New Scent', img: '', link: '' };
-                                                    updateAromaticBliss({ items: [...(aromaticBliss?.items || []), newItem] });
-                                                }} size="sm">
-                                                    <Plus size={16} className="mr-2" /> Add Scent
-                                                </Button>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                                {aromaticBliss?.items && aromaticBliss.items.map((item, index) => (
-                                                    <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
-                                                        <button
-                                                            onClick={() => {
-                                                                if (window.confirm('Delete this item?')) {
-                                                                    const newItems = aromaticBliss.items.filter((_, i) => i !== index);
-                                                                    updateAromaticBliss({ items: newItems });
-                                                                }
-                                                            }}
-                                                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                                        >
-                                                            <X size={12} />
-                                                        </button>
-
-                                                        {/* Image Upload for Aromatic Bliss */}
-                                                        <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
-                                                            <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
-                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
-                                                                    Change
-                                                                    <input
-                                                                        type="file"
-                                                                        className="hidden"
-                                                                        accept="image/*"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files[0];
-                                                                            if (file) {
-                                                                                const reader = new FileReader();
-                                                                                reader.onloadend = () => {
-                                                                                    const newItems = [...aromaticBliss.items];
-                                                                                    newItems[index] = { ...item, img: reader.result };
-                                                                                    updateAromaticBliss({ items: newItems });
-                                                                                };
-                                                                                reader.readAsDataURL(file);
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </label>
-                                                            </div>
+                                        <SectionContainer title="Aromatic Bliss (Incense)" data={aromaticBliss} onSave={updateAromaticBliss}>
+                                            {({ data, handleChange }) => (
+                                                <>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                                            <input
+                                                                value={data.title || ''}
+                                                                onChange={(e) => handleChange({ ...data, title: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
                                                         </div>
-
-                                                        <input
-                                                            value={item.title}
-                                                            onChange={(e) => {
-                                                                const newItems = [...aromaticBliss.items];
-                                                                newItems[index] = { ...item, title: e.target.value };
-                                                                updateAromaticBliss({ items: newItems });
-                                                            }}
-                                                            className="w-full p-1 border rounded text-sm font-bold"
-                                                            placeholder="Scent Name"
-                                                        />
-                                                        <input
-                                                            value={item.link || ''}
-                                                            onChange={(e) => {
-                                                                const newItems = [...aromaticBliss.items];
-                                                                newItems[index] = { ...item, link: e.target.value };
-                                                                updateAromaticBliss({ items: newItems });
-                                                            }}
-                                                            className="w-full p-1 border rounded text-xs text-blue-500"
-                                                            placeholder="Link (e.g. /shop)"
-                                                        />
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                                            <input
+                                                                value={data.subtitle || ''}
+                                                                onChange={(e) => handleChange({ ...data, subtitle: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                                            <input
+                                                                value={data.bgImage || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgImage: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="https://example.com/image.jpg"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </CollapsibleSection>
+
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <h3 className="font-bold text-gray-700">Items</h3>
+                                                        <Button onClick={() => {
+                                                            const newItem = { title: 'New Incense', img: '', link: '' };
+                                                            handleChange({ ...data, items: [...(data.items || []), newItem] });
+                                                        }} size="sm">
+                                                            <Plus size={16} className="mr-2" /> Add Incense
+                                                        </Button>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                        {data.items && data.items.map((item, index) => (
+                                                            <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (window.confirm('Delete this item?')) {
+                                                                            const newItems = data.items.filter((_, i) => i !== index);
+                                                                            handleChange({ ...data, items: newItems });
+                                                                        }
+                                                                    }}
+                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                                                >
+                                                                    <X size={12} />
+                                                                </button>
+                                                                <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                                    <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                                        <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                            Change
+                                                                            <input
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                accept="image/*"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files[0];
+                                                                                    if (file) {
+                                                                                        const reader = new FileReader();
+                                                                                        reader.onloadend = () => {
+                                                                                            const newItems = [...data.items];
+                                                                                            newItems[index] = { ...item, img: reader.result };
+                                                                                            handleChange({ ...data, items: newItems });
+                                                                                        };
+                                                                                        reader.readAsDataURL(file);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <input
+                                                                    value={item.title}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, title: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-sm font-bold"
+                                                                    placeholder="Title"
+                                                                />
+                                                                <input
+                                                                    value={item.link || ''}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, link: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-xs text-blue-500"
+                                                                    placeholder="Link (e.g. /shop)"
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Temple Corridor Section */}
-                                        <CollapsibleSection title="The Temple Corridor (Dhoop)" id="templeCorridor">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
-                                                    <input
-                                                        value={templeCorridor?.title || ''}
-                                                        onChange={(e) => updateTempleCorridor({ title: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
-                                                    <input
-                                                        value={templeCorridor?.subtitle || ''}
-                                                        onChange={(e) => updateTempleCorridor({ subtitle: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
-                                                    <input
-                                                        value={templeCorridor?.bgImage || ''}
-                                                        onChange={(e) => updateTempleCorridor({ bgImage: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="https://example.com/image.jpg"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h3 className="font-bold text-gray-700">Items</h3>
-                                                <Button onClick={() => {
-                                                    const newItem = { title: 'New Dhoop', img: '', link: '' };
-                                                    updateTempleCorridor({ items: [...(templeCorridor?.items || []), newItem] });
-                                                }} size="sm">
-                                                    <Plus size={16} className="mr-2" /> Add Dhoop
-                                                </Button>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                                {templeCorridor?.items && templeCorridor.items.map((item, index) => (
-                                                    <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
-                                                        <button
-                                                            onClick={() => {
-                                                                if (window.confirm('Delete this item?')) {
-                                                                    const newItems = templeCorridor.items.filter((_, i) => i !== index);
-                                                                    updateTempleCorridor({ items: newItems });
-                                                                }
-                                                            }}
-                                                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                                        >
-                                                            <X size={12} />
-                                                        </button>
-                                                        <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
-                                                            <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
-                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
-                                                                <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
-                                                                    Change
-                                                                    <input
-                                                                        type="file"
-                                                                        className="hidden"
-                                                                        accept="image/*"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files[0];
-                                                                            if (file) {
-                                                                                const reader = new FileReader();
-                                                                                reader.onloadend = () => {
-                                                                                    const newItems = [...templeCorridor.items];
-                                                                                    newItems[index] = { ...item, img: reader.result };
-                                                                                    updateTempleCorridor({ items: newItems });
-                                                                                };
-                                                                                reader.readAsDataURL(file);
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </label>
-                                                            </div>
+                                        <SectionContainer
+                                            title="The Temple Corridor (Dhoop)"
+                                            data={templeCorridor}
+                                            onSave={updateTempleCorridor}
+                                        >
+                                            {({ data, handleChange }) => (
+                                                <>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                                            <input
+                                                                value={data.title || ''}
+                                                                onChange={(e) => handleChange({ ...data, title: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
                                                         </div>
-                                                        <input
-                                                            value={item.title}
-                                                            onChange={(e) => {
-                                                                const newItems = [...templeCorridor.items];
-                                                                newItems[index] = { ...item, title: e.target.value };
-                                                                updateTempleCorridor({ items: newItems });
-                                                            }}
-                                                            className="w-full p-1 border rounded text-sm font-bold"
-                                                            placeholder="Title"
-                                                        />
-                                                        <input
-                                                            value={item.link || ''}
-                                                            onChange={(e) => {
-                                                                const newItems = [...templeCorridor.items];
-                                                                newItems[index] = { ...item, link: e.target.value };
-                                                                updateTempleCorridor({ items: newItems });
-                                                            }}
-                                                            className="w-full p-1 border rounded text-xs text-blue-500"
-                                                            placeholder="Link (e.g. /shop)"
-                                                        />
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                                            <input
+                                                                value={data.subtitle || ''}
+                                                                onChange={(e) => handleChange({ ...data, subtitle: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                                            <input
+                                                                value={data.bgImage || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgImage: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="https://example.com/image.jpg"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </CollapsibleSection>
+
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <h3 className="font-bold text-gray-700">Items</h3>
+                                                        <Button onClick={() => {
+                                                            const newItem = { title: 'New Dhoop', img: '', link: '' };
+                                                            handleChange({ ...data, items: [...(data.items || []), newItem] });
+                                                        }} size="sm">
+                                                            <Plus size={16} className="mr-2" /> Add Dhoop
+                                                        </Button>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                        {data.items && data.items.map((item, index) => (
+                                                            <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (window.confirm('Delete this item?')) {
+                                                                            const newItems = data.items.filter((_, i) => i !== index);
+                                                                            handleChange({ ...data, items: newItems });
+                                                                        }
+                                                                    }}
+                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                                                >
+                                                                    <X size={12} />
+                                                                </button>
+                                                                <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                                    <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                                        <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                            Change
+                                                                            <input
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                accept="image/*"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files[0];
+                                                                                    if (file) {
+                                                                                        const reader = new FileReader();
+                                                                                        reader.onloadend = () => {
+                                                                                            const newItems = [...data.items];
+                                                                                            newItems[index] = { ...item, img: reader.result };
+                                                                                            handleChange({ ...data, items: newItems });
+                                                                                        };
+                                                                                        reader.readAsDataURL(file);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <input
+                                                                    value={item.title}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, title: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-sm font-bold"
+                                                                    placeholder="Title"
+                                                                />
+                                                                <input
+                                                                    value={item.link || ''}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, link: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-xs text-blue-500"
+                                                                    placeholder="Link (e.g. /shop)"
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </SectionContainer>
 
                                         {/* Royal Treasury Section */}
-                                        <CollapsibleSection title="Royal Treasury (Lamps)" id="royalTreasury">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
-                                                    <input
-                                                        value={royalTreasury?.title || ''}
-                                                        onChange={(e) => updateRoyalTreasury({ title: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
-                                                    <input
-                                                        value={royalTreasury?.subtitle || ''}
-                                                        onChange={(e) => updateRoyalTreasury({ subtitle: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
-                                                    <input
-                                                        value={royalTreasury?.bgImage || ''}
-                                                        onChange={(e) => updateRoyalTreasury({ bgImage: e.target.value })}
-                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
-                                                        placeholder="https://example.com/image.jpg"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h3 className="font-bold text-gray-700">Items</h3>
-                                                <Button onClick={() => {
-                                                    const newItem = { title: 'New Lamp', img: '', link: '' };
-                                                    updateRoyalTreasury({ items: [...(royalTreasury?.items || []), newItem] });
-                                                }} size="sm">
-                                                    <Plus size={16} className="mr-2" /> Add Lamp
-                                                </Button>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                                {royalTreasury?.items && royalTreasury.items.map((item, index) => (
-                                                    <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
-                                                        <button
-                                                            onClick={() => {
-                                                                if (window.confirm('Delete this item?')) {
-                                                                    const newItems = royalTreasury.items.filter((_, i) => i !== index);
-                                                                    updateRoyalTreasury({ items: newItems });
-                                                                }
-                                                            }}
-                                                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                                        >
-                                                            <X size={12} />
-                                                        </button>
-                                                        <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
-                                                            <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
-                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
-                                                                <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
-                                                                    Change
-                                                                    <input
-                                                                        type="file"
-                                                                        className="hidden"
-                                                                        accept="image/*"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files[0];
-                                                                            if (file) {
-                                                                                const reader = new FileReader();
-                                                                                reader.onloadend = () => {
-                                                                                    const newItems = [...royalTreasury.items];
-                                                                                    newItems[index] = { ...item, img: reader.result };
-                                                                                    updateRoyalTreasury({ items: newItems });
-                                                                                };
-                                                                                reader.readAsDataURL(file);
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </label>
-                                                            </div>
+                                        <SectionContainer
+                                            title="Royal Treasury (Lamps)"
+                                            data={royalTreasury}
+                                            onSave={updateRoyalTreasury}
+                                        >
+                                            {({ data, handleChange }) => (
+                                                <>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 border-b pb-6">
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+                                                            <input
+                                                                value={data.title || ''}
+                                                                onChange={(e) => handleChange({ ...data, title: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
                                                         </div>
-                                                        <input
-                                                            value={item.title}
-                                                            onChange={(e) => {
-                                                                const newItems = [...royalTreasury.items];
-                                                                newItems[index] = { ...item, title: e.target.value };
-                                                                updateRoyalTreasury({ items: newItems });
-                                                            }}
-                                                            className="w-full p-1 border rounded text-sm font-bold"
-                                                            placeholder="Title"
-                                                        />
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+                                                            <input
+                                                                value={data.subtitle || ''}
+                                                                onChange={(e) => handleChange({ ...data, subtitle: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-bold text-gray-700 mb-1">Background Image URL</label>
+                                                            <input
+                                                                value={data.bgImage || ''}
+                                                                onChange={(e) => handleChange({ ...data, bgImage: e.target.value })}
+                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-luminous-gold outline-none"
+                                                                placeholder="https://example.com/image.jpg"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </CollapsibleSection>
+
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <h3 className="font-bold text-gray-700">Items</h3>
+                                                        <Button onClick={() => {
+                                                            const newItem = { title: 'New Lamp', img: '', link: '' };
+                                                            handleChange({ ...data, items: [...(data.items || []), newItem] });
+                                                        }} size="sm">
+                                                            <Plus size={16} className="mr-2" /> Add Lamp
+                                                        </Button>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                        {data.items && data.items.map((item, index) => (
+                                                            <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 relative group">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (window.confirm('Delete this item?')) {
+                                                                            const newItems = data.items.filter((_, i) => i !== index);
+                                                                            handleChange({ ...data, items: newItems });
+                                                                        }
+                                                                    }}
+                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                                                >
+                                                                    <X size={12} />
+                                                                </button>
+                                                                <div className="relative h-24 bg-gray-100 rounded-md overflow-hidden group/img">
+                                                                    <img src={item.img || "https://via.placeholder.com/150?text=No+Image"} alt={item.title} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                                        <label className="cursor-pointer bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold hover:bg-gray-100">
+                                                                            Change
+                                                                            <input
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                accept="image/*"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files[0];
+                                                                                    if (file) {
+                                                                                        const reader = new FileReader();
+                                                                                        reader.onloadend = () => {
+                                                                                            const newItems = [...data.items];
+                                                                                            newItems[index] = { ...item, img: reader.result };
+                                                                                            handleChange({ ...data, items: newItems });
+                                                                                        };
+                                                                                        reader.readAsDataURL(file);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <input
+                                                                    value={item.title}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...data.items];
+                                                                        newItems[index] = { ...item, title: e.target.value };
+                                                                        handleChange({ ...data, items: newItems });
+                                                                    }}
+                                                                    className="w-full p-1 border rounded text-sm font-bold"
+                                                                    placeholder="Title"
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </SectionContainer>
                                     </div>
                                 )}
                             </div>

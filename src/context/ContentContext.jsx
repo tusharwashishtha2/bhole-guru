@@ -123,6 +123,11 @@ export const ContentProvider = ({ children }) => {
         updateContent({ sacredOfferings: updatedList });
     };
 
+    const updateSacredOfferingsList = (newList) => {
+        setSacredOfferings(newList);
+        updateContent({ sacredOfferings: newList });
+    };
+
     const updateHeroSection = (updatedFields) => {
         const updatedHero = { ...heroSection, ...updatedFields };
         setHeroSection(updatedHero); // Optimistic update
